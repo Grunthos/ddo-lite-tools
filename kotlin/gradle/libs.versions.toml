@@ -1,7 +1,10 @@
 [versions]
 kotlin = "2.4.21"
 agp = "9.5.0"
+compose-multiplatform = "1.12.2"
 android-compileSdk = "36"
+# AndroidX Compose needs API 37 to compile against; only the UI modules use this.
+android-composeCompileSdk = "37"
 android-minSdk = "26"
 jvm-toolchain = "21"
 
@@ -10,4 +13,6 @@ jvm-toolchain = "21"
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }

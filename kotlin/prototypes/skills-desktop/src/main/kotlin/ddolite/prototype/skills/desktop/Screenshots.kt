@@ -1,0 +1,106 @@
+package ddolite.prototype.skills.desktop
+
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.use
+import ddolite.builder.data.LoadLog
+import ddolite.builder.data.loadBuilderData
+import ddolite.builder.model.Skill
+import ddolite.common.theme.Theme
+import ddolite.common.theme.ThemeFileKind
+import ddolite.common.theme.loadTheme
+import ddolite.dataformat.DirectoryDataSource
+import ddolite.dataformat.decodeText
+import ddolite.prototype.skills.SkillsScreen
+import ddolite.prototype.skills.SkillsScreenState
+import ddolite.prototype.skills.prototypePresets
+import org.jetbrains.skia.EncodedImageFormat
+import java.nio.file.Files
+import java.nio.file.Path
+
+/**
+ * Renders the prototype off-screen and saves PNGs, so it can be checked without opening a window.
+ * Also drives it with simulated mouse clicks, to check the interaction code paths.
+ *
+ * Usage: `./gradlew :prototypes:skills-desktop:screenshots` (writes to build/screenshots).
+ * Not part of the app; a tool for the F1 test drive.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+fun main(args: Array<String>) {
+    val repoRoot = Path.of(System.getProperty("ddolite.repoRoot", ".."))
+    var outDir = Path.of("build", "screenshots")
+    if (args.isNotEmpty()) {
+        outDir = Path.of(args[0])
+    }
+    Files.createDirectories(outDir)
+
+    val data = loadBuilderData(DirectoryDataSource(repoRoot.resolve("Data")), LoadLog())
+    val themes = ArrayList<Theme>()
+    for (name in listOf("Black", "Tan")) {
+        val file = repoRoot.resolve("Settings").resolve("$name.screen")
+        themes.add(loadTheme(decodeText(Files.readAllBytes(file)).text, name, ThemeFileKind.SCREEN).theme)
+    }
+    val state = SkillsScreenState(data, themes, prototypePresets())
+    state.selectPreset(1) // Fighter 12 / Rogue 6 / Wizard 2: shows class initials and trapper levels
+
+    ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
+        save(scene, outDir.resolve("1-start.png"))
+
+        // Click the Tumble name (fill half ranks), then three level-1 Jump points, then right-click one off.
+        val layoutLeft = 12f // the screen's padding
+        val gridTop = findGridTop(scene)
+        val nameX = layoutLeft + 20f
+        val tumbleRow = Skill.TUMBLE.ordinal + 1
+        val jumpRow = Skill.JUMP.ordinal + 1
+        click(scene, Offset(nameX, gridTop + rowCentre(tumbleRow)), PointerButton.Primary)
+        val level1X = layoutLeft + nameColumnWidth() + 10f
+        for (i in 0 until 3) {
+            click(scene, Offset(level1X, gridTop + rowCentre(jumpRow)), PointerButton.Primary)
+        }
+        click(scene, Offset(level1X, gridTop + rowCentre(jumpRow)), PointerButton.Secondary)
+        // Leave the mouse over a cell, to show the highlight.
+        scene.sendPointerEvent(PointerEventType.Move, Offset(level1X + 60f, gridTop + rowCentre(jumpRow)))
+        save(scene, outDir.resolve("2-after-clicks.png"))
+
+        println("Tumble: " + state.grid.totalRanks(state.spend, Skill.TUMBLE) + " half ranks; Jump at level 1: " + state.spend.get(Skill.JUMP, 1) + " points")
+
+        state.selectTheme(1)
+        save(scene, outDir.resolve("3-tan-theme.png"))
+    }
+    println("Screenshots written to " + outDir.toAbsolutePath())
+}
+
+// Positions for the simulated clicks, measured from the rendered screen at density 1
+// (two bars of controls above the grid, then the grid's two header rows).
+private fun findGridTop(scene: ImageComposeScene): Float = 84f // measured from 1-start.png
+
+private fun nameColumnWidth(): Float = 136f
+
+private fun rowCentre(row: Int): Float {
+    val rowHeight = 24.55f // measured from 1-start.png
+    return rowHeight * 2 + rowHeight * (row - 1) + rowHeight / 2
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun click(scene: ImageComposeScene, at: Offset, button: PointerButton) {
+    var pressed = PointerButtons(isPrimaryPressed = true)
+    if (button == PointerButton.Secondary) {
+        pressed = PointerButtons(isSecondaryPressed = true)
+    }
+    scene.sendPointerEvent(PointerEventType.Move, at)
+    scene.sendPointerEvent(PointerEventType.Press, at, buttons = pressed, button = button)
+    scene.sendPointerEvent(PointerEventType.Release, at, buttons = PointerButtons(), button = button)
+}
+
+private fun save(scene: ImageComposeScene, file: Path) {
+    val image = scene.render()
+    val png = image.encodeToData(EncodedImageFormat.PNG)
+    if (png != null) {
+        Files.write(file, png.bytes)
+    }
+}

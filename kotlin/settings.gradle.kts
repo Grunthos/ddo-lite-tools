@@ -17,6 +17,9 @@ dependencyResolutionManagement {
 
 include(
     ":data-format",
+    ":common",
     ":builder-core",
     ":tools:validate",
+    ":prototypes:skills-ui",
+    ":prototypes:skills-desktop",
 )
