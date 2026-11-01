@@ -106,6 +106,24 @@ object Vb {
     }
 
     /**
+     * VB `CBool` applied to a string: "True"/"False" in any case, or a number (non-zero is true).
+     * Returns null where VB raises run-time error 13 (Type mismatch), e.g. for "yes".
+     */
+    fun cBool(s: String): Boolean? {
+        val t = s.trim(' ')
+        if (t.equals("true", ignoreCase = true)) {
+            return true
+        }
+        if (t.equals("false", ignoreCase = true)) {
+            return false
+        }
+        if (isNumeric(t)) {
+            return valOf(t) != 0.0
+        }
+        return null
+    }
+
+    /**
      * VB `CLng`, and VB's implicit conversion when a Double is assigned to a Long variable
      * (e.g. `plngValue = Val(strValue)` in the loaders).
      *

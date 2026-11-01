@@ -1,7 +1,9 @@
 package ddolite.tools.validate
 
 import ddolite.builder.data.BuilderRecordFile
+import ddolite.builder.data.LoadLog
 import ddolite.builder.data.ParsedLine
+import ddolite.builder.data.loadBuilderData
 import ddolite.builder.data.parseLine
 import ddolite.dataformat.DataSource
 import ddolite.dataformat.DirectoryDataSource
@@ -19,15 +21,17 @@ import kotlin.system.exitProcess
  *
  * Usage: `validate <Data folder>`. Exit code 1 if any errors were found.
  *
- * Current checks (structure only):
+ * Current checks:
  * - every file decodes; line endings other than CRLF are warned about, because VB6
  *   splits on CRLF and would misread the file;
  * - Builder record files: record markers in the middle of a line (VB6 silently starts a new
  *   record there), and field lines without ':' (what basDataLoad.ParseLine reports via
- *   LogError, Build/basDataLoad.bas:2142).
+ *   LogError, Build/basDataLoad.bas:2142);
+ * - Races.txt and Classes.txt: everything the ported loaders check (invalid values, unknown
+ *   names, cross-references), with VB6's wording.
  *
- * The content checks done by the VB6 loaders (unknown classes, bad levels, …) arrive with
- * the typed loaders in step B2. The goal is the same set of problems as VB6's error.log.
+ * More files are checked as their loaders are ported (step B2). The goal is the same set of
+ * problems as VB6's error.log.
  */
 fun main(args: Array<String>) {
     var dir = Path.of("Data")
@@ -97,7 +101,45 @@ fun validate(source: DataSource): Report {
     for (file in BuilderRecordFile.entries) {
         checkBuilderRecordFile(source, file, issues)
     }
+    checkWithLoaders(source, issues)
     return Report(files.size, issues)
+}
+
+/**
+ * Runs the ported loaders (plan step B2; races and classes so far) and reports what they found.
+ * VB6's own errors are ERRORs; problems VB6 doesn't report, or handles differently, are WARNINGs.
+ *
+ * The loaders also report lines without ':', which [checkBuilderRecordFile] has already reported,
+ * so those duplicates are skipped.
+ */
+private fun checkWithLoaders(source: DataSource, issues: MutableList<Issue>) {
+    val log = LoadLog()
+    loadBuilderData(source, log)
+    for (found in log.issues) {
+        val path = "Builder/" + found.file
+        val line = found.line
+        if (line != null && alreadyReported(issues, path, line)) {
+            continue
+        }
+        var message = found.message
+        if (found.detail != null) {
+            message = message + " " + found.detail
+        }
+        var severity = Severity.ERROR
+        if (found.vbDifference) {
+            severity = Severity.WARNING
+        }
+        issues.add(Issue(severity, path, found.line, message))
+    }
+}
+
+private fun alreadyReported(issues: List<Issue>, path: String, line: Int): Boolean {
+    for (issue in issues) {
+        if (issue.path == path && issue.line == line) {
+            return true
+        }
+    }
+    return false
 }
 
 /** Line endings VB6 would misread, and unexpected byte-order marks. */
