@@ -22,10 +22,11 @@ Needs JDK 21. The Android target also needs the Android SDK: set `ANDROID_HOME`,
 | Module | What it is |
 |---|---|
 | `data-format` | Reading data files: Windows-1252/BOM decoding, VB6 string functions (`Vb`), basUtils helpers, record splitting, `DataSource` |
-| `builder-core` | Character Builder logic. So far: the Builder's `ParseLine` and its list of data files |
+| `common` | Shared by all three apps: colour themes (.screen files) so far |
+| `builder-core` | Character Builder logic: `ParseLine`, Races/Classes loaders, skills grid rules |
 | `tools/validate` | Command-line data validator, run by CI |
 
-`data-format` and `builder-core` are Kotlin Multiplatform (JVM + Android), so they can
+`data-format`, `common` and `builder-core` are Kotlin Multiplatform (JVM + Android), so they can
 later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io`,
 `java.nio`, AWT, `String.format`); the tools are JVM-only and may.
 
@@ -41,3 +42,19 @@ later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io
 - **Copy VB behaviour exactly first.** Use `Vb.trim`, `Vb.split`, `Vb.isNumeric`, `Vb.valOf`,
   `Vb.cLng` rather than the Kotlin equivalents wherever the difference could change a result.
   Improve on VB only once tests prove the behaviour is unchanged.
+
+## Prototypes (plan step F1)
+
+Throwaway code to test Compose before building the real screens; see PLAN.md §8.2.
+
+```
+./gradlew :prototypes:skills-desktop:run           # open the prototype window
+./gradlew :prototypes:skills-desktop:screenshots   # render it off-screen with simulated clicks → build/screenshots
+./gradlew :prototypes:skills-android:assembleDebug # Android APK (same screens, data bundled)
+```
+
+| Module | What it is |
+|---|---|
+| `prototypes/skills-ui` | Shared screens (desktop + Android): themed spinner, skills grid, tree slots with drag-and-drop |
+| `prototypes/skills-desktop` | Desktop window and the off-screen screenshot tool |
+| `prototypes/skills-android` | Android app wrapping the same screens |

@@ -22,4 +22,5 @@ include(
     ":tools:validate",
     ":prototypes:skills-ui",
     ":prototypes:skills-desktop",
+    ":prototypes:skills-android",
 )

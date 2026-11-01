@@ -16,9 +16,13 @@ import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
+import ddolite.prototype.skills.PrototypeScreen
+import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreen
 import ddolite.prototype.skills.SkillsScreenState
+import ddolite.prototype.skills.TreeSlotsState
 import ddolite.prototype.skills.prototypePresets
+import ddolite.prototype.skills.readTreeHeaders
 import org.jetbrains.skia.EncodedImageFormat
 import java.nio.file.Files
 import java.nio.file.Path
@@ -71,6 +75,31 @@ fun main(args: Array<String>) {
 
         state.selectTheme(1)
         save(scene, outDir.resolve("3-tan-theme.png"))
+        state.selectTheme(0)
+    }
+
+    // The enhancement trees tab: drag two trees into slots, then swap them.
+    val trees = TreeSlotsState(data, readTreeHeaders(DirectoryDataSource(repoRoot.resolve("Data"))), state)
+    val prototype = PrototypeState(state, trees)
+    prototype.tab = 1
+    ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { PrototypeScreen(prototype) }.use { scene ->
+        save(scene, outDir.resolve("4-trees-start.png"))
+        val listX = 60f
+        val firstTreeY = treeListRowY(0)
+        val secondTreeY = treeListRowY(1)
+        val slotX = 500f
+
+        // Drag the first available tree to slot 2 (slot 1 is the race tree), and hold the next one over slot 3.
+        drag(scene, Offset(listX, firstTreeY), Offset(slotX, slotY(1)), release = true)
+        drag(scene, Offset(listX, firstTreeY), Offset(slotX, slotY(2)), release = false)
+        save(scene, outDir.resolve("5-trees-dragging.png"))
+        scene.sendPointerEvent(PointerEventType.Release, Offset(slotX, slotY(2)), buttons = PointerButtons(), button = PointerButton.Primary)
+
+        // Swap slots 2 and 3 by dragging slot 3 onto slot 2.
+        drag(scene, Offset(slotX, slotY(2)), Offset(slotX, slotY(1)), release = true)
+        save(scene, outDir.resolve("6-trees-swapped.png"))
+        println("Slots: " + trees.slots.toList())
+        check(secondTreeY > 0)
     }
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
@@ -84,6 +113,29 @@ private fun nameColumnWidth(): Float = 136f
 private fun rowCentre(row: Int): Float {
     val rowHeight = 24.55f // measured from 1-start.png
     return rowHeight * 2 + rowHeight * (row - 1) + rowHeight / 2
+}
+
+// Positions on the trees tab, measured from 4-trees-start.png.
+private fun treeListRowY(index: Int): Float = 111f + index * 25f
+
+private fun slotY(index: Int): Float = 111f + index * 35f
+
+/** Presses at [from], moves in steps to [to] (so the drag gesture starts), and optionally releases. */
+@OptIn(ExperimentalComposeUiApi::class)
+private fun drag(scene: ImageComposeScene, from: Offset, to: Offset, release: Boolean) {
+    val pressed = PointerButtons(isPrimaryPressed = true)
+    scene.sendPointerEvent(PointerEventType.Move, from)
+    scene.sendPointerEvent(PointerEventType.Press, from, buttons = pressed, button = PointerButton.Primary)
+    val steps = 10
+    for (i in 1..steps) {
+        val at = Offset(from.x + (to.x - from.x) * i / steps, from.y + (to.y - from.y) * i / steps)
+        scene.sendPointerEvent(PointerEventType.Move, at, buttons = pressed)
+        scene.render() // let layout and gestures catch up between moves
+    }
+    if (release) {
+        scene.sendPointerEvent(PointerEventType.Release, to, buttons = PointerButtons(), button = PointerButton.Primary)
+        scene.render()
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

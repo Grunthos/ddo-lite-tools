@@ -11,9 +11,12 @@ import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
-import ddolite.prototype.skills.SkillsScreen
+import ddolite.prototype.skills.PrototypeScreen
+import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
+import ddolite.prototype.skills.TreeSlotsState
 import ddolite.prototype.skills.prototypePresets
+import ddolite.prototype.skills.readTreeHeaders
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -31,20 +34,22 @@ fun main(args: Array<String>) {
     val repoRoot = Path.of(root)
 
     val log = LoadLog()
-    val data = loadBuilderData(DirectoryDataSource(repoRoot.resolve("Data")), log)
+    val dataSource = DirectoryDataSource(repoRoot.resolve("Data"))
+    val data = loadBuilderData(dataSource, log)
     for (issue in log.issues) {
         println(issue.message)
     }
     val themes = loadThemes(repoRoot.resolve("Settings"))
-    val state = SkillsScreenState(data, themes, prototypePresets())
+    val skills = SkillsScreenState(data, themes, prototypePresets())
+    val state = PrototypeState(skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills))
 
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Skills – Kotlin prototype",
+            title = "Character Builder – Kotlin prototype (F1)",
             state = rememberWindowState(width = 1100.dp, height = 820.dp),
         ) {
-            SkillsScreen(state)
+            PrototypeScreen(state)
         }
     }
 }

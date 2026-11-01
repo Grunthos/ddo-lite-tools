@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
+import ddolite.common.theme.Theme
 
 /**
  * The whole prototype screen: a bar for choosing the level plan, theme and Intelligence
@@ -49,18 +50,18 @@ fun SkillsScreen(state: SkillsScreenState) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             BasicText("Build:", style = label)
             for (i in state.presets.indices) {
-                ChoiceButton(state, state.presets[i].name, selected = i == state.presetIndex) { state.selectPreset(i) }
+                ChoiceButton(theme, state.presets[i].name, selected = i == state.presetIndex) { state.selectPreset(i) }
             }
         }
 
         // Theme and Intelligence.
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             BasicText("Theme:", style = label)
-            ChoiceButton(state, "<", selected = false) {
+            ChoiceButton(theme, "<", selected = false) {
                 state.selectTheme((state.themeIndex + state.themes.size - 1) % state.themes.size)
             }
             BasicText(theme.name, style = label.copy(fontWeight = FontWeight.Bold))
-            ChoiceButton(state, ">", selected = false) {
+            ChoiceButton(theme, ">", selected = false) {
                 state.selectTheme((state.themeIndex + 1) % state.themes.size)
             }
             BasicText("      Intelligence modifier:", style = label)
@@ -94,8 +95,7 @@ fun SkillsScreen(state: SkillsScreenState) {
 
 /** A small clickable label, in the navigation colours (the VB userHeader links). */
 @Composable
-private fun ChoiceButton(state: SkillsScreenState, text: String, selected: Boolean, onClick: () -> Unit) {
-    val theme = state.theme
+internal fun ChoiceButton(theme: Theme, text: String, selected: Boolean, onClick: () -> Unit) {
     var background = theme.color(ColorGroup.NAVIGATION, ColorValue.BACKGROUND)
     if (selected) {
         background = theme.color(ColorGroup.NAVIGATION, ColorValue.BACK_HIGHLIGHT)

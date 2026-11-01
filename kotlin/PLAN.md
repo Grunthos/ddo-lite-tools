@@ -92,7 +92,7 @@ fixing them afterwards would mean rewriting the core:
 | ID | Decision | Status |
 |---|---|---|
 | D-1 | Target: Kotlin Multiplatform, Gradle multi-module. Desktop (JVM) first; Android/iOS targets compiled from day one (§2a) | Agreed |
-| D-2 | UI toolkit: Compose Multiplatform (desktop now, mobile later). Swing is **no longer a sensible fallback** because it can't run on mobile. If F1 finds problems, the fallback is custom pointer/drawing code inside Compose | **Provisional – checked by F1 (§8.2)** |
+| D-2 | UI toolkit: Compose Multiplatform (desktop now, mobile later). Swing is **no longer a sensible fallback** because it can't run on mobile. If F1 finds problems, the fallback is custom pointer/drawing code inside Compose | **Provisional – F1 found no blockers (§8.2); confirm after the Android run** |
 | D-3 | Same repo, top-level `kotlin/` folder, on a long-lived `kotlin` branch; merge `master` in often; propose merging to master once B3 works | Agreed (pending Chris Lewis's buy-in, see D-10) |
 | D-4 | Character Builder first; Cannith second; Compendium third | Agreed |
 | D-5 | Data/user file formats are frozen; Kotlin must read and write them byte-compatibly | Agreed |
@@ -307,6 +307,26 @@ toolkit problems; prototype 4 builds and runs from the same `ui-kit`/screen code
 pointer/drawing code inside Compose for the failing piece (D-2). Revisit the toolkit itself only if
 the problem is fundamental.**
 
+**F1 status (2026-11-02): mostly done; no blocking problems found.** Code in `prototypes/` (see its modules):
+- [x] 1. Spinner: themed, click and hold to repeat (VB's 300/50 ms timers), right button = large step,
+      middle = min/max, wheel. Not yet: keyboard, typing digits.
+- [x] 2. Skills grid: drawing, hit-testing, row/column highlight, live theme switch, all three mouse buttons,
+      hold to repeat, name-column fills. Rules come from `builder-core` (`SkillGrid`), not the UI.
+      Not yet: keyboard (VB's grid has none either), the right-click menu on skill names.
+- [x] 3. Drag-and-drop: tree slots (add, swap, remove) with "can drop" / "drop here" highlights and a
+      ghost following the pointer. **Finding:** Compose's own drag-and-drop API carries platform data
+      (AWT on desktop, ClipData on Android), so shared code would need per-platform versions. A small
+      shared implementation (`DragAndDrop.kt`, ~150 lines) works the same for mouse and touch; use that.
+      The ability-onto-slot drag uses the same mechanism and is left for F3.
+- [~] 4. Android: the same screens build into an APK (`:prototypes:skills-android:assembleDebug`) with the
+      data bundled as assets. Not yet run on a device or emulator (the local AVDs' system images aren't
+      installed). Touch: tap = left click, hold repeats, drag works; other buttons need §2a.5 alternatives.
+- [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
+- **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
+  (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can
+  drive the UI with simulated clicks and save PNGs, which is useful for UI regression checks in F3/F4.
+- **Recommendation:** confirm D-2 (Compose Multiplatform) once the Android run and the scaling check pass.
+
 ### 8.3 F2 – Widget kit and gallery (`ui-kit`)
 - [ ] Theme model loaded from `.screen` files (replaces `cfg.GetColor(group, value)`), switchable at runtime.
 - [ ] Fonts: Verdana 9 equivalent (`basFonts`), with a fallback where Verdana is missing.
@@ -442,7 +462,12 @@ All of these sit behind interfaces in `common` (§2a.7), with one implementation
 1. [ ] Ask Chris Lewis: support for the `kotlin` branch/folder and a LICENSE (D-10).
 2. [x] Create the `kotlin` branch; set up Gradle (`data-format`, `builder-core` as KMP with `jvm` + `android` targets, `tools/validate`), `.gitattributes`, `.gitignore`, CI workflow.
 3. [x] B1: shared reading building blocks + Builder `ParseLine` + tests over all of `Data/` (writer moved to B4).
-4. [ ] B2: Races and Classes loaders (first typed models, races/classes by name, D-7).
-5. [ ] F0: inventory `frmEnhancements` and `frmSkills`.
-6. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
-7. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
+4. [x] B2: Races and Classes loaders (first typed models, races/classes by name, D-7).
+5. [x] B6 (first rules): skills grid (`SkillGrid`: InitBuildSkills + the frmSkills editing rules).
+6. [x] F1: prototypes 1–3 on desktop, Android build (see §8.2 status).
+7. [ ] F1: run the Android prototype on a device/emulator; check 150% scaling on desktop; then confirm D-2.
+8. [ ] B2: remaining loaders (Feats, Enhancements, Destinies, Spells, Templates, …).
+9. [ ] F0: inventory `frmEnhancements` and `frmSkills`.
+10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
+11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
+12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice).
