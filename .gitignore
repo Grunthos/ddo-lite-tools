@@ -22,3 +22,10 @@ master
 !/Source/Graphics/Graphics.zip
 
 
+
+#Kotlin conversion (kotlin/ folder)
+kotlin/**/build/
+kotlin/.gradle/
+kotlin/.kotlin/
+kotlin/.idea/
+kotlin/local.properties

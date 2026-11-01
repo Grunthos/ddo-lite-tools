@@ -1,2 +1,7 @@
 * text=auto
 *.res binary
+# Kotlin conversion: keep golden outputs byte-for-byte, scripts with their native line endings
+kotlin/golden/** -text
+kotlin/gradlew text eol=lf
+kotlin/gradlew.bat text eol=crlf
+*.jar binary
