@@ -3,16 +3,18 @@ package ddolite.builder.data
 import ddolite.builder.model.AutoGrantedFeat
 import ddolite.builder.model.CharacterClass
 import ddolite.builder.model.Feat
+import ddolite.builder.model.NameChange
 import ddolite.builder.model.FeatMapEntry
 import ddolite.builder.model.Race
 import ddolite.builder.model.Spell
 import ddolite.builder.model.StatTemplate
 import ddolite.builder.model.Tree
+import ddolite.builder.model.Tomes
 import ddolite.dataformat.DataSource
 
 /**
  * The Character Builder's game data. Replaces the VB global `db` (`DatabaseType`,
- * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates, feats, the feat map, auto-granted feats, enhancement trees and destinies.
+ * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates, feats, the feat map, auto-granted feats, enhancement trees, destinies, tome limits and name changes: everything VB's `InitData` loads.
  *
  * Races and classes are looked up by name (plan D-7), accepting the same alternative
  * spellings as VB's `GetRaceID`/`GetClassID`.
@@ -32,6 +34,9 @@ class BuilderData(
     val trees: List<Tree>,
     /** Epic destinies, sorted by name (VB `db.Destiny`). */
     val destinies: List<Tree>,
+    val tomes: Tomes,
+    /** Sorted by type, then old name (VB `db.NameChange`). */
+    val nameChanges: List<NameChange>,
 ) {
     private val spellsByName = HashMap<String, Spell>()
     private val featsByName = HashMap<String, Feat>()
@@ -70,6 +75,19 @@ class BuilderData(
 
     /** The destiny called exactly [name], or null. Replaces `SeekTree(name, peDestiny)`. */
     fun findDestiny(name: String): Tree? = findExactName(destinies, name)
+
+    /**
+     * The rename for [oldName] of [type] ("Feat"), or null. Replaces `basDataLoad.SeekNameChange`
+     * (Build/basDataLoad.bas:2100), an exact binary search.
+     */
+    fun findNameChange(type: String, oldName: String): NameChange? {
+        for (change in nameChanges) {
+            if (change.type == type && change.oldName == oldName) {
+                return change
+            }
+        }
+        return null
+    }
 
     private fun findExactName(list: List<Tree>, name: String): Tree? {
         for (tree in list) {
@@ -136,7 +154,11 @@ fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
     val autoGrantedFeats = loadAutoGrantedFeats(source, feats, log)
     val trees = loadEnhancements(source, log)
     val destinies = loadDestinies(source, log)
-    val data = BuilderData(races, classes, spells, templates, feats, featMap, autoGrantedFeats, trees, destinies)
+    val tomes = loadTomes(source, log)
+    val nameChanges = loadNameChanges(source, log)
+    val data = BuilderData(
+        races, classes, spells, templates, feats, featMap, autoGrantedFeats, trees, destinies, tomes, nameChanges,
+    )
     checkReferences(data, log)
     checkClassSpells(data, log)
     checkTemplates(templates, log)

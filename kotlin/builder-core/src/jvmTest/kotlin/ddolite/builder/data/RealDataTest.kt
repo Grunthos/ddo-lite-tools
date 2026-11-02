@@ -166,6 +166,15 @@ class RealDataTest {
         }
         assertTrue(found)
 
+        // Data/Tomes.txt and NameChange.txt.
+        assertEquals(3, data.tomes.racialApMax)
+        assertEquals(4, data.tomes.universalApMax)
+        assertEquals(27, data.tomes.permDestinyPointMax)
+        assertEquals(12, data.tomes.permDestinyPointMin)
+        assertEquals(3, data.tomes.fateTomeMax)
+        assertEquals(3, data.nameChanges.size)
+        assertEquals("Purity of Heart", data.findNameChange("Feat", "Purity of Spirit")?.newName)
+
         // Every SharedSelector feat ends up with selectors.
         for (feat in data.feats) {
             if (feat.selectorStyle == SelectorStyle.SHARED) {
