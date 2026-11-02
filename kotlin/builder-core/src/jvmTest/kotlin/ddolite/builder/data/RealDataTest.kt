@@ -1,6 +1,8 @@
 package ddolite.builder.data
 
 import ddolite.builder.model.Bab
+import ddolite.builder.model.ClassLevel
+import ddolite.builder.model.SelectorStyle
 import ddolite.builder.model.Stat
 import ddolite.dataformat.DirectoryDataSource
 import java.nio.file.Path
@@ -94,5 +96,28 @@ class RealDataTest {
         assertEquals(Stat.STR, first.levelups)
         assertEquals(16, first.points(0, Stat.STR))
         assertEquals(4, first.points(4, Stat.DEX))
+    }
+
+    @Test
+    fun feats() {
+        assertEquals(417, data.feats.size)
+        val focus = assertNotNull(data.findFeat("Weapon Focus"))
+        assertEquals(listOf("Bludgeoning", "Piercing", "Ranged", "Slashing", "Thrown"), focus.selectors.map { it.name })
+        // Ranged has no section of its own, so it keeps the feat's ClassBonus; Bludgeoning sets its own.
+        assertEquals(listOf("Artificer", "Fighter"), focus.findSelector("Ranged")?.classBonus)
+        assertEquals(listOf("Fighter", "Dragon Lord"), focus.findSelector("Bludgeoning")?.classBonus)
+        assertEquals(listOf("Human", "Purple Dragon Knight"), focus.raceBonus)
+
+        val specialization = assertNotNull(data.findFeat("Weapon Specialization"))
+        assertEquals(SelectorStyle.SHARED, specialization.selectorStyle)
+        assertEquals(focus.selectors.map { it.name }, specialization.selectors.map { it.name })
+        assertEquals(listOf(ClassLevel("Fighter", 4), ClassLevel("Dragon Lord", 4)), specialization.classes)
+
+        // Every SharedSelector feat ends up with selectors.
+        for (feat in data.feats) {
+            if (feat.selectorStyle == SelectorStyle.SHARED) {
+                assertTrue(feat.selectors.isNotEmpty(), "${feat.name} has no selectors")
+            }
+        }
     }
 }

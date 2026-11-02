@@ -550,7 +550,8 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 8. [ ] **All data and file support before more screens** (agreed 2026-11-02): with the data model settled
    against the real data, the screens are mostly presentation. In VB's `InitData` order
    (Build/basDataLoad.bas, later files refer to earlier ones):
-   1. [ ] B2: ~~Templates, Spells~~ (done, with the ProcessTemplates and ProcessSpells checks), Feats (+ selectors), FeatMap, AutoGrantedFeats/EpicGrantedFeats,
+   1. [ ] B2: ~~Templates, Spells, Feats (+ selectors)~~ (done, with the ProcessTemplates, ProcessSpells and
+      ProcessFeatSelectors checks), FeatMap, AutoGrantedFeats/EpicGrantedFeats,
       Enhancements + Destinies (trees, abilities, selectors), tome data, NameChange — each with real-data
       tests and added to the validator.
    2. [ ] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item

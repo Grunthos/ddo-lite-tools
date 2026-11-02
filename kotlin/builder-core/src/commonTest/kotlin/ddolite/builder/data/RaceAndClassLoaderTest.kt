@@ -206,11 +206,17 @@ class RaceAndClassLoaderTest {
         val source = MapDataSource.ofText(
             "Builder/Races.txt" to "RaceName: Purple Dragon Knight\nStats: 8, 8, 8, 8, 8, 8\nIconicClass: Juggler\nSubRace: Martian\n",
             "Builder/Classes.txt" to "ClassName: Bard\nBAB: 0.75\nDisallowedClasses: Mime\n",
-            "Builder/Spells.txt" to "",
-            "Builder/Templates.txt" to "",
         )
         val log = LoadLog()
         val data = loadBuilderData(source, log)
+        // The other data files are missing here; ignore those messages (and keep issue indexes below right).
+        val missing = ArrayList<LoadIssue>()
+        for (issue in log.issues) {
+            if (issue.message.startsWith("File not found")) {
+                missing.add(issue)
+            }
+        }
+        log.issues.removeAll(missing)
         assertEquals(
             listOf(
                 "Races.txt: Purple Dragon Knight has invalid IconicClass: Juggler",

@@ -18,6 +18,7 @@ class ValidateTest {
         }
         files[BuilderRecordFile.RACES.path] = "RaceName: Human\r\nType: Free\r\nStats: 8, 8, 8, 8, 8, 8\r\n".encodeToByteArray()
         files[BuilderRecordFile.CLASSES.path] = "ClassName: Fighter\r\nBAB: 1\r\nSkillPoints: 2\r\n".encodeToByteArray()
+        files[BuilderRecordFile.FEATS.path] = "FeatName: Example\r\nGroup: Misc\r\n".encodeToByteArray()
         // A template must name a real class and add up to 28-36 points.
         files[BuilderRecordFile.TEMPLATES.path] =
             "Class: Fighter\r\nCaption: Example\r\nSTR: 16 16 16 16 16\r\nDEX:  6  8  8 10 10\r\nCON:  6  6  8  8 10\r\n".encodeToByteArray()
@@ -78,7 +79,7 @@ class ValidateTest {
     fun missingFileIsAnError() {
         val report = validate(MapDataSource(HashMap()))
         // Each Builder record file is reported missing once by the structure check; the
-        // loaders report the ones ported so far (Races, Templates, Spells, Classes) again in VB's wording.
-        assertEquals(BuilderRecordFile.entries.size + 4, report.errorCount())
+        // loaders report the ones ported so far (Races, Templates, Spells, Classes, Feats) again in VB's wording.
+        assertEquals(BuilderRecordFile.entries.size + 5, report.errorCount())
     }
 }

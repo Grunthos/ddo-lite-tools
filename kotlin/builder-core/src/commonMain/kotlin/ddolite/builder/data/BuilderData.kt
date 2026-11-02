@@ -1,6 +1,7 @@
 package ddolite.builder.data
 
 import ddolite.builder.model.CharacterClass
+import ddolite.builder.model.Feat
 import ddolite.builder.model.Race
 import ddolite.builder.model.Spell
 import ddolite.builder.model.StatTemplate
@@ -8,7 +9,7 @@ import ddolite.dataformat.DataSource
 
 /**
  * The Character Builder's game data. Replaces the VB global `db` (`DatabaseType`,
- * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells and stat templates.
+ * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates and feats.
  *
  * Races and classes are looked up by name (plan D-7), accepting the same alternative
  * spellings as VB's `GetRaceID`/`GetClassID`.
@@ -19,13 +20,21 @@ class BuilderData(
     /** Sorted by name, as VB keeps `db.Spell`. */
     val spells: List<Spell>,
     val templates: List<StatTemplate>,
+    /** In file order, as VB keeps `db.Feat`. */
+    val feats: List<Feat>,
 ) {
     private val spellsByName = HashMap<String, Spell>()
+    private val featsByName = HashMap<String, Feat>()
 
     init {
         for (spell in spells) {
             if (!spellsByName.containsKey(spell.name)) {
                 spellsByName[spell.name] = spell
+            }
+        }
+        for (feat in feats) {
+            if (!featsByName.containsKey(feat.name)) {
+                featsByName[feat.name] = feat
             }
         }
     }
@@ -36,36 +45,52 @@ class BuilderData(
      */
     fun findSpell(name: String): Spell? = spellsByName[name]
 
+    /**
+     * The feat called exactly [name] (case matters), or null. Replaces `basDataLoad.SeekFeat`
+     * (Build/basDataLoad.bas:1179) with its default exact match; its case-insensitive form is only
+     * used for old builds and comes with that code.
+     */
+    fun findFeat(name: String): Feat? = featsByName[name]
+
     /** The race called [name] (any case, or a VB alternative spelling), or null. Replaces `GetRaceID`. */
-    fun findRace(name: String): Race? {
-        val canonical = canonicalName(KNOWN_RACES, name)
-        for (race in races) {
-            if (race.name.equals(name, ignoreCase = true) || race.name.equals(canonical, ignoreCase = true)) {
-                return race
-            }
-        }
-        return null
-    }
+    fun findRace(name: String): Race? = findRaceIn(races, name)
 
     /** The class called [name] (any case), or null. Replaces `GetClassID`. */
-    fun findClass(name: String): CharacterClass? {
-        val canonical = canonicalName(KNOWN_CLASSES, name)
-        for (c in classes) {
-            if (c.name.equals(name, ignoreCase = true) || c.name.equals(canonical, ignoreCase = true)) {
-                return c
-            }
-        }
-        return null
-    }
+    fun findClass(name: String): CharacterClass? = findClassIn(classes, name)
+}
 
-    /** The name VB would use for [text] if it's one of VB's alternative spellings, else [text] itself. */
-    private fun canonicalName(table: List<KnownName>, text: String): String {
-        val known = findKnownName(table, text)
-        if (known == null) {
-            return text
+/**
+ * The race in [races] called [name] (any case, or a VB alternative spelling), or null.
+ * Replaces `GetRaceID` (basEnum.bas); used by loaders before the whole [BuilderData] exists.
+ */
+fun findRaceIn(races: List<Race>, name: String): Race? {
+    val canonical = canonicalName(KNOWN_RACES, name)
+    for (race in races) {
+        if (race.name.equals(name, ignoreCase = true) || race.name.equals(canonical, ignoreCase = true)) {
+            return race
         }
-        return known.name
     }
+    return null
+}
+
+/** The class in [classes] called [name] (any case, or a VB alternative spelling), or null. Replaces `GetClassID`. */
+fun findClassIn(classes: List<CharacterClass>, name: String): CharacterClass? {
+    val canonical = canonicalName(KNOWN_CLASSES, name)
+    for (c in classes) {
+        if (c.name.equals(name, ignoreCase = true) || c.name.equals(canonical, ignoreCase = true)) {
+            return c
+        }
+    }
+    return null
+}
+
+/** The name VB would use for [text] if it's one of VB's alternative spellings, else [text] itself. */
+private fun canonicalName(table: List<KnownName>, text: String): String {
+    val known = findKnownName(table, text)
+    if (known == null) {
+        return text
+    }
+    return known.name
 }
 
 /**
@@ -78,7 +103,8 @@ fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
     val templates = loadTemplates(source, log)
     val spells = loadSpells(source, log)
     val classes = loadClasses(source, log)
-    val data = BuilderData(races, classes, spells, templates)
+    val feats = processFeatSelectors(loadFeats(source, races, classes, log), log)
+    val data = BuilderData(races, classes, spells, templates, feats)
     checkReferences(data, log)
     checkClassSpells(data, log)
     checkTemplates(templates, log)
