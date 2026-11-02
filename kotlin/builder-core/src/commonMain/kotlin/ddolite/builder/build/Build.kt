@@ -232,6 +232,12 @@ class Build {
     val includePoints = BooleanArray(BuildPoints.entries.size)
     val levelups = arrayOfNulls<Stat>(MAX_LEVELUPS + 1)
     val tomes = IntArray(Stat.entries.size)
+
+    /**
+     * The Stats screen's "Supreme" tome (VB's `build.Tome(aeAny)`, index 0): every stat tome is
+     * at least this. Kept in the build while the program runs but never saved, as in VB.
+     */
+    var tomeAll = 0
     val skills = Array(Skill.entries.size) { IntArray(HEROIC_LEVELS) }
     val skillTomes = IntArray(Skill.entries.size)
     val feats = Array(BuildFeatType.entries.size) { ArrayList<BuildFeat>() }
