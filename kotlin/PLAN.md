@@ -264,6 +264,42 @@ Order: BAB/stats → skills → granted/deity/selected feats and exchanges → s
 
 ## 8. Forms plan (Builder)
 
+### 8.0 How the Builder is organised (the order to follow)
+
+The Builder is several separate windows around a main window, and a build is made by working
+through them in the order of frmMain's **Edit** menu (`frmMain.frm:311`, handler `mnuEdit_Click` :738):
+
+| # | Edit menu | Form | Key (`Form_KeyDown` :751) | What it sets |
+|---|---|---|---|---|
+| 1 | Overview… | frmOverview | O | name, race, alignment, classes by level |
+| 2 | Stats… | frmStats | T | base stats (build points), level-up stats, tomes |
+| 3 | Skills… | frmSkills | K | skill points per level, skill tomes |
+| 4 | Feats… | frmFeats | F | feats per slot |
+| 5 | Spells… | frmSpells | P | spells per level (casters only) |
+| 6 | Enhancements… | frmEnhancements | E | trees, abilities, leveling guide |
+| 7 | Destiny… | frmDestiny2 | D | epic destinies and twists (level 20+) |
+| – | Gear… | (frmGear) | – | never built: commented out in `OpenForm`; drop |
+
+- **frmMain** holds the menus and the **output view** (the build summary, regenerated as the build changes).
+- **Gating** (`basMain.OpenForm`, Build/basMain.bas:131): a window only opens once the earlier steps make
+  sense – Stats/Skills/Feats/Enhancements need a race; Stats/Skills/Feats/Spells/Enhancements need a class
+  at level 1; Skills/Feats need all build points spent in Stats; Spells needs a caster; Destiny needs
+  20+ levels. The messages differ when the user is already in the window that fixes it ("Select a Race
+  first." vs "…in the Overview screen first."). The Edit menu items are enabled the same way
+  (`basDocuments.bas:270`: Spells only for casters, Destiny only for 20+ levels). These are rules → `builder-core`
+  (a `canOpen(window)` query with the reason), with tests.
+- **Windows:** each is a separate top-level window, owned by frmMain when the `ChildWindows` option is on
+  (`cfg.ChildWindows`, default True); positions saved per window (`cfg.SavePosition`/`MoveForm`); a Window
+  menu lists the open ones; closing the last edit window brings the output back up (`UnloadForm`).
+  Changes in one window refresh the others through `CascadeChanges`.
+
+**Consequence for the order of work.** The F1 prototypes jumped to Skills and Enhancements because those
+were the riskiest *interactions* (their presets stand in for Overview). Real screens are built in Edit-menu
+order: the shell (frmMain + output) and Overview first, since every later window depends on the race and
+classes Overview sets – then Stats, Skills, Feats, Spells, Enhancements, Destiny. That also sets the
+core order: the build model (B4) and the Overview/Stats rules come before more loaders that only later
+windows need.
+
 ### 8.1 F0 – Routine inventory (can start now)
 For each form and control, list every routine, menu item, timer, drag-and-drop source/target and keyboard handler, and classify each routine:
 
@@ -293,7 +329,7 @@ as they were probably meant to line up). For each form it writes:
 Philip compares the wireframes with the running VB6 app and notes anything the `.frm` doesn't show
 (run-time layout, owner-drawn content). The Compose screen then follows the same rows and columns.
 
-Deliverable: `kotlin/inventory/<form>.md` per form (generated from the `.frm` files, then reviewed). Each becomes **that form's parity checklist**. Do `frmEnhancements` and `frmSkills` first.
+Deliverable: `kotlin/inventory/<form>.md` per form (generated from the `.frm` files, then reviewed). Each becomes **that form's parity checklist**. Do them in Edit-menu order (§8.0): `frmMain`, `frmOverview`, `frmStats`, `frmSkills`, …
 
 | Form | Lines | Wave | Main risks |
 |---|---|---|---|
@@ -346,6 +382,11 @@ the problem is fundamental.**
 - [x] Portable Windows app: `:prototypes:skills-desktop:portableZip` builds `CharacterBuilderPrototype.exe` with its own
       Java runtime and Data/ + Settings/ beside it (zip 55 MB, 122 MB unpacked). Unzipped outside the repo and
       started from another folder, it finds its data next to the .exe and runs (2026-11-02). Figures for D-11.
+- [x] Multi-window shell like the VB Builder (§8.0): main window with File / Edit / Window menus and an output
+      stand-in; Edit opens Skills and Enhancements in their own windows (other items disabled), plain-letter
+      shortcuts K / E as in `frmMain.Form_KeyDown`; the Window menu lists open screens and brings one to the front.
+      Changes in one window show in the others straight away (shared state, no `CascadeChanges` calls needed).
+      Not yet: windows owned by the main window (`ChildWindows`), saved positions, the OpenForm gating.
 - [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
 - **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
   (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can
@@ -366,11 +407,11 @@ Patterns used in every wave:
 - **Custom-drawn surfaces** are ported fairly directly onto `GridCanvas` (`Line`/`Print`/`TextWidth` → `drawRect`/`drawText`/`TextMeasurer`). Ordinary dialogs get real layouts, not copies of VB twip coordinates.
 - **Windows** (D-6): one Compose `Window` per form, created by `app-desktop`. Positions and sizes saved in `Settings.txt` as today, plus the Window menu and cascade. Screens in `builder-ui` must not reference `Window`, AWT or desktop-only APIs (§2a.4); a check in CI enforces this by compiling `builder-ui` for Android.
 
-Waves (each needs the previous one's patterns settled):
+Waves, in Edit-menu order (§8.0; each needs the previous one's patterns settled):
 1. **Shell:** frmMain (output view from B5, menus, recent files, open/save/new/close, dirty flag, Window menu), message window.
-2. **Inputs:** Overview, Stats, Skills.
-3. **Feats, Spells.**
-4. **Enhancements, Destiny2.**
+2. **Inputs:** Overview, then Stats, then Skills (with the `canOpen` gating rules).
+3. **Feats, then Spells.**
+4. **Enhancements, then Destiny2.**
 5. **Dialogs:** Import, Export, Format, Options, Deprecate, Level, Help, About.
 
 **A form is done when:**
@@ -494,8 +535,8 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 5. [x] B6 (first rules): skills grid (`SkillGrid`: InitBuildSkills + the frmSkills editing rules).
 6. [x] F1: prototypes 1–3 on desktop, Android build (see §8.2 status).
 7. [ ] F1: ~~run the Android prototype~~ (done, emulator); portable Windows exe done; check 150% scaling on desktop; then confirm D-2.
-8. [ ] B2: remaining loaders (Feats, Enhancements, Destinies, Spells, Templates, …).
-9. [ ] F0: inventory `frmEnhancements` and `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
+8. [ ] B4: build model + `.build` read/write, then the Overview rules (race, alignment, class split, `canOpen` gating). Loaders for later windows (Feats, Spells, Enhancements, Destinies, Templates) follow in Edit-menu order.
+9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
 12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice).

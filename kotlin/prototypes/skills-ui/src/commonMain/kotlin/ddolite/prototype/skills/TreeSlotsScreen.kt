@@ -23,6 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ddolite.builder.model.Skill
+import ddolite.builder.rules.formatRanks
 import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 
@@ -52,6 +54,70 @@ fun PrototypeScreen(state: PrototypeState) {
             }
         }
         DragGhost(state.trees.drag, state.skills)
+    }
+}
+
+/**
+ * The tree-slots screen on its own, with its background and drag ghost: the content of a separate
+ * Enhancements window on desktop (the VB app opens each Edit-menu screen in its own window).
+ */
+@Composable
+fun TreeSlotsWindowContent(state: PrototypeState) {
+    val theme = state.skills.theme
+    Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
+        TreeSlotsScreen(state.trees, state.skills)
+        DragGhost(state.trees.drag, state.skills)
+    }
+}
+
+/** The skills screen on its own, with its background: the content of a separate Skills window. */
+@Composable
+fun SkillsWindowContent(state: PrototypeState) {
+    val theme = state.skills.theme
+    Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
+        SkillsScreen(state.skills)
+    }
+}
+
+/**
+ * The main window's content: a stand-in for frmMain's output view (the build summary that VB
+ * regenerates as the build changes, `basOutput.GenerateOutput`, Build/basOutput.bas:154). Uses the workspace colours
+ * (.screen themes have no output colours; VB keeps those in separate output colour files). Shows the chosen build and the
+ * skill ranks, so changes made in the Skills window can be seen arriving in another window.
+ */
+@Composable
+fun MainWindowContent(state: PrototypeState) {
+    val skills = state.skills
+    val theme = skills.theme
+    val text = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val revision = skills.revision // read so this redraws when the build changes
+    val lines = ArrayList<String>()
+    lines.add("Build: " + skills.presets[skills.presetIndex].name + " (" + RACE_NAME + ")   [revision " + revision + "]")
+    lines.add("")
+    lines.add("Skills (total ranks):")
+    for (skill in Skill.entries) {
+        val ranks = skills.grid.totalRanks(skills.spend, skill)
+        if (ranks > 0) {
+            lines.add("  " + skill.displayName + ": " + formatRanks(ranks))
+        }
+    }
+    lines.add("")
+    lines.add("Enhancement trees:")
+    for (i in 0 until state.trees.slots.size) {
+        val tree = state.trees.slots[i]
+        if (tree != null) {
+            lines.add("  " + (i + 1) + ". " + tree)
+        }
+    }
+    lines.add("")
+    lines.add("Open screens from the Edit menu (or press K / E), in the VB app's order.")
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
+            .verticalScroll(rememberScrollState())
+            .padding(12.dp),
+    ) {
+        BasicText(lines.joinToString("\n"), style = text)
     }
 }
 
