@@ -93,6 +93,7 @@ class SkillsScreenState(
     fun selectPreset(index: Int) {
         presetIndex = index
         openedBuild = null
+        noLevels = false
         grid = makeGrid()
     }
 
@@ -109,8 +110,12 @@ class SkillsScreenState(
                 spend.set(skill, level, build.skills[skill.ordinal][level - 1])
             }
         }
-        grid = makeGrid()
-        changed()
+        // The grid needs a class at level 1; until the build has one, the Skills window can't open.
+        noLevels = build.levelClass(1) == null
+        if (!noLevels) {
+            grid = makeGrid()
+        }
+        revision = revision + 1
     }
 
     /** Copies the skill points into [build] (`build.Skills`), for saving. */
@@ -132,7 +137,10 @@ class SkillsScreenState(
     }
 
     /** True if the grid has levels to show (an opened build may have no class at level 1). */
-    fun hasLevels(): Boolean = grid.levels > 0
+    fun hasLevels(): Boolean = !noLevels
+
+    // True while the opened build has no class at level 1, so [grid] is out of date.
+    private var noLevels = false
 
     fun selectTheme(index: Int) {
         themeIndex = index
@@ -140,7 +148,9 @@ class SkillsScreenState(
 
     fun changeIntModifier(value: Int) {
         intModifier = value
-        grid = makeGrid()
+        if (!noLevels) {
+            grid = makeGrid()
+        }
     }
 
     /** The class shown above a level, if the build has more than one class (VB's `mblnClassRow`). */
@@ -263,7 +273,11 @@ class SkillsScreenState(
 
     private fun changed() {
         revision = revision + 1
+        onChanged()
     }
+
+    /** Called after each change the user makes, so the app can copy the points into the build. */
+    var onChanged: () -> Unit = {}
 
     private fun makeGrid(): SkillGrid {
         val classes = ArrayList<CharacterClass>()

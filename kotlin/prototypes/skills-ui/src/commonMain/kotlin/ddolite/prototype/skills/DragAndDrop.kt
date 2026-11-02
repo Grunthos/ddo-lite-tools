@@ -79,13 +79,21 @@ class DragDropState<T> {
         targets[key] = bounds
     }
 
+    /** The target under [at]; where targets are nested (a slot inside a window-wide target), the smallest. */
     private fun targetAt(at: Offset): Any? {
+        var found: Any? = null
+        var foundArea = 0f
         for (entry in targets.entries) {
-            if (entry.value.contains(at)) {
-                return entry.key
+            val bounds = entry.value
+            if (bounds.contains(at)) {
+                val area = bounds.width * bounds.height
+                if (found == null || area < foundArea) {
+                    found = entry.key
+                    foundArea = area
+                }
             }
         }
-        return null
+        return found
     }
 }
 

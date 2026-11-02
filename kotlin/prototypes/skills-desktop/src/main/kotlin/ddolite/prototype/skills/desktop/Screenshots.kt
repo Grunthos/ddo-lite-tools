@@ -84,7 +84,7 @@ fun main(args: Array<String>) {
 
     // The enhancement trees tab: drag two trees into slots, then swap them.
     val trees = TreeSlotsState(data, readTreeHeaders(DirectoryDataSource(repoRoot.resolve("Data"))), state)
-    val prototype = PrototypeState(state, trees)
+    val prototype = PrototypeState(data, state, trees, ScriptPrompts)
     ImageComposeScene(width = 900, height = 640, density = Density(1f)) { TreeSlotsWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("4-trees-start.png"))
 
@@ -130,6 +130,8 @@ fun main(args: Array<String>) {
     val resaved = writeBuildFile(rules)
     println("Kensei Warpriest re-saved: " + resaved.size + " bytes, same as a direct save: " +
         resaved.contentEquals(writeBuildFile(readBuildFile(bytes, data, BuildPoints.ADVENTURER).rules)))
+
+    overviewScreenshots(prototype, bytes, repoRoot, outDir)
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
 

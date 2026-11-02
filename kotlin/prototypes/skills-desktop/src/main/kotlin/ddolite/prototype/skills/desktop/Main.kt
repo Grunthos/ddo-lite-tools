@@ -1,35 +1,42 @@
 package ddolite.prototype.skills.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import ddolite.builder.build.BuildScreen
+import ddolite.builder.build.closesAfterChange
+import ddolite.builder.build.openScreenNotice
 import ddolite.builder.data.LoadLog
 import ddolite.builder.data.loadBuilderData
+import ddolite.common.resources.RT_BITMAP
+import ddolite.common.resources.bitmapFile
+import ddolite.common.resources.readResFile
 import ddolite.common.theme.Theme
 import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
 import ddolite.prototype.skills.MainWindowContent
+import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
 import ddolite.prototype.skills.SkillsWindowContent
@@ -37,13 +44,15 @@ import ddolite.prototype.skills.TreeSlotsState
 import ddolite.prototype.skills.TreeSlotsWindowContent
 import ddolite.prototype.skills.prototypePresets
 import ddolite.prototype.skills.readTreeHeaders
+import java.awt.KeyboardFocusManager
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.imageio.ImageIO
 
 /**
- * Desktop prototype (plan step F1), arranged like the VB Builder (PLAN.md §8.0): a main window
- * with File / Edit / Window menus and the output view, and each Edit-menu screen in its own window.
- * Only Skills and Enhancements exist in the prototype; the other Edit items are shown disabled.
+ * Desktop prototype, arranged like the VB Builder (PLAN.md §8.0): a main window with File / Edit /
+ * Window menus and the output view, and each Edit-menu screen in its own window. Overview, Skills
+ * and Enhancements exist so far; the other Edit items are shown disabled.
  *
  * Reads Data/ and Settings/ from the folder found by [findAppRoot]. Run with
  * `./gradlew :prototypes:skills-desktop:run`, or build the portable Windows app with
@@ -60,80 +69,98 @@ fun main(args: Array<String>) {
     }
     val themes = loadThemes(repoRoot.resolve("Settings"))
     val skills = SkillsScreenState(data, themes, prototypePresets())
-    val state = PrototypeState(skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills))
+    val prompts = DesktopPrompts { KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow }
+    val state = PrototypeState(data, skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills), prompts)
     val files = BuildFiles(data, repoRoot.resolve("Save").toFile())
+    val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files)
+        BuilderWindows(state, files, icons)
     }
 }
 
 /**
- * The Edit-menu screens, in frmMain's Edit menu order (frmMain.frm:311), with the menu mnemonic and
- * the main window's shortcut key (frmMain.Form_KeyDown, :751). [built] = exists in the prototype.
+ * The Edit-menu screens with the menu mnemonic and the main window's shortcut key
+ * (frmMain.frm:311, Form_KeyDown :751). [built] = exists in the prototype.
  */
-private enum class EditScreen(val title: String, val mnemonic: Char, val key: Key, val built: Boolean) {
-    OVERVIEW("Overview...", 'O', Key.O, false),
-    STATS("Stats...", 'A', Key.T, false),
-    SKILLS("Skills...", 'K', Key.K, true),
-    FEATS("Feats...", 'F', Key.F, false),
-    SPELLS("Spells...", 'P', Key.P, false),
-    ENHANCEMENTS("Enhancements...", 'E', Key.E, true),
-    DESTINY("Destiny...", 'D', Key.D, false),
+private enum class EditScreen(val screen: BuildScreen, val title: String, val mnemonic: Char, val key: Key, val built: Boolean) {
+    OVERVIEW(BuildScreen.OVERVIEW, "Overview...", 'O', Key.O, true),
+    STATS(BuildScreen.STATS, "Stats...", 'A', Key.T, false),
+    SKILLS(BuildScreen.SKILLS, "Skills...", 'K', Key.K, true),
+    FEATS(BuildScreen.FEATS, "Feats...", 'F', Key.F, false),
+    SPELLS(BuildScreen.SPELLS, "Spells...", 'P', Key.P, false),
+    ENHANCEMENTS(BuildScreen.ENHANCEMENTS, "Enhancements...", 'E', Key.E, true),
+    DESTINY(BuildScreen.DESTINY, "Destiny...", 'D', Key.D, false),
 }
 
 /** Which screen windows are open, and their AWT windows (for bringing one to the front). */
 private class OpenWindows {
-    var skills by mutableStateOf(false)
-    var enhancements by mutableStateOf(false)
-    val awtWindows = HashMap<EditScreen, ComposeWindow>()
+    private val open = mutableStateMapOf<BuildScreen, Boolean>()
+    val awtWindows = HashMap<BuildScreen, ComposeWindow>()
 
-    /**
-     * Opens a screen's window, or brings it to the front if it's already open.
-     * Ported from basMain.OpenForm (Build/basMain.bas:131), without its gating checks: the
-     * prototype's builds always have a race, classes and stats.
-     */
-    fun open(screen: EditScreen) {
-        if (screen == EditScreen.SKILLS) {
-            skills = true
-        } else if (screen == EditScreen.ENHANCEMENTS) {
-            enhancements = true
-        }
+    fun isOpen(screen: BuildScreen): Boolean = open[screen] == true
+
+    fun show(screen: BuildScreen) {
+        open[screen] = true
         val existing = awtWindows[screen]
         if (existing != null) {
             existing.toFront()
         }
     }
 
-    fun isOpen(screen: EditScreen): Boolean {
-        if (screen == EditScreen.SKILLS) {
-            return skills
+    fun close(screen: BuildScreen) {
+        open.remove(screen)
+        awtWindows.remove(screen)
+    }
+
+    /** CloseForm "All" (basMain.bas:210). */
+    fun closeAll() {
+        for (screen in BuildScreen.entries) {
+            close(screen)
         }
-        if (screen == EditScreen.ENHANCEMENTS) {
-            return enhancements
-        }
-        return false
     }
 }
 
 /**
- * Whether a screen can be opened: it exists in the prototype, and the Skills grid has levels to
- * show. (VB's OpenForm, basMain.bas:131, also refuses screens until the build has what they need.)
+ * Opens a screen's window, or brings it to the front, if the build is ready for it. Ported from
+ * basMain.OpenForm (Build/basMain.bas:131): the checks are in builder-core's openScreenNotice; on
+ * "Select a Race first." the Overview drops down its race list, as VB's does.
  */
-private fun canOpen(screen: EditScreen, state: PrototypeState): Boolean {
-    if (!screen.built) {
+private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenWindows) {
+    val rules = state.rules
+    if (!screen.built || rules == null) {
+        return
+    }
+    val notice = openScreenNotice(rules, screen.screen, null)
+    if (notice != null) {
+        state.prompts.notice(notice)
+        return
+    }
+    windows.show(screen.screen)
+}
+
+/**
+ * Whether an Edit menu item is enabled. Ported from basDocuments.EnableMenus (:249): everything
+ * once a build is open, except Spells (casters only) and Destiny (20 or more levels).
+ */
+private fun menuEnabled(screen: EditScreen, state: PrototypeState): Boolean {
+    val rules = state.rules
+    if (!screen.built || rules == null) {
         return false
     }
-    if (screen == EditScreen.SKILLS) {
-        return state.skills.hasLevels()
+    if (screen == EditScreen.SPELLS) {
+        return rules.build.canCastSpell[1] > 0
+    }
+    if (screen == EditScreen.DESTINY) {
+        return rules.build.maxLevels > 19
     }
     return true
 }
 
 /**
- * The main window's title: the build's name, with the file name if it differs; the program's name
- * if the build has no name. Ported from basDocuments.SetAppCaption (Build/basDocuments.bas:172),
- * without the "*" for unsaved changes (the prototype doesn't track them yet).
+ * The main window's title: the build's name, with the file name if it differs, and "*" for unsaved
+ * changes; the program's name if the build has no name. Ported from basDocuments.SetAppCaption
+ * (Build/basDocuments.bas:172).
  */
 private fun appCaption(files: BuildFiles, state: PrototypeState): String {
     val opened = state.opened
@@ -144,6 +171,9 @@ private fun appCaption(files: BuildFiles, state: PrototypeState): String {
     val file = files.file
     if (file != null && caption != file.nameWithoutExtension) {
         caption = caption + " (" + file.name + ")"
+    }
+    if (state.dirty) {
+        caption = caption + "*"
     }
     return caption
 }
@@ -159,9 +189,12 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
     if (event.isCtrlPressed || event.isAltPressed || event.isShiftPressed) {
         return false // VB: If Shift <> 0 Then Exit Sub
     }
+    if (state.opened == null) {
+        return false // VB: If Not BuildIsOpen() Then Exit Sub
+    }
     for (screen in EditScreen.entries) {
-        if (canOpen(screen, state) && event.key == screen.key) {
-            windows.open(screen)
+        if (event.key == screen.key) {
+            openScreen(screen, state, windows)
             return true
         }
     }
@@ -170,35 +203,66 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, icons: Map<String, ImageBitmap>) {
     val windows = remember { OpenWindows() }
+    val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    // The window part of CascadeChanges: close the screens that no longer make sense.
+    state.onCascade = { change ->
+        for (screen in BuildScreen.entries) {
+            val rules = state.rules
+            if (windows.isOpen(screen) && (rules == null || closesAfterChange(rules, screen, change))) {
+                windows.close(screen)
+            }
+        }
+    }
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = {
+            val parent = mainWindow[0]
+            if (parent == null || !files.checkDirty(parent, state)) {
+                exitApplication()
+            }
+        },
         title = appCaption(files, state),
         state = rememberWindowState(position = WindowPosition(40.dp, 40.dp), width = 460.dp, height = 640.dp),
         onKeyEvent = { event -> mainWindowKey(event, windows, state) },
     ) {
+        mainWindow[0] = window
         MenuBar {
             // frmMain's File menu (frmMain.frm:160), with the items the prototype has.
             Menu("File", mnemonic = 'F') {
+                Item("New...", mnemonic = 'N', shortcut = KeyShortcut(Key.N, ctrl = true), onClick = {
+                    windows.closeAll()
+                    if (files.new(window, state)) {
+                        openScreen(EditScreen.OVERVIEW, state, windows)
+                    }
+                })
                 Item("Open...", mnemonic = 'O', shortcut = KeyShortcut(Key.O, ctrl = true), onClick = { files.open(window, state) })
+                Item("Close", mnemonic = 'C', enabled = state.opened != null, onClick = {
+                    if (files.close(window, state)) {
+                        windows.closeAll()
+                    }
+                })
                 Separator()
                 Item("Save", mnemonic = 'S', shortcut = KeyShortcut(Key.S, ctrl = true), enabled = state.opened != null, onClick = { files.save(window, state) })
                 Item("Save As...", mnemonic = 'A', enabled = state.opened != null, onClick = { files.saveAs(window, state) })
                 Separator()
-                Item("Exit", mnemonic = 'x', onClick = ::exitApplication)
+                Item("Exit", mnemonic = 'x', onClick = {
+                    if (!files.checkDirty(window, state)) {
+                        exitApplication()
+                    }
+                })
             }
             Menu("Edit", mnemonic = 'E') {
                 for (screen in EditScreen.entries) {
-                    Item(screen.title, mnemonic = screen.mnemonic, enabled = canOpen(screen, state), onClick = { windows.open(screen) })
+                    Item(screen.title, mnemonic = screen.mnemonic, enabled = menuEnabled(screen, state), onClick = { openScreen(screen, state, windows) })
                 }
             }
             // frmMain's Window menu lists the open screens (tmrWindowMenu_Timer, frmMain.frm:819).
             Menu("Window", mnemonic = 'W') {
                 for (screen in EditScreen.entries) {
-                    if (windows.isOpen(screen)) {
-                        Item(screen.title.removeSuffix("..."), onClick = { windows.open(screen) })
+                    if (windows.isOpen(screen.screen)) {
+                        Item(screen.title.removeSuffix("..."), onClick = { windows.show(screen.screen) })
                     }
                 }
             }
@@ -206,13 +270,19 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         MainWindowContent(state)
     }
 
-    if (windows.skills) {
-        ScreenWindow(windows, EditScreen.SKILLS, "Skills", 520, 40, 1000, 760, onClose = { windows.skills = false }) {
+    if (windows.isOpen(BuildScreen.OVERVIEW)) {
+        // The form's client area is 866 x 609 at 100%; the window adds its frame and title bar.
+        ScreenWindow(windows, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
+            OverviewWindowContent(state, icons)
+        }
+    }
+    if (windows.isOpen(BuildScreen.SKILLS)) {
+        ScreenWindow(windows, BuildScreen.SKILLS, "Skills", 520, 40, 1000, 760) {
             SkillsWindowContent(state)
         }
     }
-    if (windows.enhancements) {
-        ScreenWindow(windows, EditScreen.ENHANCEMENTS, "Enhancements", 560, 80, 900, 640, onClose = { windows.enhancements = false }) {
+    if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {
+        ScreenWindow(windows, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 900, 640) {
             TreeSlotsWindowContent(state)
         }
     }
@@ -222,20 +292,16 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
 @Composable
 private fun ScreenWindow(
     windows: OpenWindows,
-    screen: EditScreen,
+    screen: BuildScreen,
     title: String,
     x: Int,
     y: Int,
     width: Int,
     height: Int,
-    onClose: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Window(
-        onCloseRequest = {
-            windows.awtWindows.remove(screen)
-            onClose()
-        },
+        onCloseRequest = { windows.close(screen) },
         title = title,
         state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp),
     ) {
@@ -243,6 +309,32 @@ private fun ScreenWindow(
         content()
     }
 }
+
+/**
+ * The class icons from CharacterBuilderLite.RES (copied onto the classpath by the build), by
+ * resource name. VB reads them with LoadResPicture; empty if the file is missing.
+ */
+internal fun loadClassIcons(): Map<String, ImageBitmap> {
+    val result = HashMap<String, ImageBitmap>()
+    val stream = BuilderIcons::class.java.getResourceAsStream("/CharacterBuilderLite.RES")
+    if (stream == null) {
+        println("CharacterBuilderLite.RES not found: class icons won't show")
+        return result
+    }
+    val resources = stream.use { readResFile(it.readBytes()) }
+    for (resource in resources) {
+        if (resource.type == RT_BITMAP && resource.name.startsWith("CLS")) {
+            val image = ImageIO.read(bitmapFile(resource.data).inputStream())
+            if (image != null) {
+                result[resource.name] = image.toComposeImageBitmap()
+            }
+        }
+    }
+    return result
+}
+
+/** Something in this module to find resources from. */
+private object BuilderIcons
 
 /** Every .screen file in [settings], with "Black" first (VB's default theme, clsConfig.LoadColors). */
 private fun loadThemes(settings: Path): List<Theme> {

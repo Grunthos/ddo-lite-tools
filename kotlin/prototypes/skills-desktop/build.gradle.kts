@@ -17,6 +17,14 @@ dependencies {
     implementation(compose.desktop.currentOs)
 }
 
+// The VB Builder's resource file (class icons and other bitmaps), which VB builds into its .exe;
+// the app reads it from the classpath (Main.kt loadClassIcons).
+val vbResources = tasks.register<Sync>("vbResources") {
+    from(rootDir.resolve("../Source/CharacterBuilderLite.RES"))
+    into(layout.buildDirectory.dir("generated/vb-resources"))
+}
+sourceSets["main"].resources.srcDir(vbResources)
+
 compose.desktop {
     application {
         mainClass = "ddolite.prototype.skills.desktop.MainKt"

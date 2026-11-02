@@ -11,6 +11,7 @@ import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DataSource
 import ddolite.dataformat.decodeText
+import ddolite.prototype.skills.BuilderPrompts
 import ddolite.prototype.skills.PrototypeScreen
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
@@ -31,10 +32,22 @@ class MainActivity : ComponentActivity() {
         val dataSource = AssetDataSource(assets)
         val data = loadBuilderData(dataSource, LoadLog())
         val skills = SkillsScreenState(data, loadThemes(assets), prototypePresets())
-        val state = PrototypeState(skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills))
+        val state = PrototypeState(data, skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills), AndroidPrompts)
         setContent {
             PrototypeScreen(state)
         }
+    }
+}
+
+/**
+ * The Android prototype has no Overview screen yet, so nothing asks questions: everything is
+ * answered yes and notices go to the log. Real dialogs come with the Android screens (phase G).
+ */
+object AndroidPrompts : BuilderPrompts {
+    override fun confirm(message: String): Boolean = true
+
+    override fun notice(message: String) {
+        android.util.Log.i("Builder", message)
     }
 }
 

@@ -34,37 +34,6 @@ import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
-/** Both prototype screens, with tabs to switch between them. */
-class PrototypeState(val skills: SkillsScreenState, val trees: TreeSlotsState) {
-    /** 0 = skills grid, 1 = enhancement tree slots. */
-    var tab by mutableIntStateOf(0)
-
-    /** The opened .build file, with what loading it reported; null while showing a made-up preset. */
-    var opened: BuildLoadResult? by mutableStateOf(null)
-        private set
-
-    /** Shows an opened build in every screen. */
-    fun openBuild(result: BuildLoadResult) {
-        opened = result
-        skills.openBuild(result.build, result.rules.heroicLevels())
-        trees.openBuild(result.build)
-    }
-
-    /**
-     * The opened build's rules with the screens' changes copied back into the build, ready for
-     * writeBuildFile; null if no build is open.
-     */
-    fun prepareSave(): BuildRules? {
-        val result = opened
-        if (result == null) {
-            return null
-        }
-        skills.storeInto(result.build)
-        trees.storeInto(result.rules)
-        return result.rules
-    }
-}
-
 /** The prototype's whole window: a tab bar, the chosen screen, and anything being dragged. */
 @Composable
 fun PrototypeScreen(state: PrototypeState) {
@@ -185,15 +154,36 @@ fun MainWindowContent(state: PrototypeState) {
     val skills = state.skills
     val theme = skills.theme
     val text = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val revision = skills.revision // read so this redraws when the build changes
+    val revision = skills.revision + state.revision // read so this redraws when the build changes
     val lines = ArrayList<String>()
-    lines.add("Build: " + skills.buildTitle() + "   [revision " + revision + "]")
-    lines.add("")
     val opened = state.opened
-    if (opened != null) {
+    if (opened == null) {
+        lines.add("No build is open: start one with File > New (Ctrl+N), or open one with File > Open (Ctrl+O).")
+    } else {
+        lines.add("Build: " + skills.buildTitle() + "   [revision " + revision + "]")
+        lines.add("")
         lines.addAll(openedBuildLines(opened))
+        appendScreenLines(state, lines)
+        lines.add("Open screens from the Edit menu (or press O / K / E), in the VB app's order.")
     }
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
+            .verticalScroll(rememberScrollState())
+            .padding(12.dp),
+    ) {
+        BasicText(lines.joinToString("\n"), style = text)
+    }
+}
+
+/** The skill ranks and tree slots as the Skills and Enhancements windows have them. */
+private fun appendScreenLines(state: PrototypeState, lines: ArrayList<String>) {
+    val skills = state.skills
     lines.add("Skills (total ranks):")
+    if (!skills.hasLevels()) {
+        lines.add("")
+        return
+    }
     for (skill in Skill.entries) {
         val ranks = skills.grid.totalRanks(skills.spend, skill)
         if (ranks > 0) {
@@ -209,15 +199,6 @@ fun MainWindowContent(state: PrototypeState) {
         }
     }
     lines.add("")
-    lines.add("Open a build with File > Open (Ctrl+O). Open screens from the Edit menu (or press K / E), in the VB app's order.")
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
-            .verticalScroll(rememberScrollState())
-            .padding(12.dp),
-    ) {
-        BasicText(lines.joinToString("\n"), style = text)
-    }
 }
 
 /**

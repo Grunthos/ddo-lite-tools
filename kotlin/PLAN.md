@@ -585,6 +585,22 @@ desktop first; Android only has to keep compiling (CI) until phase G.
       open: VB-re-saved copies of the samples as exact goldens, and more varied builds (races, casters, epic,
       old ones with renamed items).
    4. [ ] Then the Overview window on real files, then Stats, Skills, … in Edit-menu order.
+      - [x] Desktop shell: File > New / Open / Close / Save / Save As with the "Save changes?" check
+        (`CheckDirty`), the dirty "*" in the title, Edit-menu enabling (`EnableMenus`), the `OpenForm`
+        checks with VB's messages (core `openScreenNotice`), and windows closed after a change
+        (core `closesAfterChange`, the window part of `CascadeChanges`).
+      - [x] Overview, icon layout (VB's default): name, race list (userRaceCombo, with its keys), alignment,
+        max levels, notes and the Notes tab, class icons from `CharacterBuilderLite.RES` (read by
+        `common/resources/ResFile.kt`) with the alignment and disallowed-class filters, dragging classes
+        onto / between / off the three build class slots, the level grid (click a class column to give
+        a level that class, drag in the class column to swap two levels), the Sub-Race notice and the
+        "erase the Leveling Guide?" question. Rules in core `OverviewRules` with tests; the build part
+        of `CascadeChanges` in `BuildRules.cascadeChanges`.
+      - [ ] Overview still open: the combo-box layout used when icons are off in Options (needs the
+        settings), the Help link, the footer's "Stats >" (needs Stats), saved window positions, and a
+        by-eye comparison with the VB form (fonts: Verdana isn't bundled yet).
+      - Not ported in the cascade yet: `InitBuildSkills` (the Skills screen builds its own grid) and
+        `CheckSlotErrors` (comes with the Feats screen).
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.

@@ -7,17 +7,20 @@ import ddolite.builder.build.BuildPoints
 import ddolite.builder.build.readBuildFile
 import ddolite.builder.build.writeBuildFile
 import ddolite.builder.data.BuilderData
+import ddolite.prototype.skills.BuilderPrompts
 import ddolite.prototype.skills.PrototypeState
+import java.awt.Component
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 import javax.swing.JOptionPane
 
 /**
- * File > Open, Save and Save As for .build files. Ported from basDocuments.BuildOpen (Build/basDocuments.bas:45),
- * BuildSave (:112), BuildSaveAs (:126) and SaveAsDialog (:142), without what the prototype doesn't have yet:
- * the "save changes?" check (CheckDirty), the recent-files list (MRU), .bld files, and the reserved
- * Save\Binary folder. The file dialogs are AWT's, which are the system's own and ask before overwriting.
+ * File > New, Open, Close, Save and Save As for .build files. Ported from basDocuments
+ * (Build/basDocuments.bas): BuildNew (:32), BuildOpen (:45), BuildClose (:99), BuildSave (:112),
+ * BuildSaveAs (:126), SaveAsDialog (:142), CheckDirty (:228) and PromptName (:236). Not yet: the
+ * recent-files list (MRU), .bld files, the reserved Save\Binary folder and the autosaved backup.
+ * The file dialogs are AWT's, which are the system's own and ask before overwriting.
  *
  * @property folder the folder the dialogs start in (VB's cfg.LitePath), remembered for this run only.
  */
@@ -26,8 +29,22 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
     var file: File? by mutableStateOf(null)
         private set
 
+    /** A new build. Returns false if the user cancelled at "Save changes?". */
+    fun new(parent: Frame, state: PrototypeState): Boolean {
+        if (checkDirty(parent, state)) {
+            return false
+        }
+        file = null
+        // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.
+        state.newBuild(BuildPoints.ADVENTURER)
+        return true
+    }
+
     /** Asks for a .build file and opens it. VB's BuildOpen → OpenDialog → LoadBuild. */
     fun open(parent: Frame, state: PrototypeState) {
+        if (checkDirty(parent, state)) {
+            return
+        }
         val dialog = FileDialog(parent, "Open", FileDialog.LOAD)
         dialog.directory = folder.path
         dialog.file = "*.build"
@@ -47,8 +64,8 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         }
         // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.
         val result = readBuildFile(bytes, data, BuildPoints.ADVENTURER)
-        state.openBuild(result)
         file = chosen
+        state.openBuild(result)
         if (result.problems.isNotEmpty()) {
             // VB asks "Ignore error and load anyway?" for each one; the prototype carries on and lists them.
             JOptionPane.showMessageDialog(
@@ -61,28 +78,41 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         }
     }
 
-    /** Saves to the file the build came from, or asks for one. VB's BuildSave. */
-    fun save(parent: Frame, state: PrototypeState) {
-        val current = file
-        if (current == null) {
-            saveAs(parent, state)
-        } else {
-            write(parent, state, current)
+    /** No build open. Returns false if the user cancelled at "Save changes?". */
+    fun close(parent: Frame, state: PrototypeState): Boolean {
+        if (checkDirty(parent, state)) {
+            return false
         }
+        file = null
+        state.closeBuild()
+        return true
     }
 
-    /** Asks for a file name, starting from the build's name, and saves. VB's BuildSaveAs → SaveAsDialog. */
-    fun saveAs(parent: Frame, state: PrototypeState) {
+    /** Saves to the file the build came from, or asks for one. VB's BuildSave; true if cancelled. */
+    fun save(parent: Frame, state: PrototypeState): Boolean {
+        val current = file
+        if (current == null) {
+            return saveAs(parent, state)
+        }
+        if (!write(parent, state, current)) {
+            return true
+        }
+        state.dirty = false
+        return false
+    }
+
+    /** Asks for a file name, starting from the build's name, and saves. VB's BuildSaveAs → SaveAsDialog; true if cancelled. */
+    fun saveAs(parent: Frame, state: PrototypeState): Boolean {
         val opened = state.opened
         if (opened == null) {
-            return
+            return true
         }
         val dialog = FileDialog(parent, "Save As", FileDialog.SAVE)
         dialog.directory = folder.path
         dialog.file = dosName(opened.build.buildName) + ".build"
         dialog.isVisible = true
         if (dialog.file == null) {
-            return
+            return true
         }
         var name = dialog.file
         if (!name.lowercase().endsWith(".build")) {
@@ -90,9 +120,48 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         }
         val chosen = File(dialog.directory, name)
         folder = chosen.parentFile
-        if (write(parent, state, chosen)) {
-            file = chosen
+        if (!write(parent, state, chosen)) {
+            return true
         }
+        file = chosen
+        state.dirty = false
+        return false
+    }
+
+    /**
+     * "Save changes to <name>?" with Yes, No and Cancel, if there are unsaved changes. Returns
+     * true if the user cancelled (or cancelled the save). Ported from CheckDirty (basDocuments.bas:228),
+     * which always asks (AskCancel with pblnAlwaysAsk, basUtils.bas:80: No is the default).
+     */
+    fun checkDirty(parent: Frame, state: PrototypeState): Boolean {
+        if (!state.dirty) {
+            return false
+        }
+        val options = arrayOf("Yes", "No", "Cancel")
+        val answer = JOptionPane.showOptionDialog(
+            parent,
+            "Save changes to " + promptName(state) + "?",
+            "Notice",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[1],
+        )
+        if (answer == 0) {
+            return save(parent, state)
+        }
+        return answer != 1
+    }
+
+    /** The build's name, or the file's if it differs. Ported from PromptName (basDocuments.bas:236). */
+    private fun promptName(state: PrototypeState): String {
+        val buildName = state.opened?.build?.buildName ?: ""
+        val current = file
+        if (current == null || current.nameWithoutExtension == buildName) {
+            return buildName
+        }
+        return current.name
     }
 
     private fun write(parent: Frame, state: PrototypeState, target: File): Boolean {
@@ -107,6 +176,31 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             return false
         }
         return true
+    }
+}
+
+/**
+ * VB's message boxes as Swing dialogs over the window [parent] returns. Ported from
+ * basUtils.AskAlways (:72, Yes/No with No as the default) and Notice (:91); both are titled "Notice".
+ */
+class DesktopPrompts(private val parent: () -> Component?) : BuilderPrompts {
+    override fun confirm(message: String): Boolean {
+        val options = arrayOf("Yes", "No")
+        val answer = JOptionPane.showOptionDialog(
+            parent(),
+            message,
+            "Notice",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[1],
+        )
+        return answer == 0
+    }
+
+    override fun notice(message: String) {
+        JOptionPane.showMessageDialog(parent(), message, "Notice", JOptionPane.INFORMATION_MESSAGE)
     }
 }
 

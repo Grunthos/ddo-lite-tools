@@ -329,5 +329,9 @@ class TreeSlotsState(
                 selectedSlot = null
             }
         }
+        onChanged()
     }
+
+    /** Called after each change the user makes, so the app can copy the trees into the build. */
+    var onChanged: () -> Unit = {}
 }
