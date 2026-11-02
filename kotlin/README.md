@@ -50,6 +50,7 @@ Throwaway code to test Compose before building the real screens; see PLAN.md §8
 
 ```
 ./gradlew :prototypes:skills-desktop:run           # open the prototype window
+./gradlew :prototypes:skills-desktop:portableZip   # portable Windows app: build/portable/ (folder + zip, .exe with its own Java runtime)
 ./gradlew :prototypes:skills-desktop:screenshots   # render it off-screen with simulated clicks → build/screenshots
 ./gradlew :prototypes:skills-android:assembleDebug # Android APK (same screens, data bundled)
 ```

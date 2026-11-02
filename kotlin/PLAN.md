@@ -104,7 +104,7 @@ fixing them afterwards would mean rewriting the core:
 | D-8 | Drop `frmDestiny.frm` (not in the `.vbp`); move `frmConvert` (`.bld`) and `frmRefreshData` (wiki scrape) to command-line tools | Recommended – confirm |
 | D-9 | Fate of the ADQ/Colors/LightsOut/Stopwatch utilities | **Open** |
 | D-10 | Upstream owner (Chris Lewis) agreement for the `kotlin/` folder, a LICENSE, and supplying VB6 builds | **Open** |
-| D-11 | Accept a bundled JRE (download size ~70–100 MB vs today's small exes); delivered as portable per-OS zips (§1) | Open – portable-zip form agreed 2026-11-02; size still to accept |
+| D-11 | Accept a bundled JRE (download size 55 MB zipped / 122 MB unpacked for the prototype vs today's small exes); delivered as portable per-OS zips (§1) | Open – portable-zip form agreed 2026-11-02; size still to accept |
 | D-12 | Mobile: Android first; iOS only if there's demand and a Mac + Apple developer account available | Proposed – revisit at end of F4 |
 
 ---
@@ -343,6 +343,9 @@ the problem is fundamental.**
       tree-slot column is squeezed): phone layouts are phase G work, not a toolkit problem.
       Other mouse buttons still need §2a.5 alternatives.
       Emulator from Git Bash: set `ANDROID_AVD_HOME=C:\Users\pjw\.android\avd` (Cygwin's HOME hides the AVDs).
+- [x] Portable Windows app: `:prototypes:skills-desktop:portableZip` builds `CharacterBuilderPrototype.exe` with its own
+      Java runtime and Data/ + Settings/ beside it (zip 55 MB, 122 MB unpacked). Unzipped outside the repo and
+      started from another folder, it finds its data next to the .exe and runs (2026-11-02). Figures for D-11.
 - [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
 - **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
   (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can
@@ -481,13 +484,16 @@ All of these sit behind interfaces in `common` (§2a.7), with one implementation
 
 ## 14. Immediate next actions
 
+Priority: the Windows desktop app. All the layouts come from Windows forms, so screens are built and tuned on
+desktop first; Android only has to keep compiling (CI) until phase G.
+
 1. [ ] Ask Chris Lewis: support for the `kotlin` branch/folder and a LICENSE (D-10).
 2. [x] Create the `kotlin` branch; set up Gradle (`data-format`, `builder-core` as KMP with `jvm` + `android` targets, `tools/validate`), `.gitattributes`, `.gitignore`, CI workflow.
 3. [x] B1: shared reading building blocks + Builder `ParseLine` + tests over all of `Data/` (writer moved to B4).
 4. [x] B2: Races and Classes loaders (first typed models, races/classes by name, D-7).
 5. [x] B6 (first rules): skills grid (`SkillGrid`: InitBuildSkills + the frmSkills editing rules).
 6. [x] F1: prototypes 1–3 on desktop, Android build (see §8.2 status).
-7. [ ] F1: ~~run the Android prototype~~ (done, emulator); check 150% scaling on desktop; then confirm D-2.
+7. [ ] F1: ~~run the Android prototype~~ (done, emulator); portable Windows exe done; check 150% scaling on desktop; then confirm D-2.
 8. [ ] B2: remaining loaders (Feats, Enhancements, Destinies, Spells, Templates, …).
 9. [ ] F0: inventory `frmEnhancements` and `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
