@@ -10,6 +10,9 @@ import ddolite.builder.build.BuildPoints
 import ddolite.builder.build.BuildRules
 import ddolite.builder.build.CascadeChange
 import ddolite.builder.build.Deprecations
+import ddolite.builder.build.HEROIC_LEVELS
+import ddolite.builder.build.StatRules
+import ddolite.builder.model.Stat
 import ddolite.builder.data.BuilderData
 
 /**
@@ -22,6 +25,9 @@ interface BuilderPrompts {
 
     /** A message with an OK button. */
     fun notice(message: String)
+
+    /** Yes, No or Cancel (the default), titled [title]: true, false, or null for Cancel. */
+    fun yesNoCancel(message: String, title: String): Boolean?
 }
 
 /**
@@ -55,6 +61,8 @@ class PrototypeState(
     var onCascade: (CascadeChange) -> Unit = {}
 
     val overview = OverviewScreenState(this)
+
+    val stats = StatsScreenState(this)
 
     init {
         skills.onChanged = { storeScreens() }
@@ -94,6 +102,7 @@ class PrototypeState(
     private fun show(result: BuildLoadResult) {
         opened = result
         overview.opened()
+        stats.refresh()
         refreshScreens()
         revision++
         onCascade(CascadeChange.ALL)
@@ -105,6 +114,10 @@ class PrototypeState(
      * screens, marks the build dirty and lets the app close windows that no longer apply.
      */
     fun buildChanged(change: CascadeChange?) {
+        // VB cascades to the Stats window only for these (CascadeChanges, basMain.bas:282).
+        if (change == CascadeChange.ALL || change == CascadeChange.CLASS || change == CascadeChange.RACE || change == CascadeChange.MAX_LEVEL) {
+            stats.refresh()
+        }
         refreshScreens()
         dirty = true
         revision++
@@ -118,7 +131,13 @@ class PrototypeState(
         if (result == null) {
             return
         }
-        skills.openBuild(result.build, result.rules.heroicLevels())
+        // InitBuildSkills (basBuild.bas:394) uses the Intelligence modifier at each level.
+        val statRules = StatRules(result.rules)
+        val intModifiers = ArrayList<Int>()
+        for (level in 1..HEROIC_LEVELS) {
+            intModifiers.add(statRules.stat(Stat.INT, level, modifier = true))
+        }
+        skills.openBuild(result.build, result.rules.heroicLevels(), intModifiers)
         trees.openBuild(result.build)
         overview.refreshChoices()
     }

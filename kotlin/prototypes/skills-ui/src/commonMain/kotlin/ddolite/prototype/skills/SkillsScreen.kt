@@ -47,15 +47,15 @@ fun SkillsScreen(state: SkillsScreenState) {
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        // Level plans.
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            BasicText("Build:", style = label)
-            val opened = state.openedBuild
-            if (opened != null) {
-                ChoiceButton(theme, openedBuildLabel(opened), selected = true) {}
-            }
-            for (i in state.presets.indices) {
-                ChoiceButton(theme, state.presets[i].name, selected = opened == null && i == state.presetIndex) { state.selectPreset(i) }
+        // Made-up level plans, only when no build is open (the Android prototype): with a build
+        // open, its classes come from the Overview and its Intelligence from Stats.
+        val opened = state.openedBuild
+        if (opened == null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                BasicText("Build:", style = label)
+                for (i in state.presets.indices) {
+                    ChoiceButton(theme, state.presets[i].name, selected = i == state.presetIndex) { state.selectPreset(i) }
+                }
             }
         }
 
@@ -69,14 +69,16 @@ fun SkillsScreen(state: SkillsScreenState) {
             ChoiceButton(theme, ">", selected = false) {
                 state.selectTheme((state.themeIndex + 1) % state.themes.size)
             }
-            BasicText("      Intelligence modifier:", style = label)
-            Spinner(
-                value = state.intModifier,
-                min = -5,
-                max = 15,
-                theme = theme,
-                onValueChange = { state.changeIntModifier(it) },
-            )
+            if (opened == null) {
+                BasicText("      Intelligence modifier:", style = label)
+                Spinner(
+                    value = state.intModifier,
+                    min = -5,
+                    max = 15,
+                    theme = theme,
+                    onValueChange = { state.changeIntModifier(it) },
+                )
+            }
         }
 
         // The grid scrolls if the window is too small for it.

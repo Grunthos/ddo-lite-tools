@@ -30,6 +30,11 @@ object ScriptPrompts : BuilderPrompts {
     override fun notice(message: String) {
         println("Notice: $message")
     }
+
+    override fun yesNoCancel(message: String, title: String): Boolean? {
+        println("Asked: $message -> Yes")
+        return true
+    }
 }
 
 /**
@@ -43,7 +48,7 @@ fun overviewScreenshots(prototype: PrototypeState, kensei: ByteArray, repoRoot: 
     println("Class icons: " + icons.size)
     val data = prototype.data
     prototype.openBuild(readBuildFile(kensei, data, BuildPoints.ADVENTURER))
-    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) }.use { scene ->
+    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
         saveScene(scene, outDir.resolve("10-overview-opened.png"))
         prototype.overview.showTab(notes = true)
         saveScene(scene, outDir.resolve("10b-overview-notes.png"))
@@ -52,7 +57,7 @@ fun overviewScreenshots(prototype: PrototypeState, kensei: ByteArray, repoRoot: 
 
     prototype.newBuild(BuildPoints.ADVENTURER)
     val overview = prototype.overview
-    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) }.use { scene ->
+    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
         saveScene(scene, outDir.resolve("11-overview-new.png"))
         overview.toggleRaceList()
         saveScene(scene, outDir.resolve("12-overview-race-list.png"))

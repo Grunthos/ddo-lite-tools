@@ -28,9 +28,9 @@ enum class PointerButton { PRIMARY, SECONDARY, TERTIARY }
  * numbering: row 0 = the header rows, rows 1-21 = skills; column 0 = the skill names,
  * columns 1-20 = levels; -1 = outside.
  *
- * Simplifications for the prototype: the build is an opened .build file or a made-up
- * [BuildPreset] with a Human, and the Intelligence modifier is one number for every level (VB works it out per level from stats,
- * level-ups and tomes).
+ * The build is the open .build, with the Intelligence modifier at each level from its stats (as
+ * VB's InitBuildSkills); the Android prototype still uses a made-up [BuildPreset] with a Human
+ * and one Intelligence modifier for every level.
  */
 class SkillsScreenState(
     private val data: BuilderData,
@@ -53,6 +53,9 @@ class SkillsScreenState(
 
     // Heroic levels of the opened build (basBuild.GetHeroicLevels).
     private var openedLevels = 0
+
+    // The opened build's Intelligence modifier at each heroic level (from its stats).
+    private var openedModifiers: List<Int> = emptyList()
 
     /** The skill points spent. Kept when the preset changes, as VB keeps build.Skills when classes change. */
     val spend = SkillSpend()
@@ -102,9 +105,10 @@ class SkillsScreenState(
      * VB's frmSkills reads `build.Skills` directly; here the screen keeps its own [SkillSpend]
      * and [storeInto] copies it back before saving.
      */
-    fun openBuild(build: Build, heroicLevels: Int) {
+    fun openBuild(build: Build, heroicLevels: Int, intModifiers: List<Int>) {
         openedBuild = build
         openedLevels = heroicLevels
+        openedModifiers = intModifiers
         for (skill in Skill.entries) {
             for (level in 1..HEROIC_LEVELS) {
                 spend.set(skill, level, build.skills[skill.ordinal][level - 1])
@@ -308,7 +312,11 @@ class SkillsScreenState(
         }
         val modifiers = ArrayList<Int>()
         for (i in classes.indices) {
-            modifiers.add(intModifier)
+            if (build != null) {
+                modifiers.add(openedModifiers[i])
+            } else {
+                modifiers.add(intModifier)
+            }
         }
         return SkillGrid(classes, raceSkillPoints, modifiers)
     }

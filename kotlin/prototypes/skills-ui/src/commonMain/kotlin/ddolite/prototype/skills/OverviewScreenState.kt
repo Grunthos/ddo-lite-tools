@@ -155,7 +155,7 @@ class OverviewScreenState(private val session: PrototypeState) {
     }
 
     /** RaceShow (:1521) → userRaceCombo.DropDown/DrawList (:88, :140): the current race is highlighted. */
-    private fun showRaceList() {
+    fun showRaceList() {
         if (notesTab) {
             return
         }

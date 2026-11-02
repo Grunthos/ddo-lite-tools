@@ -40,6 +40,7 @@ import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
 import ddolite.prototype.skills.SkillsWindowContent
+import ddolite.prototype.skills.StatsWindowContent
 import ddolite.prototype.skills.TreeSlotsState
 import ddolite.prototype.skills.TreeSlotsWindowContent
 import ddolite.prototype.skills.prototypePresets
@@ -85,7 +86,7 @@ fun main(args: Array<String>) {
  */
 private enum class EditScreen(val screen: BuildScreen, val title: String, val mnemonic: Char, val key: Key, val built: Boolean) {
     OVERVIEW(BuildScreen.OVERVIEW, "Overview...", 'O', Key.O, true),
-    STATS(BuildScreen.STATS, "Stats...", 'A', Key.T, false),
+    STATS(BuildScreen.STATS, "Stats...", 'A', Key.T, true),
     SKILLS(BuildScreen.SKILLS, "Skills...", 'K', Key.K, true),
     FEATS(BuildScreen.FEATS, "Feats...", 'F', Key.F, false),
     SPELLS(BuildScreen.SPELLS, "Spells...", 'P', Key.P, false),
@@ -123,20 +124,47 @@ private class OpenWindows {
 
 /**
  * Opens a screen's window, or brings it to the front, if the build is ready for it. Ported from
- * basMain.OpenForm (Build/basMain.bas:131): the checks are in builder-core's openScreenNotice; on
- * "Select a Race first." the Overview drops down its race list, as VB's does.
+ * basMain.OpenForm (Build/basMain.bas:131): the checks are in builder-core's openScreenNotice. [from]
+ * is the window asking (VB's Screen.ActiveForm; null for the main window): on "Select a Race first."
+ * the Overview drops down its race list, as VB's does. Returns false if the screen didn't open.
  */
-private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenWindows) {
+private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenWindows, from: BuildScreen? = null): Boolean {
     val rules = state.rules
     if (!screen.built || rules == null) {
-        return
+        return false
     }
-    val notice = openScreenNotice(rules, screen.screen, null)
+    val notice = openScreenNotice(rules, screen.screen, from)
     if (notice != null) {
         state.prompts.notice(notice)
-        return
+        if (from == BuildScreen.OVERVIEW && notice == "Select a Race first.") {
+            state.overview.showRaceList()
+        }
+        return false
     }
     windows.show(screen.screen)
+    return true
+}
+
+/**
+ * A footer link: open the neighbouring window and close this one, as each form's usrFooter_Click
+ * does (e.g. frmStats.frm:1003). Moving on ("Skills >") stops if the next window can't open;
+ * going back ("< Overview") closes this window either way.
+ */
+private fun footerLink(link: String, from: BuildScreen, state: PrototypeState, windows: OpenWindows) {
+    var target: EditScreen? = null
+    for (screen in EditScreen.entries) {
+        if (link == "< " + screen.screen.title || link == screen.screen.title + " >") {
+            target = screen
+        }
+    }
+    if (target == null) {
+        return
+    }
+    val opened = openScreen(target, state, windows, from)
+    if (!opened && link.endsWith(">")) {
+        return
+    }
+    windows.close(from)
 }
 
 /**
@@ -273,7 +301,13 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     if (windows.isOpen(BuildScreen.OVERVIEW)) {
         // The form's client area is 866 x 609 at 100%; the window adds its frame and title bar.
         ScreenWindow(windows, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
-            OverviewWindowContent(state, icons)
+            OverviewWindowContent(state, icons) { link -> footerLink(link, BuildScreen.OVERVIEW, state, windows) }
+        }
+    }
+    if (windows.isOpen(BuildScreen.STATS)) {
+        // The form's client area is 815 x 549 at 100%.
+        ScreenWindow(windows, BuildScreen.STATS, "Stats", 540, 60, 831, 592) {
+            StatsWindowContent(state) { link -> footerLink(link, BuildScreen.STATS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.SKILLS)) {

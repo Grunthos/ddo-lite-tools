@@ -49,6 +49,8 @@ object AndroidPrompts : BuilderPrompts {
     override fun notice(message: String) {
         android.util.Log.i("Builder", message)
     }
+
+    override fun yesNoCancel(message: String, title: String): Boolean? = true
 }
 
 /**

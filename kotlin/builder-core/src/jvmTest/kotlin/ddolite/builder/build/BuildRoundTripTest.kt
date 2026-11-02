@@ -73,7 +73,8 @@ class BuildRoundTripTest {
      */
     @Test
     fun differencesFromVbAreExplained() {
-        assertEquals(listOf("Bard Acolyte.build", "Kensei Warpriest.build", "TEST.build", "Warlock Blaster.build"), sampleBuilds())
+        // The repository's samples, plus any others saved there.
+        assertTrue(sampleBuilds().containsAll(listOf("Bard Acolyte.build", "Kensei Warpriest.build", "TEST.build", "Warlock Blaster.build")))
         for (name in sampleBuilds()) {
             val (loaded, differences) = roundTrip(name)
             assertEquals(emptyList(), loaded.problems, name)
@@ -99,8 +100,10 @@ class BuildRoundTripTest {
             // A renamed feat is written back under its new name in the same slot.
             assertEquals(deprecations.feats.size + deprecations.nameChanges.size, removedFeats, "$name feats")
             val expectedAdded = ArrayList<String>()
-            if (name != "TEST.build") {
-                expectedAdded.add("+Levelup: 36\t") // TEST.build was saved by a version that already writes it
+            // Versions before MAX_LEVELUPS = 9 don't write the level 36 line (TEST.build and newer saves do).
+            val original = Windows1252.decode(File(saveDir, name).readBytes())
+            if (!original.contains("\r\nLevelup: 36\t")) {
+                expectedAdded.add("+Levelup: 36\t")
             }
             for (change in deprecations.nameChanges) {
                 assertEquals("Epic Pact Dice", change.newName)

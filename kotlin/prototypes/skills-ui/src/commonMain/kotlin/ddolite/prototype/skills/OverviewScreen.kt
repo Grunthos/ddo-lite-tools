@@ -61,7 +61,7 @@ import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
 /** Verdana 9, the VB forms' font, is 12 px at 100%. */
-private val FONT_SIZE = 12.sp
+internal val FONT_SIZE = 12.sp
 
 /** VB's MAX_CLASS_NAME (basCONST.bas:25): the class column is as wide as this name. */
 private const val MAX_CLASS_NAME = "Arcane Trickster"
@@ -117,11 +117,11 @@ private val GREY = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation
  * levels, the class icons, the level grid with the three build class slots, and the footer.
  * Laid out from frmOverview.frm's control positions (see tools/form-layout's frmOverview.md).
  *
- * [classIcons] holds the icons by resource name (see [classResourceId]); the platform reads them
+ * [onNavigate] gets the footer's "Stats >". [classIcons] holds the icons by resource name (see [classResourceId]); the platform reads them
  * from CharacterBuilderLite.RES.
  */
 @Composable
-fun OverviewWindowContent(state: PrototypeState, classIcons: Map<String, ImageBitmap>) {
+fun OverviewWindowContent(state: PrototypeState, classIcons: Map<String, ImageBitmap>, onNavigate: (String) -> Unit) {
     val theme = state.skills.theme
     val overview = state.overview
     val rules = state.rules
@@ -143,8 +143,8 @@ fun OverviewWindowContent(state: PrototypeState, classIcons: Map<String, ImageBi
             )
         }
         Box(modifier = Modifier.offset(8.dp, 584.dp).size(858.dp, 26.dp)) {
-            // usrFooter: "Stats >" (usrFooter_Click :1407); the Stats window isn't ported yet.
-            HeaderBar(theme, emptyList(), null, listOf("Stats >"), isEnabled = { false }, onClick = {})
+            // usrFooter: "Stats >" (usrFooter_Click :1407).
+            HeaderBar(theme, emptyList(), null, listOf("Stats >"), isEnabled = { true }, onClick = onNavigate)
         }
         OverviewDragGhost(overview.drag, classIcons, rules)
     }
@@ -228,13 +228,13 @@ private fun OverviewBody(state: PrototypeState, rules: OverviewRules, theme: The
 // ---------------------------------------------------------------- simple controls
 
 @Composable
-private fun Label(text: String, style: TextStyle, left: Int, top: Int) {
+internal fun Label(text: String, style: TextStyle, left: Int, top: Int) {
     BasicText(text, style = style, modifier = Modifier.offset(left.dp, top.dp))
 }
 
 /** A Shape: border only, in the workspace's highlight border colour (clsConfig.ApplyColors, Shape). */
 @Composable
-private fun Frame(theme: Theme, left: Int, top: Int, width: Int, height: Int) {
+internal fun Frame(theme: Theme, left: Int, top: Int, width: Int, height: Int) {
     Box(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
             .border(1.dp, theme.color(ColorGroup.WORKSPACE, ColorValue.BORDER_HIGHLIGHT)),
@@ -243,7 +243,7 @@ private fun Frame(theme: Theme, left: Int, top: Int, width: Int, height: Int) {
 
 /** A TextBox in the controls colours. */
 @Composable
-private fun TextBox(theme: Theme, value: String, onChange: (String) -> Unit, left: Int, top: Int, width: Int, height: Int, singleLine: Boolean) {
+internal fun TextBox(theme: Theme, value: String, onChange: (String) -> Unit, left: Int, top: Int, width: Int, height: Int, singleLine: Boolean) {
     val style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     BasicTextField(
         value = value,
@@ -260,7 +260,7 @@ private fun TextBox(theme: Theme, value: String, onChange: (String) -> Unit, lef
 
 /** A drop-down list box (Style 2): the current text and an arrow; [onClick] opens or closes the list. */
 @Composable
-private fun ComboBox(theme: Theme, style: TextStyle, text: String, left: Int, top: Int, width: Int, height: Int, onClick: () -> Unit) {
+internal fun ComboBox(theme: Theme, style: TextStyle, text: String, left: Int, top: Int, width: Int, height: Int, onClick: () -> Unit) {
     Box(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
@@ -274,7 +274,7 @@ private fun ComboBox(theme: Theme, style: TextStyle, text: String, left: Int, to
 
 /** The open list of a [ComboBox]. */
 @Composable
-private fun DropList(theme: Theme, style: TextStyle, items: List<String>, left: Int, top: Int, width: Int, onChoose: (Int) -> Unit) {
+internal fun DropList(theme: Theme, style: TextStyle, items: List<String>, left: Int, top: Int, width: Int, onChoose: (Int) -> Unit) {
     var hover by remember { mutableStateOf(-1) }
     Column(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, (items.size * 18 + 2).dp)
@@ -310,8 +310,8 @@ private fun DropList(theme: Theme, style: TextStyle, items: List<String>, left: 
 }
 
 /** Windows' selection colours (vbHighlight / vbHighlightText), which VB's lists use whatever the theme. */
-private val HIGHLIGHT = Color(0xFF0078D7)
-private val HIGHLIGHT_TEXT = Color.White
+internal val HIGHLIGHT = Color(0xFF0078D7)
+internal val HIGHLIGHT_TEXT = Color.White
 
 // ---------------------------------------------------------------- race
 

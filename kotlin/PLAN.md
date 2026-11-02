@@ -601,6 +601,22 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         by-eye comparison with the VB form (fonts: Verdana isn't bundled yet).
       - Not ported in the cascade yet: `InitBuildSkills` (the Skills screen builds its own grid) and
         `CheckSlotErrors` (comes with the Feats screen).
+      - [x] Stats: the four point-buy columns (userStats: costs, the preferred column carrying changes to
+        the others, Include boxes, Drow without Champion), preferred build points, level-ups ("All Levels"),
+        tomes (Supreme, locked to max level), class templates (with warnings for 5 s), Clear Stats, and the
+        Schedule tab. Rules in core `StatRules` with tests. Footer links move between Overview, Stats and Skills.
+      - [ ] Stats still open: the Customize link (editing template files), the Help link, the preferred
+        point-buy setting (`cfg.BuildPoints`; Adventurer for now). **Check in VB:** the Schedule tab with a
+        level-up stat chosen: `DrawLevelupRow` runs to level 36 but `CellLeft` stops at 30, which looks like
+        a "Subscript out of range" crash; Kotlin stops at 30.
+      - VB quirk kept: `CalculateLevelup` counts level-ups only to level 32 ("NEED MAX LEVEL HERE"), so the
+        level 36 level-up never raises the score.
+      - [x] Skills uses the Intelligence modifier at each level from Stats; the presets and the
+        Intelligence spinner only show with no build open (Android).
+      - [ ] Skills next: class icons above the level columns (`cfg.IconSkills`, frmSkills.frm:1529), tomes tab,
+        footer links, the right-click menu on skill names.
+      - `Save/Eresh WFWizRog.build` (saved by a current VB) reads and writes back byte for byte: the first exact
+        golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.

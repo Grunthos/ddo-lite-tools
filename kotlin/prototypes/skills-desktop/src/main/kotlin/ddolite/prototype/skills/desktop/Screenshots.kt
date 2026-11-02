@@ -132,6 +132,7 @@ fun main(args: Array<String>) {
         resaved.contentEquals(writeBuildFile(readBuildFile(bytes, data, BuildPoints.ADVENTURER).rules)))
 
     overviewScreenshots(prototype, bytes, repoRoot, outDir)
+    statsScreenshots(prototype, bytes, outDir)
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
 

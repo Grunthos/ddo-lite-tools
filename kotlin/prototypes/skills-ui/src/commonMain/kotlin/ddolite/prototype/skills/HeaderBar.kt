@@ -42,24 +42,35 @@ fun HeaderBar(
     rightLinks: List<String>,
     isEnabled: (String) -> Boolean,
     onClick: (String) -> Unit,
+    centerLink: String? = null,
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(theme.color(ColorGroup.NAVIGATION, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.NAVIGATION, ColorValue.BORDER_EXTERIOR))
             .padding(horizontal = 12.dp, vertical = 5.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            for (i in leftLinks.indices) {
-                HeaderLink(theme, leftLinks[i], currentTab == i, isEnabled(leftLinks[i]), onClick)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                for (i in leftLinks.indices) {
+                    HeaderLink(theme, leftLinks[i], currentTab == i, isEnabled(leftLinks[i]), onClick)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                for (link in rightLinks) {
+                    HeaderLink(theme, link, false, isEnabled(link), onClick)
+                }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            for (link in rightLinks) {
-                HeaderLink(theme, link, false, isEnabled(link), onClick)
+        // userHeader's CenterLink (e.g. frmStats "Clear Stats"), centred on the bar.
+        if (centerLink != null) {
+            Box(modifier = Modifier.align(Alignment.Center)) {
+                HeaderLink(theme, centerLink, false, isEnabled(centerLink), onClick)
             }
         }
     }

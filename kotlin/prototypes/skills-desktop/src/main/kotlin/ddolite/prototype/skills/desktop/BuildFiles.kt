@@ -202,6 +202,27 @@ class DesktopPrompts(private val parent: () -> Component?) : BuilderPrompts {
     override fun notice(message: String) {
         JOptionPane.showMessageDialog(parent(), message, "Notice", JOptionPane.INFORMATION_MESSAGE)
     }
+
+    override fun yesNoCancel(message: String, title: String): Boolean? {
+        val options = arrayOf("Yes", "No", "Cancel")
+        val answer = JOptionPane.showOptionDialog(
+            parent(),
+            message,
+            title,
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[2],
+        )
+        if (answer == 0) {
+            return true
+        }
+        if (answer == 1) {
+            return false
+        }
+        return null
+    }
 }
 
 /**
