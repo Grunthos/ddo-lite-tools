@@ -21,6 +21,8 @@ class ValidateTest {
         files[BuilderRecordFile.CLASSES.path] = "ClassName: Fighter\r\nBAB: 1\r\nSkillPoints: 2\r\n".encodeToByteArray()
         files[BuilderRecordFile.FEATS.path] = "FeatName: Example\r\nGroup: Misc\r\n".encodeToByteArray()
         files[BuilderRecordFile.AUTO_GRANTED_FEATS.path] = "GrantedFeats1: Example\r\n".encodeToByteArray()
+        files[BuilderRecordFile.ENHANCEMENTS.path] = "TreeName: Example\r\nType: Global\r\n".encodeToByteArray()
+        files[BuilderRecordFile.DESTINIES.path] = "DestinyName: Example\r\nType: Destiny\r\n".encodeToByteArray()
         files[FEAT_MAP_PATH] = "Lite\tRon\tBuilder\r\nExample\tExample\tExample".encodeToByteArray()
         // A template must name a real class and add up to 28-36 points.
         files[BuilderRecordFile.TEMPLATES.path] =
@@ -84,8 +86,9 @@ class ValidateTest {
     fun missingFileIsAnError() {
         val report = validate(MapDataSource(HashMap()))
         // Each Builder record file is reported missing once by the structure check; the
-        // loaders report the ones ported so far (Races, Templates, Spells, Classes, Feats, AutoGrantedFeats)
+        // loaders report the ones ported so far (Races, Templates, Spells, Classes, Feats, AutoGrantedFeats,
+        // Enhancements, Destinies)
         // again in VB's wording, plus FeatMap.txt, which the structure check doesn't cover.
-        assertEquals(BuilderRecordFile.entries.size + 7, report.errorCount())
+        assertEquals(BuilderRecordFile.entries.size + 9, report.errorCount())
     }
 }

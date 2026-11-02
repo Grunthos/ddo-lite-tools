@@ -12,8 +12,11 @@ enum class PointerStyle { FEAT, ENHANCEMENT, DESTINY }
  * `Raw` and `Style` while loading, and fills in the rest (feat, tree, tier, ability, selector,
  * rank) in `basProcess.ProcessPointers` once every file is loaded. That resolved form is ported
  * with ProcessPointers.
+ *
+ * [style] is null where VB leaves it unset at load time (`peError`): enhancement and destiny
+ * requirements are written as paths ("Tier 1: Ability") and get their style when resolved.
  */
-data class Requirement(val raw: String, val style: PointerStyle)
+data class Requirement(val raw: String, val style: PointerStyle?)
 
 /**
  * The three requirement lists of a feat, selector or ability: all of [all], at least one of

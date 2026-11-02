@@ -3,8 +3,7 @@ package ddolite.builder.model
 /**
  * One option of a feat (or enhancement ability) that has choices, e.g. "Weapon Focus: Slashing".
  * Ported from `SelectorType` (Build/basDataDefs.bas:111), which VB shares between feats and
- * enhancement abilities. The ability-only fields (Cost, RaceBonus, Rank, RankReqs) are added when
- * the enhancement loader is ported.
+ * enhancement abilities. VB's RaceBonus is never set for either, so it's left out.
  *
  * VB marks some arrays as "present" with element 0 (e.g. `Class(0) = True`); those are nullable
  * lists here: null means the data had no such line, which VB code tests before using the list.
@@ -21,6 +20,9 @@ package ddolite.builder.model
  * @property notRaces races that can't take it; null if none (`NotRace(0)` false).
  * @property raceOnly `RaceOnly`: only this race can take it (as a racial feat).
  * @property classOnly `ClassOnly`: only this class can take it (added for Acolyte).
+ * @property cost ability selectors only: AP cost per rank (VB copies the ability's cost; 0 for feats).
+ * @property rankReqs ability selectors only: has rank 2/3 requirements (`Rank2All:` etc.).
+ * @property rankDetails ability selectors only: ranks 2 and 3; null if never set (see [Ability.rankDetails]).
  */
 data class Selector(
     val name: String,
@@ -41,4 +43,7 @@ data class Selector(
     val notRaces: List<String>?,
     val raceOnly: String?,
     val classOnly: String?,
+    val cost: Int = 0,
+    val rankReqs: Boolean = false,
+    val rankDetails: List<RankDetail>? = null,
 )

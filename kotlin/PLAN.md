@@ -553,7 +553,7 @@ desktop first; Android only has to keep compiling (CI) until phase G.
    1. [ ] B2: ~~Templates, Spells, Feats (+ selectors)~~ (done, with the ProcessTemplates, ProcessSpells and
       ProcessFeatSelectors checks), ~~FeatMap, AutoGrantedFeats~~ (done; `EpicGrantedFeats.txt` is never read by
       VB – unused since the first check-in, so not ported; ask the data maintainers whether to delete it),
-      Enhancements + Destinies (trees, abilities, selectors), tome data, NameChange — each with real-data
+      ~~Enhancements + Destinies (trees, abilities, selectors)~~ (done, incl. automatic stat abilities and core chains), tome data, NameChange — each with real-data
       tests and added to the validator.
    2. [ ] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item
       handling (`basDeprecate`).

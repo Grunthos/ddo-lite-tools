@@ -3,6 +3,7 @@ package ddolite.builder.data
 import ddolite.builder.model.Bab
 import ddolite.builder.model.ClassLevel
 import ddolite.builder.model.SelectorStyle
+import ddolite.builder.model.TreeStyle
 import ddolite.builder.model.Stat
 import ddolite.dataformat.DirectoryDataSource
 import java.nio.file.Path
@@ -115,6 +116,55 @@ class RealDataTest {
 
         assertEquals(438, data.featMap.size) // 439 lines, less the heading
         assertEquals(60, data.autoGrantedFeats.size)
+
+        // Trees and destinies (values read from Enhancements.txt and Destinies.txt).
+        assertEquals(94, data.trees.size)
+        assertEquals(13, data.destinies.size)
+        val kensei = assertNotNull(data.findTree("Kensei"))
+        assertEquals(TreeStyle.CLASS, kensei.style)
+        assertEquals(listOf("Ken", "Ken"), kensei.initials)
+        assertEquals("Kensei enhancements", kensei.wiki)
+        assertEquals(6, kensei.tiers[0].size)
+        assertEquals(9, kensei.tiers[0][0].selectors.size)
+        // Stats: Strength, Dexterity, Wisdom → a "Stat" ability with three selectors at the end of tiers 3 and 4.
+        assertEquals(listOf("Strength", "Dexterity", "Wisdom"), kensei.tiers[3].last().selectors.map { it.name })
+        var abilities = 0
+        for (tree in data.trees) {
+            for (tier in tree.tiers) {
+                abilities += tier.size
+            }
+        }
+        for (tree in data.destinies) {
+            for (tier in tree.tiers) {
+                abilities += tier.size
+            }
+        }
+        // 2903 AbilityName lines, plus two automatic stat abilities per class/race-class/global tree with Stats.
+        var statTrees = 0
+        for (tree in data.trees) {
+            if (tree.stats.isNotEmpty() && tree.style != TreeStyle.RACE) {
+                statTrees++
+            }
+        }
+        assertEquals(2903 + 2 * statTrees, abilities)
+
+        val crusader = assertNotNull(data.findDestiny("Divine Crusader"))
+        assertEquals("Crusader", crusader.abbreviation)
+        assertEquals("Divine Crusader", crusader.wiki)
+
+        // The one Rank3Cost line in the data (Protection from Evil and Good).
+        var found = false
+        for (tree in data.trees) {
+            for (tier in tree.tiers) {
+                for (ability in tier) {
+                    if (ability.name == "Protection from Evil and Good") {
+                        assertEquals(2, ability.rankDetails?.get(1)?.cost)
+                        found = true
+                    }
+                }
+            }
+        }
+        assertTrue(found)
 
         // Every SharedSelector feat ends up with selectors.
         for (feat in data.feats) {

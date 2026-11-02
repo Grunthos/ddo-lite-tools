@@ -7,11 +7,12 @@ import ddolite.builder.model.FeatMapEntry
 import ddolite.builder.model.Race
 import ddolite.builder.model.Spell
 import ddolite.builder.model.StatTemplate
+import ddolite.builder.model.Tree
 import ddolite.dataformat.DataSource
 
 /**
  * The Character Builder's game data. Replaces the VB global `db` (`DatabaseType`,
- * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates, feats, the feat map and auto-granted feats.
+ * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates, feats, the feat map, auto-granted feats, enhancement trees and destinies.
  *
  * Races and classes are looked up by name (plan D-7), accepting the same alternative
  * spellings as VB's `GetRaceID`/`GetClassID`.
@@ -27,6 +28,10 @@ class BuilderData(
     /** FeatMap.txt, in file order (blank entries for bad lines, as VB). */
     val featMap: List<FeatMapEntry>,
     val autoGrantedFeats: List<AutoGrantedFeat>,
+    /** Enhancement trees, sorted by name (VB `db.Tree`; VB's TreeID is the position + 1). */
+    val trees: List<Tree>,
+    /** Epic destinies, sorted by name (VB `db.Destiny`). */
+    val destinies: List<Tree>,
 ) {
     private val spellsByName = HashMap<String, Spell>()
     private val featsByName = HashMap<String, Feat>()
@@ -56,6 +61,24 @@ class BuilderData(
      * used for old builds and comes with that code.
      */
     fun findFeat(name: String): Feat? = featsByName[name]
+
+    /**
+     * The enhancement tree called exactly [name], or null. Replaces `basDataLoad.SeekTree(name, peEnhancement)`
+     * (Build/basDataLoad.bas:1966), a binary search over the sorted trees with an exact comparison.
+     */
+    fun findTree(name: String): Tree? = findExactName(trees, name)
+
+    /** The destiny called exactly [name], or null. Replaces `SeekTree(name, peDestiny)`. */
+    fun findDestiny(name: String): Tree? = findExactName(destinies, name)
+
+    private fun findExactName(list: List<Tree>, name: String): Tree? {
+        for (tree in list) {
+            if (tree.name == name) {
+                return tree
+            }
+        }
+        return null
+    }
 
     /** The race called [name] (any case, or a VB alternative spelling), or null. Replaces `GetRaceID`. */
     fun findRace(name: String): Race? = findRaceIn(races, name)
@@ -111,7 +134,9 @@ fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
     val feats = processFeatSelectors(loadFeats(source, races, classes, log), log)
     val featMap = loadFeatMap(source, log)
     val autoGrantedFeats = loadAutoGrantedFeats(source, feats, log)
-    val data = BuilderData(races, classes, spells, templates, feats, featMap, autoGrantedFeats)
+    val trees = loadEnhancements(source, log)
+    val destinies = loadDestinies(source, log)
+    val data = BuilderData(races, classes, spells, templates, feats, featMap, autoGrantedFeats, trees, destinies)
     checkReferences(data, log)
     checkClassSpells(data, log)
     checkTemplates(templates, log)
