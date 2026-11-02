@@ -1,6 +1,10 @@
 package ddolite.prototype.skills
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import ddolite.builder.data.BuilderData
 import ddolite.builder.data.BuilderRecordFile
 import ddolite.builder.data.ParsedLine
@@ -59,8 +63,12 @@ fun readTreeHeaders(source: DataSource): List<TreeHeader> {
 /** A tree in the "available" list, with where it comes from (a class or race name; empty for global trees). */
 class AvailableTree(val name: String, val source: String)
 
-/** What's being dragged: a tree name, and the slot it came from (null if from the available list). */
-class TreeDrag(val treeName: String, val fromSlot: Int?)
+/**
+ * What's being dragged: a tree name, and the slot it came from (null if from the available list).
+ * A data class so that two equal drags compare equal: [dragSource] restarts its gesture handler when
+ * its item changes, and the list is redrawn (with a new TreeDrag) as soon as a press selects a row.
+ */
+data class TreeDrag(val treeName: String, val fromSlot: Int?)
 
 /** Drop target key for a tree slot. */
 data class SlotKey(val index: Int)
@@ -89,6 +97,18 @@ class TreeSlotsState(
     val slots = mutableStateListOf<String?>()
 
     val drag = DragDropState<TreeDrag>()
+
+    /** The tree selected in the available list (VB: lstTree.ListIndex), or null. */
+    var selectedTree: String? by mutableStateOf(null)
+
+    /** The selected slot (VB: usrTree.Selected, 0 = none; here null = none), or null. */
+    var selectedSlot: Int? by mutableStateOf(null)
+
+    /** Whether the slot being pressed was already selected when the press began (for the click toggle). */
+    private var slotWasSelected = false
+
+    /** Which tab of the Enhancements window is showing (VB: mlngTab; 0 Trees, 1 Enhancements, 2 Leveling Guide). */
+    var tab by mutableIntStateOf(0)
 
     init {
         for (i in 0 until TREE_SLOTS) {
@@ -176,12 +196,46 @@ class TreeSlotsState(
     }
 
     /**
+     * The pointer went down on a tree in the available list: select it at once, before any drag.
+     * Ported from frmEnhancements.lstTree_MouseDown (:1501), which clears the slot selection
+     * (`usrTree.Selected = 0`); the ListBox itself selects the row on mouse down.
+     */
+    fun pressListTree(treeName: String) {
+        selectedSlot = null
+        selectedTree = treeName
+    }
+
+    /**
+     * The pointer went down on a slot: select it at once, so it shows before any drag starts.
+     * VB selects on click instead (usrTree_SlotClick, :1267); selecting on press gives the
+     * immediate feedback. Clears the list selection, as VB does (`lstTree.ListIndex = -1`).
+     */
+    fun pressSlot(slot: Int) {
+        selectedTree = null
+        slotWasSelected = selectedSlot == slot
+        selectedSlot = slot
+    }
+
+    /**
+     * A slot was clicked (pressed and released without dragging). Left-clicking an already
+     * selected slot deselects it, as in usrTree_SlotClick (:1267):
+     * `If Me.usrTree.Selected = Index Then Me.usrTree.Selected = 0 Else Me.usrTree.Selected = Index`.
+     */
+    fun clickSlot(slot: Int) {
+        if (slotWasSelected && selectedSlot == slot) {
+            selectedSlot = null
+        }
+    }
+
+    /**
      * A drag ended over [target]. From `usrTree_OLEDragDrop` (:1537): a tree from the list goes
      * into the slot (`AddBuildTree`, replacing what was there); a tree from another slot swaps
      * places with it (`SwapBuildTrees`).
      */
     fun dropped(item: TreeDrag, target: Any?) {
+        selectedTree = null // the list is rebuilt after a drop (VB: ShowAvailableTrees)
         if (target is SlotKey && !isRaceSlot(target.index)) {
+            selectedSlot = target.index // the slot that received the tree
             val from = item.fromSlot
             if (from == null) {
                 slots[target.index] = item.treeName
@@ -195,6 +249,7 @@ class TreeSlotsState(
             val from = item.fromSlot
             if (from != null) {
                 slots[from] = null
+                selectedSlot = null
             }
         }
     }

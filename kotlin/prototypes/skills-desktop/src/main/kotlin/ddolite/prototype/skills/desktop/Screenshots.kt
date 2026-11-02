@@ -16,11 +16,11 @@ import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
-import ddolite.prototype.skills.PrototypeScreen
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreen
 import ddolite.prototype.skills.SkillsScreenState
 import ddolite.prototype.skills.TreeSlotsState
+import ddolite.prototype.skills.TreeSlotsWindowContent
 import ddolite.prototype.skills.prototypePresets
 import ddolite.prototype.skills.readTreeHeaders
 import org.jetbrains.skia.EncodedImageFormat
@@ -81,9 +81,16 @@ fun main(args: Array<String>) {
     // The enhancement trees tab: drag two trees into slots, then swap them.
     val trees = TreeSlotsState(data, readTreeHeaders(DirectoryDataSource(repoRoot.resolve("Data"))), state)
     val prototype = PrototypeState(state, trees)
-    prototype.tab = 1
-    ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { PrototypeScreen(prototype) }.use { scene ->
+    ImageComposeScene(width = 900, height = 640, density = Density(1f)) { TreeSlotsWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("4-trees-start.png"))
+
+        // Press on the first tree and hold still: it should show as selected before any drag starts.
+        val pressed = PointerButtons(isPrimaryPressed = true)
+        scene.sendPointerEvent(PointerEventType.Move, Offset(60f, treeListRowY(0)))
+        scene.sendPointerEvent(PointerEventType.Press, Offset(60f, treeListRowY(0)), buttons = pressed, button = PointerButton.Primary)
+        save(scene, outDir.resolve("4b-tree-pressed.png"))
+        scene.sendPointerEvent(PointerEventType.Release, Offset(60f, treeListRowY(0)), buttons = PointerButtons(), button = PointerButton.Primary)
+        scene.render()
         val listX = 60f
         val firstTreeY = treeListRowY(0)
         val secondTreeY = treeListRowY(1)
@@ -94,6 +101,7 @@ fun main(args: Array<String>) {
         drag(scene, Offset(listX, firstTreeY), Offset(slotX, slotY(2)), release = false)
         save(scene, outDir.resolve("5-trees-dragging.png"))
         scene.sendPointerEvent(PointerEventType.Release, Offset(slotX, slotY(2)), buttons = PointerButtons(), button = PointerButton.Primary)
+        scene.render() // let the slot recompose with its new tree (and drag handler) before the next press
 
         // Swap slots 2 and 3 by dragging slot 3 onto slot 2.
         drag(scene, Offset(slotX, slotY(2)), Offset(slotX, slotY(1)), release = true)

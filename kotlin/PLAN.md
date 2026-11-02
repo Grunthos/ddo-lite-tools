@@ -281,6 +281,13 @@ through them in the order of frmMain's **Edit** menu (`frmMain.frm:311`, handler
 | – | Gear… | (frmGear) | – | never built: commented out in `OpenForm`; drop |
 
 - **frmMain** holds the menus and the **output view** (the build summary, regenerated as the build changes).
+- **Every Edit window has the same frame** (the `userHeader` control, Navigation colours): a **header** whose left
+  links are the window's tabs, current one underlined (Overview: Overview;Notes · Stats: Stats;Schedule ·
+  Skills: Skill Ranks;Skill Tomes · Feats: Selected;Granted · Enhancements: Trees;Enhancements;Leveling Guide ·
+  Destiny: Destiny Trees;Destinies), right links such as Help (and Contrast on Skills); and a **footer** with
+  "< previous" / "next >" links in Edit-menu order, which open the neighbouring window and close this one
+  (`usrFooter_Click`), so the windows also work as a step-by-step wizard. The F2 widget kit needs this as
+  one shared `HeaderBar` (prototype: `prototypes/skills-ui/HeaderBar.kt`).
 - **Gating** (`basMain.OpenForm`, Build/basMain.bas:131): a window only opens once the earlier steps make
   sense – Stats/Skills/Feats/Enhancements need a race; Stats/Skills/Feats/Spells/Enhancements need a class
   at level 1; Skills/Feats need all build points spent in Stats; Spells needs a caster; Destiny needs
@@ -387,6 +394,11 @@ the problem is fundamental.**
       shortcuts K / E as in `frmMain.Form_KeyDown`; the Window menu lists open screens and brings one to the front.
       Changes in one window show in the others straight away (shared state, no `CascadeChanges` calls needed).
       Not yet: windows owned by the main window (`ChildWindows`), saved positions, the OpenForm gating.
+- [x] Enhancements window: header with its three tabs (Trees working; Enhancements and Leveling Guide placeholders)
+      and footer; Skills window likewise. Pressing a tree in the list or a slot selects it at once, before any
+      drag (VB: ListBox selects on mouse down; `usrTree_SlotClick` toggles a slot's selection, drawn in drop-slot
+      colours). **Lesson:** items used as gesture keys must compare by value (data classes), or a redraw during
+      the press restarts the drag handler and the drag is lost.
 - [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
 - **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
   (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can

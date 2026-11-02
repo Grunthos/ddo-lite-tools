@@ -1,6 +1,9 @@
 package ddolite.prototype.skills
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -122,6 +125,33 @@ fun <T> Modifier.dragSource(state: DragDropState<T>, item: T, onDrop: (T, Any?) 
                 onDragCancel = { state.cancel() },
             )
         }
+}
+
+/**
+ * Calls [onPress] as soon as the pointer goes down here (before any drag starts), and [onClick]
+ * when it comes up again without having moved (a click or tap, not the end of a drag).
+ * Works alongside [dragSource] on the same element.
+ *
+ * Gives the immediate feedback VB's controls give: a ListBox selects its item on mouse down
+ * (frmEnhancements.lstTree_MouseDown), and userList slots toggle their selection on click
+ * (usrTree_SlotClick).
+ */
+fun Modifier.pressAndClick(onPress: () -> Unit, onClick: () -> Unit): Modifier = composed {
+    val currentOnPress by rememberUpdatedState(onPress)
+    val currentOnClick by rememberUpdatedState(onClick)
+    Modifier.pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            currentOnPress()
+            val up = waitForUpOrCancellation()
+            if (up != null) {
+                val moved = (up.position - down.position).getDistance()
+                if (moved < viewConfiguration.touchSlop) {
+                    currentOnClick()
+                }
+            }
+        }
+    }
 }
 
 /** Remembers an element's layout position, to convert its local coordinates to window ones. */
