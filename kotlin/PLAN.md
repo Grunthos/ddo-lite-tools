@@ -547,8 +547,18 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 5. [x] B6 (first rules): skills grid (`SkillGrid`: InitBuildSkills + the frmSkills editing rules).
 6. [x] F1: prototypes 1–3 on desktop, Android build (see §8.2 status).
 7. [ ] F1: ~~run the Android prototype~~ (done, emulator); portable Windows exe done; check 150% scaling on desktop; then confirm D-2.
-8. [ ] B4: build model + `.build` read/write, then the Overview rules (race, alignment, class split, `canOpen` gating). Loaders for later windows (Feats, Spells, Enhancements, Destinies, Templates) follow in Edit-menu order.
+8. [ ] **All data and file support before more screens** (agreed 2026-11-02): with the data model settled
+   against the real data, the screens are mostly presentation. In VB's `InitData` order
+   (Build/basDataLoad.bas, later files refer to earlier ones):
+   1. [ ] B2: ~~Templates, Spells~~ (done, with the ProcessTemplates and ProcessSpells checks), Feats (+ selectors), FeatMap, AutoGrantedFeats/EpicGrantedFeats,
+      Enhancements + Destinies (trees, abilities, selectors), tome data, NameChange — each with real-data
+      tests and added to the validator.
+   2. [ ] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item
+      handling (`basDeprecate`).
+   3. [ ] B4: writing `.build` (`SaveFileLite`) + round-trip test (load → save → byte-identical) on the
+      builds in `Save/` (Philip: add more varied builds – races, casters, epic, old ones with renamed items).
+   4. [ ] Then the Overview window on real files, then Stats, Skills, … in Edit-menu order.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
-12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice).
+12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice); `Spells.txt` lists Prismatic Strike twice (lines 1371 and 1892).

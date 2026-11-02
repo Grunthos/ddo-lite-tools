@@ -10,7 +10,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Loads the repository's real Races.txt and Classes.txt (Gradle passes the Data folder as
+ * Loads the repository's real Builder data files ported so far (Gradle passes the Data folder as
  * ddolite.dataDir). Spot checks use values from the current data; update them if the data changes.
  */
 class RealDataTest {
@@ -42,14 +42,21 @@ class RealDataTest {
 
     @Test
     fun onlyExpectedVbDifferences() {
-        // Warlock lists the Fey pact twice; VB6 keeps both, and so do we.
+        // Data issues VB6 tolerates: Warlock lists the Fey pact twice (VB6 keeps both, and so do we);
+        // Spells.txt lists Prismatic Strike twice (VB6 keeps both and may find either).
         val differences = ArrayList<String>()
         for (issue in log.issues) {
             if (issue.vbDifference) {
                 differences.add(issue.message)
             }
         }
-        assertEquals(listOf("Classes.txt: Warlock has pact Fey more than once (VB6 keeps both)"), differences)
+        assertEquals(
+            listOf(
+                "Spells.txt: Prismatic Strike is listed more than once (also at line 1371); VB6 keeps both and may use either",
+                "Classes.txt: Warlock has pact Fey more than once (VB6 keeps both)",
+            ),
+            differences,
+        )
     }
 
     @Test
@@ -69,5 +76,23 @@ class RealDataTest {
         // vbIndex order: Barbarian (1) first, Arcane Trickster (25) last.
         assertEquals("Barbarian", data.classes[0].name)
         assertEquals("Arcane Trickster", data.classes[24].name)
+    }
+
+    @Test
+    fun spellsAndTemplates() {
+        assertEquals(578, data.spells.size) // including Prismatic Strike twice
+        for (i in 1 until data.spells.size) {
+            assertTrue(data.spells[i - 1].name <= data.spells[i].name, "spells not sorted at $i")
+        }
+        val acidFog = assertNotNull(data.findSpell("Acid Fog"))
+        assertTrue(acidFog.rare)
+        assertEquals("Acid Blast (spell)", data.findSpell("Acid Blast")?.wiki)
+
+        assertEquals(51, data.templates.size)
+        val first = data.templates[0]
+        assertEquals("Barbarian: THF", first.logName)
+        assertEquals(Stat.STR, first.levelups)
+        assertEquals(16, first.points(0, Stat.STR))
+        assertEquals(4, first.points(4, Stat.DEX))
     }
 }

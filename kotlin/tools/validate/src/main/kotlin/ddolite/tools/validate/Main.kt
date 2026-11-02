@@ -106,7 +106,7 @@ fun validate(source: DataSource): Report {
 }
 
 /**
- * Runs the ported loaders (plan step B2; races and classes so far) and reports what they found.
+ * Runs the ported loaders (plan step B2; races, templates, spells and classes so far) and reports what they found.
  * VB6's own errors are ERRORs; problems VB6 doesn't report, or handles differently, are WARNINGs.
  *
  * The loaders also report lines without ':', which [checkBuilderRecordFile] has already reported,

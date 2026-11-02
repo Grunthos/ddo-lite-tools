@@ -54,6 +54,14 @@ class LoadLog {
         issues.add(LoadIssue(file, line, "Invalid section in $file ('$requiredField' not found):", recordName))
     }
 
+    /**
+     * Any other `LogError` message, already worded as VB words it for the current activity
+     * (basErrorLog.LogError, Build/basErrorLog.bas:89), e.g. the template and spell-list checks.
+     */
+    fun error(file: String, line: Int?, message: String, detail: String? = null) {
+        issues.add(LoadIssue(file, line, message, detail))
+    }
+
     /** A problem VB6 doesn't report, or a place where the Kotlin loader behaves differently. */
     fun vbDifference(file: String, line: Int?, message: String) {
         issues.add(LoadIssue(file, line, "$file: $message", null, vbDifference = true))
