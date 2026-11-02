@@ -1,7 +1,9 @@
 package ddolite.builder.data
 
+import ddolite.builder.model.AutoGrantedFeat
 import ddolite.builder.model.CharacterClass
 import ddolite.builder.model.Feat
+import ddolite.builder.model.FeatMapEntry
 import ddolite.builder.model.Race
 import ddolite.builder.model.Spell
 import ddolite.builder.model.StatTemplate
@@ -9,7 +11,7 @@ import ddolite.dataformat.DataSource
 
 /**
  * The Character Builder's game data. Replaces the VB global `db` (`DatabaseType`,
- * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates and feats.
+ * Build/basDataDefs.bas) as it gets ported; so far races, classes, spells, stat templates, feats, the feat map and auto-granted feats.
  *
  * Races and classes are looked up by name (plan D-7), accepting the same alternative
  * spellings as VB's `GetRaceID`/`GetClassID`.
@@ -22,6 +24,9 @@ class BuilderData(
     val templates: List<StatTemplate>,
     /** In file order, as VB keeps `db.Feat`. */
     val feats: List<Feat>,
+    /** FeatMap.txt, in file order (blank entries for bad lines, as VB). */
+    val featMap: List<FeatMapEntry>,
+    val autoGrantedFeats: List<AutoGrantedFeat>,
 ) {
     private val spellsByName = HashMap<String, Spell>()
     private val featsByName = HashMap<String, Feat>()
@@ -104,10 +109,13 @@ fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
     val spells = loadSpells(source, log)
     val classes = loadClasses(source, log)
     val feats = processFeatSelectors(loadFeats(source, races, classes, log), log)
-    val data = BuilderData(races, classes, spells, templates, feats)
+    val featMap = loadFeatMap(source, log)
+    val autoGrantedFeats = loadAutoGrantedFeats(source, feats, log)
+    val data = BuilderData(races, classes, spells, templates, feats, featMap, autoGrantedFeats)
     checkReferences(data, log)
     checkClassSpells(data, log)
     checkTemplates(templates, log)
+    checkFeatMap(featMap, data, log)
     return data
 }
 

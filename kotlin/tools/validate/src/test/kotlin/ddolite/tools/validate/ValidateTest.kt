@@ -1,6 +1,7 @@
 package ddolite.tools.validate
 
 import ddolite.builder.data.BuilderRecordFile
+import ddolite.builder.data.FEAT_MAP_PATH
 import ddolite.dataformat.MapDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,6 +20,8 @@ class ValidateTest {
         files[BuilderRecordFile.RACES.path] = "RaceName: Human\r\nType: Free\r\nStats: 8, 8, 8, 8, 8, 8\r\n".encodeToByteArray()
         files[BuilderRecordFile.CLASSES.path] = "ClassName: Fighter\r\nBAB: 1\r\nSkillPoints: 2\r\n".encodeToByteArray()
         files[BuilderRecordFile.FEATS.path] = "FeatName: Example\r\nGroup: Misc\r\n".encodeToByteArray()
+        files[BuilderRecordFile.AUTO_GRANTED_FEATS.path] = "GrantedFeats1: Example\r\n".encodeToByteArray()
+        files[FEAT_MAP_PATH] = "Lite\tRon\tBuilder\r\nExample\tExample\tExample".encodeToByteArray()
         // A template must name a real class and add up to 28-36 points.
         files[BuilderRecordFile.TEMPLATES.path] =
             "Class: Fighter\r\nCaption: Example\r\nSTR: 16 16 16 16 16\r\nDEX:  6  8  8 10 10\r\nCON:  6  6  8  8 10\r\n".encodeToByteArray()
@@ -27,7 +30,9 @@ class ValidateTest {
 
     private fun dataWithFeats(feats: String): MapDataSource {
         val files = minimalData()
-        files[BuilderRecordFile.FEATS.path] = feats.replace("\n", "\r\n").encodeToByteArray()
+        // Keep the "Example" feat that the minimal FeatMap.txt and AutoGrantedFeats.txt refer to.
+        val text = feats + "\n\nFeatName: Example\nGroup: Misc\n"
+        files[BuilderRecordFile.FEATS.path] = text.replace("\n", "\r\n").encodeToByteArray()
         return MapDataSource(files)
     }
 
@@ -79,7 +84,8 @@ class ValidateTest {
     fun missingFileIsAnError() {
         val report = validate(MapDataSource(HashMap()))
         // Each Builder record file is reported missing once by the structure check; the
-        // loaders report the ones ported so far (Races, Templates, Spells, Classes, Feats) again in VB's wording.
-        assertEquals(BuilderRecordFile.entries.size + 5, report.errorCount())
+        // loaders report the ones ported so far (Races, Templates, Spells, Classes, Feats, AutoGrantedFeats)
+        // again in VB's wording, plus FeatMap.txt, which the structure check doesn't cover.
+        assertEquals(BuilderRecordFile.entries.size + 7, report.errorCount())
     }
 }

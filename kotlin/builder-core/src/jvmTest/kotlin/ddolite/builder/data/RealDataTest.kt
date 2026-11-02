@@ -113,6 +113,9 @@ class RealDataTest {
         assertEquals(focus.selectors.map { it.name }, specialization.selectors.map { it.name })
         assertEquals(listOf(ClassLevel("Fighter", 4), ClassLevel("Dragon Lord", 4)), specialization.classes)
 
+        assertEquals(438, data.featMap.size) // 439 lines, less the heading
+        assertEquals(60, data.autoGrantedFeats.size)
+
         // Every SharedSelector feat ends up with selectors.
         for (feat in data.feats) {
             if (feat.selectorStyle == SelectorStyle.SHARED) {
