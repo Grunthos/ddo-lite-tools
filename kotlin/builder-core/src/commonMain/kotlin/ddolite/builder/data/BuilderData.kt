@@ -67,6 +67,41 @@ class BuilderData(
      */
     fun findFeat(name: String): Feat? = featsByName[name]
 
+    /** VB's `db.FeatLookup`: the feats sorted by name (case-sensitive), equal names in file order. */
+    private val featLookup: List<Feat> by lazy {
+        val sorted = ArrayList(feats)
+        sorted.sortWith { a, b -> a.name.compareTo(b.name) } // stable, like IndexFeatLookup's insertion sort
+        sorted
+    }
+
+    /**
+     * `SeekFeat(name, False)`, used when opening builds: a binary search over [featLookup] that
+     * compares lower-cased names. Ported from `basDataLoad.SeekFeat` (Build/basDataLoad.bas:1179).
+     *
+     * VB quirk, kept: the list is sorted case-sensitively but searched case-insensitively, so a name
+     * whose position differs between the two orders can be missed.
+     */
+    fun findFeatIgnoringCase(name: String): Feat? {
+        if (name.isEmpty()) {
+            return null
+        }
+        val lower = name.lowercase()
+        var first = 0
+        var last = featLookup.size - 1
+        while (first <= last) {
+            val mid = (first + last) / 2
+            val candidate = featLookup[mid].name.lowercase()
+            if (candidate < lower) {
+                first = mid + 1
+            } else if (candidate > lower) {
+                last = mid - 1
+            } else {
+                return featLookup[mid]
+            }
+        }
+        return null
+    }
+
     /**
      * The enhancement tree called exactly [name], or null. Replaces `basDataLoad.SeekTree(name, peEnhancement)`
      * (Build/basDataLoad.bas:1966), a binary search over the sorted trees with an exact comparison.

@@ -417,30 +417,11 @@ internal class CrossReferences(
      * If the selector isn't found, VB keeps the feat (without a selector) and reports the error.
      */
     private fun processPointerFeat(req: Requirement, fail: (String) -> Unit): Requirement {
-        var text = req.raw
-        if (text.startsWith("Feat: ")) {
-            text = text.substring(6)
-        }
-        val separator = text.indexOf(": ")
-        if (separator < 0) {
-            val feat = featsByName[text]
-            if (feat == null) {
-                fail(req.raw)
-                return req.copy(style = PointerStyle.FEAT)
-            }
-            return req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, null))
-        }
-        val feat = featsByName[text.substring(0, separator)]
-        if (feat == null) {
+        val pointer = resolveFeatPointer(req.raw) { name -> featsByName[name] }
+        if (!pointer.valid) {
             fail(req.raw)
-            return req.copy(style = PointerStyle.FEAT)
         }
-        val selectorName = text.substring(separator + 2)
-        if (feat.findSelector(selectorName) == null) {
-            fail(req.raw)
-            return req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, null))
-        }
-        return req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, selectorName))
+        return req.copy(style = PointerStyle.FEAT, target = pointer.target)
     }
 
     /**
@@ -638,6 +619,41 @@ internal fun splitRank(text: String): Pair<String, Int> {
     }
     val rank = Vb.cLng(Vb.valOf(text.substring(text.length - 1)))
     return Pair(text.substring(0, text.length - 7), rank)
+}
+
+/**
+ * The outcome of resolving "Feat: Name[: Selector]": [target] is what VB's pointer ends up with
+ * (the feat, and the selector if found), [valid] is false where VB reports an error.
+ */
+class FeatPointer(val target: FeatTarget?, val valid: Boolean)
+
+/**
+ * Resolves "Feat: Name" or "Feat: Name: Selector" (the "Feat: " is optional), looking feats up with
+ * [findFeat]. The lookup part of `basProcess.ProcessPointerFeat` (:595), shared with the build rules,
+ * which resolve race and class granted feats the same way.
+ */
+fun resolveFeatPointer(raw: String, findFeat: (String) -> Feat?): FeatPointer {
+    var text = raw
+    if (text.startsWith("Feat: ")) {
+        text = text.substring(6)
+    }
+    val separator = text.indexOf(": ")
+    if (separator < 0) {
+        val feat = findFeat(text)
+        if (feat == null) {
+            return FeatPointer(null, false)
+        }
+        return FeatPointer(FeatTarget(feat.name, null), true)
+    }
+    val feat = findFeat(text.substring(0, separator))
+    if (feat == null) {
+        return FeatPointer(null, false)
+    }
+    val selectorName = text.substring(separator + 2)
+    if (feat.findSelector(selectorName) == null) {
+        return FeatPointer(FeatTarget(feat.name, null), false)
+    }
+    return FeatPointer(FeatTarget(feat.name, selectorName), true)
 }
 
 /**

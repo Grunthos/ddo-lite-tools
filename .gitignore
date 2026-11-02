@@ -25,6 +25,8 @@ master
 
 #Kotlin conversion (kotlin/ folder)
 kotlin/**/build/
+# ...but not source packages called "build" (ddolite.builder.build)
+!kotlin/**/src/**/build/
 kotlin/.gradle/
 kotlin/.kotlin/
 kotlin/.idea/

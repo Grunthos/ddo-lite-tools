@@ -10,8 +10,13 @@ plugins {
 // The VB6 data folder at the repository root, shared by both implementations.
 val dataDir: File = rootDir.resolve("../Data").canonicalFile
 
+// Sample builds saved by VB6, used by the .build round-trip tests.
+val saveDir: File = rootDir.resolve("../Save").canonicalFile
+
 subprojects {
     tasks.withType<Test>().configureEach {
         systemProperty("ddolite.dataDir", dataDir.absolutePath)
+        systemProperty("ddolite.saveDir", saveDir.absolutePath)
+        inputs.dir(saveDir)
     }
 }

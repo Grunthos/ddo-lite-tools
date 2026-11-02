@@ -243,9 +243,32 @@ Each step lists its deliverables and the test that marks it done.
 - **Done when:** output matches `golden/snapshot-*/error.log` (same set of errors, wording may differ, differences explained). **First comparison against VB6, and the point to propose merging to `master` (D-3).**
 
 ### B4 – Build model and `.build` reading and writing
-- [ ] `Build` model (replaces `BuildType6`), plus `BuildState`, which holds the build and its derived data.
-- [ ] Read and write `.build` byte-compatibly. Port the deprecation flow (`basDeprecate`) as a pure function: `(build, nameChanges) → (build', issues)`.
+- [x] `Build` model (`builder-core` package `ddolite.builder.build`, replaces `BuildType6`). It is mutable, like VB's
+      global `build`: the rules update it in place, as the screens will. `BuildRules` holds the build together with
+      what VB keeps in the globals `Feat` and `Guide`, and has the rules that loading and saving need: BAB, feat slots
+      (granted/standard/legend/race/class/deity), spell slots, trees, guide trees, `CascadeChanges cceAll`.
+- [x] Read `.build` (`readBuildFile`, port of `LoadFileLite` + `LoadBuild`'s cascade). Renamed and removed items
+      are listed in `Deprecations` (from `basDeprecate`) for a future Deprecated screen. VB's run-time error box
+      ("Ignore error and load anyway?") becomes a `BuildLoadProblem` per line, and loading carries on as if Yes was chosen.
+- [x] Write `.build` (`writeBuildFile`, port of `SaveFileLite` + `clsFile.SaveStringAs`'s ending), Windows-1252.
+- [ ] Byte-identical against VB: the `Save/` samples are older than the data, so they can't show it (renamed
+      selectors, split abilities, changed ranks, `Levelup: 36`). Tests check instead that every difference is
+      explained by a deprecation, and that Kotlin's save → load → save is stable. **Needs from Philip:** open each
+      `Save/` build in the current VB6 and *Save As* a copy (e.g. `Save/vb-resaved/`); those become exact goldens.
+      Please also re-save one warlock build with spells chosen (see the pact quirk below).
 - [ ] `tools/bld-convert` for the binary `.bld` formats v1–6 (`basDocuments.bas` ~L540).
+- VB behaviours kept and documented in the code, all checked by tests:
+  - Deity feat slots are written by character level ("Deity 7") but read by class level, so a deity feat whose
+    class level differs from its character level is lost on reopening.
+  - After opening, a warlock's pact spell slots are empty, because `InitBuildSpells` runs before the feat list
+    is rebuilt. VB refills them when the Spells screen opens or a feat changes.
+  - `IsClassBonusFeat`'s deity-class check only works at class levels 1/3/6/12/20.
+  - The Legend feat slot is entry 15 of its list, because one index runs across two lists.
+  - An unknown `[section]` is read as Skills. "MaxLevels:" is written twice. `SeekFeat` searches
+    case-insensitively over a case-sensitive sort. After the first guide step that doesn't resolve, the rest of
+    the guide is ignored (and that step's tree is still added, giving an empty `[LevelingGuide]` once).
+  - A destiny ability that doesn't resolve makes VB fail with "Subscript out of range" (a bug in
+    `DeprecateAbility`); it's listed as deprecated and reported as a problem.
 - **Done when:** every `.build` in `Save/` and the golden set reads and re-writes identically; deprecation cases give the expected issues.
 
 ### B5 – Output, import and export
@@ -556,10 +579,11 @@ desktop first; Android only has to keep compiling (CI) until phase G.
       every requirement resolved to a typed target, both of VB's resolution paths kept). Real-data tests for
       each; the validator runs it all. `EpicGrantedFeats.txt` is never read by VB (unused since the first
       check-in), so not ported – ask the data maintainers whether to delete it.
-   2. [ ] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item
+   2. [x] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item
       handling (`basDeprecate`).
-   3. [ ] B4: writing `.build` (`SaveFileLite`) + round-trip test (load → save → byte-identical) on the
-      builds in `Save/` (Philip: add more varied builds – races, casters, epic, old ones with renamed items).
+   3. [x] B4: writing `.build` (`SaveFileLite`) + round-trip tests on the builds in `Save/` (see §7 B4). Still
+      open: VB-re-saved copies of the samples as exact goldens, and more varied builds (races, casters, epic,
+      old ones with renamed items).
    4. [ ] Then the Overview window on real files, then Stats, Skills, … in Edit-menu order.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
