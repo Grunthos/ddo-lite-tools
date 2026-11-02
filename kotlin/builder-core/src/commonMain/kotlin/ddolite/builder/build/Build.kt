@@ -204,8 +204,8 @@ class BuildGuide {
  * @property includePoints which point-buy columns are shown (VB stores 1 or 0).
  * @property levelups the stat raised at levels 0, 4, … (index = level / 4); null for none.
  * @property tomes stat tomes, by stat.
- * @property skills ranks bought per skill and heroic level (VB stores them doubled for
- *   cross-class skills; the file holds the stored value).
+ * @property skills skill points spent per skill and heroic level (points, not ranks: see
+ *   [ddolite.builder.rules.SkillGrid]).
  * @property feats feat slots of each kind.
  * @property canCastSpell the first level each spell level can be cast (index 0 = healing spells), 0 if never.
  * @property classSpells spell slots, one per class in data order; empty until the first
