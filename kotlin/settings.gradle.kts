@@ -20,6 +20,7 @@ include(
     ":common",
     ":builder-core",
     ":tools:validate",
+    ":tools:form-layout",
     ":prototypes:skills-ui",
     ":prototypes:skills-desktop",
     ":prototypes:skills-android",

@@ -11,12 +11,15 @@ progresses: tick off tasks, record decisions in §3, and add risks to §12.
 ## 1. Goals and non-goals
 
 **Goals**
-- Replace the VB6 apps with Kotlin/JVM desktop apps that behave the same for existing users.
+- **First goal: a portable desktop app for Windows, Linux and macOS** that replaces the VB6 apps and
+  behaves the same for existing users. "Portable" = unzip and run, no installer: an app folder with its
+  own bundled Java runtime, one zip per OS (Compose `createDistributable`, built by a CI job on each OS).
+  User files stay next to the app, as today.
 - Keep every data and user file format **unchanged**, so data maintainers and users notice nothing.
 - Pull game rules out of the UI into tested, UI-free code.
 - Make data updates safer by adding automated validation (CI).
-- **Longer term: mobile apps (Android first, iOS possible).** The desktop release is the
-  priority, but nothing built for it should block mobile. See §2a for the constraints this
+- **Close second: Android** (iOS possible later). The desktop release comes first, but nothing
+  built for it should block Android, and the prototypes run on both from the start. See §2a for the constraints this
   places on the work from day one.
 
 **Non-goals (for the first release)**
@@ -101,7 +104,7 @@ fixing them afterwards would mean rewriting the core:
 | D-8 | Drop `frmDestiny.frm` (not in the `.vbp`); move `frmConvert` (`.bld`) and `frmRefreshData` (wiki scrape) to command-line tools | Recommended – confirm |
 | D-9 | Fate of the ADQ/Colors/LightsOut/Stopwatch utilities | **Open** |
 | D-10 | Upstream owner (Chris Lewis) agreement for the `kotlin/` folder, a LICENSE, and supplying VB6 builds | **Open** |
-| D-11 | Accept a bundled JRE (download size ~70–100 MB vs today's small exes) | **Open** |
+| D-11 | Accept a bundled JRE (download size ~70–100 MB vs today's small exes); delivered as portable per-OS zips (§1) | Open – portable-zip form agreed 2026-11-02; size still to accept |
 | D-12 | Mobile: Android first; iOS only if there's demand and a Mac + Apple developer account available | Proposed – revisit at end of F4 |
 
 ---
@@ -275,6 +278,21 @@ For each form and control, list every routine, menu item, timer, drag-and-drop s
 For each interaction, also record a **touch alternative** (§2a.5), e.g. "right-click menu on a tree
 slot → long-press"; "drag ability to slot → long-press then drag, or tap ability then tap slot".
 
+**Layout (rows and columns from absolute positions).** `tools/form-layout` (`./gradlew :tools:form-layout:run`
+→ `tools/form-layout/build/form-layout/`) reads each `.frm`, adds up the container offsets to get every
+control's absolute position (pixels at 100% = twips ÷ 15), and groups each container's children into
+rows and columns by their top and left edges (edges within 3 px count as one; near misses are listed,
+as they were probably meant to line up). For each form it writes:
+- `<form>.md`: per container, its row/column lines and a table of children with row, column and spans;
+  menus; timers; and every code line that moves or resizes a control at run time (those positions are
+  only a starting point).
+- `<form>.png` wireframes at 100% scale, to lay beside a screenshot of the real form: container borders
+  coloured by nesting depth with name tags, each container's own rows/columns as dashed numbered lines,
+  hidden controls dotted. Containers that sit on top of each other (tab pages) get a picture each.
+
+Philip compares the wireframes with the running VB6 app and notes anything the `.frm` doesn't show
+(run-time layout, owner-drawn content). The Compose screen then follows the same rows and columns.
+
 Deliverable: `kotlin/inventory/<form>.md` per form (generated from the `.frm` files, then reviewed). Each becomes **that form's parity checklist**. Do `frmEnhancements` and `frmSkills` first.
 
 | Form | Lines | Wave | Main risks |
@@ -318,9 +336,13 @@ the problem is fundamental.**
       (AWT on desktop, ClipData on Android), so shared code would need per-platform versions. A small
       shared implementation (`DragAndDrop.kt`, ~150 lines) works the same for mouse and touch; use that.
       The ability-onto-slot drag uses the same mechanism and is left for F3.
-- [~] 4. Android: the same screens build into an APK (`:prototypes:skills-android:assembleDebug`) with the
-      data bundled as assets. Not yet run on a device or emulator (the local AVDs' system images aren't
-      installed). Touch: tap = left click, hold repeats, drag works; other buttons need §2a.5 alternatives.
+- [x] 4. Android: the same screens build into an APK (`:prototypes:skills-android:assembleDebug`) with the
+      data bundled as assets. **Run on the Pixel 3a API 34 emulator (2026-11-02):** data loads, theme
+      draws, tapping cells adds points, touch-dragging a tree into a slot works (same shared code as desktop).
+      As expected the desktop layout doesn't fit a phone (only 8 level columns show, buttons wrap, the
+      tree-slot column is squeezed): phone layouts are phase G work, not a toolkit problem.
+      Other mouse buttons still need §2a.5 alternatives.
+      Emulator from Git Bash: set `ANDROID_AVD_HOME=C:\Users\pjw\.android\avd` (Cygwin's HOME hides the AVDs).
 - [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
 - **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
   (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can
@@ -447,7 +469,7 @@ All of these sit behind interfaces in `common` (§2a.7), with one implementation
 
 - **C – Cannith Crafting:** `cannith-core` (shards, scaling, augments, gearsets, analysis, quick match, value), golden capture of gearset analysis and output, forms (`frmGearset` 4.1k lines first in the inventory). Reuses `ui-kit`.
 - **D – Compendium:** `compendium-core` (quests, patrons, sagas, challenges, wilderness, `.compendium` reading and writing, import/export), forms (`frmCharacter` 5.7k lines, `userQuests`). Notes and Colors messages become in-process events.
-- **E – Packaging and release:** a single launcher app with the three tools; jpackage/Compose packaging to MSI or exe with a bundled JRE; app icons; release script equivalent to `Make-Release.ps1`; the user data location stays next to the app (`Save/`, `Settings/`) for compatibility.
+- **E – Packaging and release:** a single launcher app with the three tools; portable per-OS zips (Compose `createDistributable`: app folder + bundled runtime + native launcher) for Windows, Linux and macOS, built on a CI matrix — an installer (MSI etc.) only if asked for; try an early portable zip of the F1 prototype to check size and start-up (D-11); app icons; release script equivalent to `Make-Release.ps1`; the user data location stays next to the app (`Save/`, `Settings/`) for compatibility.
 - **G – Mobile (Android first, D-12):** `app-android` navigation shell around the existing
   `*-ui` screens; bundled data with an update check; phone layouts for the dense screens
   (Skills, Enhancements, Destiny, leveling guide), with tablets using the desktop layouts; touch
@@ -465,9 +487,9 @@ All of these sit behind interfaces in `common` (§2a.7), with one implementation
 4. [x] B2: Races and Classes loaders (first typed models, races/classes by name, D-7).
 5. [x] B6 (first rules): skills grid (`SkillGrid`: InitBuildSkills + the frmSkills editing rules).
 6. [x] F1: prototypes 1–3 on desktop, Android build (see §8.2 status).
-7. [ ] F1: run the Android prototype on a device/emulator; check 150% scaling on desktop; then confirm D-2.
+7. [ ] F1: ~~run the Android prototype~~ (done, emulator); check 150% scaling on desktop; then confirm D-2.
 8. [ ] B2: remaining loaders (Feats, Enhancements, Destinies, Spells, Templates, …).
-9. [ ] F0: inventory `frmEnhancements` and `frmSkills`.
+9. [ ] F0: inventory `frmEnhancements` and `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
 12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice).

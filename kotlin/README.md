@@ -25,6 +25,7 @@ Needs JDK 21. The Android target also needs the Android SDK: set `ANDROID_HOME`,
 | `common` | Shared by all three apps: colour themes (.screen files) so far |
 | `builder-core` | Character Builder logic: `ParseLine`, Races/Classes loaders, skills grid rules |
 | `tools/validate` | Command-line data validator, run by CI |
+| `tools/form-layout` | Reads VB6 `.frm` files: layout report (rows/columns from absolute positions) and wireframe PNGs, for the F0 inventory |
 
 `data-format`, `common` and `builder-core` are Kotlin Multiplatform (JVM + Android), so they can
 later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io`,
