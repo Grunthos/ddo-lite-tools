@@ -21,7 +21,8 @@ class ValidateTest {
         files[BuilderRecordFile.CLASSES.path] = "ClassName: Fighter\r\nBAB: 1\r\nSkillPoints: 2\r\n".encodeToByteArray()
         files[BuilderRecordFile.FEATS.path] = "FeatName: Example\r\nGroup: Misc\r\n".encodeToByteArray()
         files[BuilderRecordFile.AUTO_GRANTED_FEATS.path] = "GrantedFeats1: Example\r\n".encodeToByteArray()
-        files[BuilderRecordFile.ENHANCEMENTS.path] = "TreeName: Example\r\nType: Global\r\n".encodeToByteArray()
+        // Every race needs a race tree of its own name.
+        files[BuilderRecordFile.ENHANCEMENTS.path] = "TreeName: Human\r\nType: Race\r\n\r\nTreeName: Example\r\nType: Global\r\n".encodeToByteArray()
         files[BuilderRecordFile.DESTINIES.path] = "DestinyName: Example\r\nType: Destiny\r\n".encodeToByteArray()
         files[BuilderRecordFile.NAME_CHANGES.path] = "NameChangeType: Feat\r\nOld: Example\r\nNew: Example\r\n".encodeToByteArray()
         files[FEAT_MAP_PATH] = "Lite\tRon\tBuilder\r\nExample\tExample\tExample".encodeToByteArray()

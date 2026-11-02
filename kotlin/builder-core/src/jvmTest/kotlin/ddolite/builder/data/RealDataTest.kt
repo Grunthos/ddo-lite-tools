@@ -4,6 +4,9 @@ import ddolite.builder.model.Bab
 import ddolite.builder.model.ClassLevel
 import ddolite.builder.model.SelectorStyle
 import ddolite.builder.model.TreeStyle
+import ddolite.builder.model.AbilityTarget
+import ddolite.builder.model.Requirement
+import ddolite.builder.model.Requirements
 import ddolite.builder.model.Stat
 import ddolite.dataformat.DirectoryDataSource
 import java.nio.file.Path
@@ -57,6 +60,10 @@ class RealDataTest {
             listOf(
                 "Spells.txt: Prismatic Strike is listed more than once (also at line 1371); VB6 keeps both and may use either",
                 "Classes.txt: Warlock has pact Fey more than once (VB6 keeps both)",
+                // Requirements that never match anything (VB6 resolves them to -1 / 0 without a word):
+                // there's no Tier 2 Halfling Guile; the feat is called "Simple Thrown Expertise".
+                "Enhancements.txt: Enhancement: Halfling Tier 3: Halfling Guile : requirement's ability not found: Tier 2: Halfling Guile (VB6 doesn't report this)",
+                "Enhancements.txt: Enhancement: Vile Chemist Tier 4: Simple Thrown Mastery : requirement's feat not found: Feat: Simple Thrown Weapon Expertise (VB6 doesn't report this)",
             ),
             differences,
         )
@@ -174,6 +181,78 @@ class RealDataTest {
         assertEquals(3, data.tomes.fateTomeMax)
         assertEquals(3, data.nameChanges.size)
         assertEquals("Purity of Heart", data.findNameChange("Feat", "Purity of Spirit")?.newName)
+
+        // Every requirement and link resolves, except the two known data problems.
+        val unresolved = ArrayList<String>()
+        var resolvedCount = 0
+        fun check(req: Requirement) {
+            if (req.target == null) {
+                unresolved.add(req.raw)
+            } else {
+                resolvedCount++
+            }
+        }
+        fun checkAll(reqs: Requirements) {
+            for (list in listOf(reqs.all, reqs.one, reqs.none)) {
+                for (req in list) {
+                    check(req)
+                }
+            }
+        }
+        for (feat in data.feats) {
+            checkAll(feat.requirements)
+            for (selector in feat.selectors) {
+                checkAll(selector.requirements)
+            }
+        }
+        for (tree in data.trees + data.destinies) {
+            for (tier in tree.tiers) {
+                for (ability in tier) {
+                    checkAll(ability.requirements)
+                    val parent = ability.parent
+                    if (parent != null) {
+                        check(parent)
+                    }
+                    for (sibling in ability.siblings) {
+                        check(sibling)
+                    }
+                    for (detail in ability.rankDetails ?: emptyList()) {
+                        checkAll(detail.requirements)
+                    }
+                    for (selector in ability.selectors) {
+                        checkAll(selector.requirements)
+                    }
+                }
+            }
+        }
+        assertEquals(listOf("Tier 2: Halfling Guile", "Feat: Simple Thrown Weapon Expertise"), unresolved)
+        assertTrue(resolvedCount > 1000, "only $resolvedCount resolved")
+
+        // A requirement in another tree, with a rank (Enhancements.txt: "Arcane Archer Tier 1: Energy of the Wild Rank 3").
+        var crossTree: AbilityTarget? = null
+        for (tree in data.trees) {
+            for (tier in tree.tiers) {
+                for (ability in tier) {
+                    val lists = ArrayList<Requirements>()
+                    lists.add(ability.requirements)
+                    for (selector in ability.selectors) {
+                        lists.add(selector.requirements) // it's in selector sections in the data
+                    }
+                    for (reqs in lists) {
+                        for (req in reqs.none + reqs.one + reqs.all) {
+                            if (req.raw == "Arcane Archer Tier 1: Energy of the Wild Rank 3") {
+                                crossTree = req.target as AbilityTarget?
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        val target = assertNotNull(crossTree)
+        assertEquals("Arcane Archer", target.treeName)
+        assertEquals(1, target.tier)
+        assertEquals("Energy of the Wild", target.abilityName)
+        assertEquals(3, target.rank)
 
         // Every SharedSelector feat ends up with selectors.
         for (feat in data.feats) {

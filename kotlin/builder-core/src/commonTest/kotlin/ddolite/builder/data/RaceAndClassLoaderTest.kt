@@ -206,6 +206,7 @@ class RaceAndClassLoaderTest {
         val source = MapDataSource.ofText(
             "Builder/Races.txt" to "RaceName: Purple Dragon Knight\nStats: 8, 8, 8, 8, 8, 8\nIconicClass: Juggler\nSubRace: Martian\n",
             "Builder/Classes.txt" to "ClassName: Bard\nBAB: 0.75\nDisallowedClasses: Mime\n",
+            "Builder/Enhancements.txt" to "TreeName: Purple Dragon Knight\nType: Race\n",
         )
         val log = LoadLog()
         val data = loadBuilderData(source, log)

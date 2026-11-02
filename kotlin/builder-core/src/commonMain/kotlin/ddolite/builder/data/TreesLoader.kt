@@ -59,8 +59,8 @@ private class AbilityDraft(val name: String) {
     var cost = 1
     var selectorStyle = SelectorStyle.NONE
     var selectors = ArrayList<AbilitySelectorDraft>()
-    var parent: String? = null
-    var siblings: List<String> = emptyList()
+    var parent: Requirement? = null
+    var siblings: List<Requirement> = emptyList()
     var selectorOnly = false
     var requirements = Requirements.EMPTY
     var rankReqs = false
@@ -349,13 +349,13 @@ private class TreeReader(private val fileName: String, private val log: LoadLog)
                 }
                 "sharedselector" -> {
                     ability.selectorStyle = SelectorStyle.SHARED
-                    ability.parent = parsed.item
+                    ability.parent = Requirement(parsed.item, null)
                 }
                 "parent" -> {
                     ability.selectorStyle = SelectorStyle.EXCLUSIVE
-                    ability.parent = parsed.item
+                    ability.parent = Requirement(parsed.item, null)
                 }
-                "siblings" -> ability.siblings = parsed.list
+                "siblings" -> ability.siblings = pathRequirements(parsed.list)
                 "all", "one", "none" -> ability.requirements = ability.requirements.withGroup(field, pathRequirements(parsed.list))
                 "rank2all", "rank3all", "rank3none" -> {
                     val rank = rankOf(field)

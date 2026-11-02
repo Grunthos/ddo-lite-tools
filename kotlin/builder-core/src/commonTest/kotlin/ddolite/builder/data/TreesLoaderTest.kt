@@ -80,8 +80,8 @@ class TreesLoaderTest {
         assertEquals("Oth", other.abbreviation)
         assertTrue(other.selectorOnly)
         assertEquals(SelectorStyle.EXCLUSIVE, other.selectorStyle)
-        assertEquals("Focus", other.parent)
-        assertEquals(listOf("Strike"), other.siblings)
+        assertEquals(Requirement("Focus", null), other.parent)
+        assertEquals(listOf(Requirement("Strike", null)), other.siblings)
     }
 
     @Test

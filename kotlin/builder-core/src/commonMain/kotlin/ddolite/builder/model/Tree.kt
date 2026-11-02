@@ -68,8 +68,8 @@ data class RankDetail(val cost: Int, val requirements: Requirements) {
  *
  * @property ranks how many ranks it has (1-3; VB keeps an out-of-range value and reports it).
  * @property cost AP per rank (1-4).
- * @property parent `SharedSelector:` or `Parent:` raw text: the ability whose selectors this uses.
- * @property siblings `Siblings:` raw text, resolved by ProcessPointers.
+ * @property parent `SharedSelector:` or `Parent:`: the ability (or "Feat: …") whose selectors this uses.
+ * @property siblings `Siblings:`: abilities linked to this one.
  * @property selectorOnly show the selector's name alone, not "Ability: Selector".
  * @property rankReqs has rank 2/3 requirements (`Rank2All:`, `Rank3All:`, `Rank3None:`).
  * @property rankDetails ranks 2 and 3 (index 0 and 1), or null if the data never mentions them.
@@ -83,8 +83,8 @@ data class Ability(
     val cost: Int,
     val selectorStyle: SelectorStyle,
     val selectors: List<Selector>,
-    val parent: String?,
-    val siblings: List<String>,
+    val parent: Requirement?,
+    val siblings: List<Requirement>,
     val selectorOnly: Boolean,
     val requirements: Requirements,
     val rankReqs: Boolean,

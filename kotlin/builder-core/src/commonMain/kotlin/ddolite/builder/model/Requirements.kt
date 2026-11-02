@@ -15,8 +15,36 @@ enum class PointerStyle { FEAT, ENHANCEMENT, DESTINY }
  *
  * [style] is null where VB leaves it unset at load time (`peError`): enhancement and destiny
  * requirements are written as paths ("Tier 1: Ability") and get their style when resolved.
+ *
+ * [target] is filled in by the cross-reference pass (`resolveCrossReferences`, VB's ProcessData);
+ * it stays null where VB couldn't resolve the text (VB leaves 0 or -1 in its pointer fields).
  */
-data class Requirement(val raw: String, val style: PointerStyle?)
+data class Requirement(val raw: String, val style: PointerStyle?, val target: RequirementTarget? = null)
+
+/**
+ * What a requirement points at once resolved: the rest of VB's `PointerType` (Feat, Tree, Tier,
+ * Ability, Selector, Rank).
+ */
+sealed interface RequirementTarget
+
+/** A feat, optionally one of its selectors (VB: `Feat`, `Selector`). */
+data class FeatTarget(val featName: String, val selectorName: String?) : RequirementTarget
+
+/**
+ * An enhancement or destiny ability, optionally one of its selectors and a minimum rank.
+ *
+ * @property abilityIndex position in the tier's list (0-based; VB's `Ability` is 1-based).
+ * @property rank a required rank ("… Rank 3"); 0 means the normal rule (VB: `Rank`).
+ */
+data class AbilityTarget(
+    val style: PointerStyle,
+    val treeName: String,
+    val tier: Int,
+    val abilityIndex: Int,
+    val abilityName: String,
+    val selectorName: String?,
+    val rank: Int,
+) : RequirementTarget
 
 /**
  * The three requirement lists of a feat, selector or ability: all of [all], at least one of

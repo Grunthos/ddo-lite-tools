@@ -156,13 +156,26 @@ fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
     val destinies = loadDestinies(source, log)
     val tomes = loadTomes(source, log)
     val nameChanges = loadNameChanges(source, log)
-    val data = BuilderData(
+    val loaded = BuilderData(
         races, classes, spells, templates, feats, featMap, autoGrantedFeats, trees, destinies, tomes, nameChanges,
     )
-    checkReferences(data, log)
+    checkReferences(loaded, log)
+
+    // basProcess.ProcessData, in its order (ProcessFeatSelectors already ran with the feats).
+    val crossReferences = CrossReferences(loaded, log)
+    crossReferences.validateRacialTrees()
+    crossReferences.validateClassTrees()
+    val sharedTrees = crossReferences.processAbilitySelectors(trees, false)
+    val sharedDestinies = crossReferences.processAbilitySelectors(destinies, true)
+    val resolved = crossReferences.processPointers(feats, sharedTrees, sharedDestinies)
+    val data = BuilderData(
+        races, classes, spells, templates, resolved.first, featMap, autoGrantedFeats,
+        resolved.second, resolved.third, tomes, nameChanges,
+    )
     checkClassSpells(data, log)
     checkTemplates(templates, log)
     checkFeatMap(featMap, data, log)
+    crossReferences.validateTreeLockouts()
     return data
 }
 

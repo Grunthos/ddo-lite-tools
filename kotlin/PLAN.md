@@ -550,11 +550,12 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 8. [ ] **All data and file support before more screens** (agreed 2026-11-02): with the data model settled
    against the real data, the screens are mostly presentation. In VB's `InitData` order
    (Build/basDataLoad.bas, later files refer to earlier ones):
-   1. [ ] B2: ~~Templates, Spells, Feats (+ selectors)~~ (done, with the ProcessTemplates, ProcessSpells and
-      ProcessFeatSelectors checks), ~~FeatMap, AutoGrantedFeats~~ (done; `EpicGrantedFeats.txt` is never read by
-      VB – unused since the first check-in, so not ported; ask the data maintainers whether to delete it),
-      ~~Enhancements + Destinies (trees, abilities, selectors)~~ (done, incl. automatic stat abilities and core chains), ~~tome data, NameChange~~ (done) — each with real-data
-      tests and added to the validator.
+   1. [x] B2: every file `InitData` loads – Races, Templates, Spells, Classes, Feats (+ selectors), FeatMap,
+      AutoGrantedFeats, Enhancements + Destinies (trees, abilities, selectors, automatic stat abilities, core
+      chains), Tomes, NameChange – plus the whole `basProcess.ProcessData` pass (tree checks, shared selectors,
+      every requirement resolved to a typed target, both of VB's resolution paths kept). Real-data tests for
+      each; the validator runs it all. `EpicGrantedFeats.txt` is never read by VB (unused since the first
+      check-in), so not ported – ask the data maintainers whether to delete it.
    2. [ ] B4: build model + reading `.build` (`basFormatLite.LoadFileLite`) with renamed/removed-item
       handling (`basDeprecate`).
    3. [ ] B4: writing `.build` (`SaveFileLite`) + round-trip test (load → save → byte-identical) on the
@@ -563,4 +564,7 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
-12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice); `Spells.txt` lists Prismatic Strike twice (lines 1371 and 1892).
+12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice); `Spells.txt` lists Prismatic Strike twice (lines 1371 and 1892). Requirements that
+    never match (VB6 is silent): `Enhancements.txt:8058` Halfling tier 3 Halfling Guile requires "Tier 2: Halfling
+    Guile" (there is none); `Enhancements.txt:14560` Vile Chemist Simple Thrown Mastery requires "Feat: Simple
+    Thrown Weapon Expertise" (the feat is "Simple Thrown Expertise").
