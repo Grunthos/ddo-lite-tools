@@ -152,7 +152,7 @@ class BuildRoundTripTest {
         assertEquals("Cleric", build.levelClass(3)?.name)
         assertEquals(listOf(10, 0, 6, 4, 2, 6), build.statPoints[BuildPoints.ADVENTURER.ordinal].toList())
         assertEquals(28, build.statTotals[BuildPoints.ADVENTURER.ordinal])
-        // Fighter 13 levels (full BAB), Cleric 7 (3/4): 13 + 5 at level 20.
+        // Fighter 12 levels (full BAB), Cleric 8 (3/4): 12 + 6 at level 20.
         assertEquals(18, build.bab[19])
         val legend = build.feats(BuildFeatType.LEGEND)
         assertEquals(15, legend.size) // VB's shared index: the Legend slot is the 15th entry

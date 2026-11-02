@@ -8,6 +8,9 @@ import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.use
+import ddolite.builder.build.BuildPoints
+import ddolite.builder.build.readBuildFile
+import ddolite.builder.build.writeBuildFile
 import ddolite.builder.data.LoadLog
 import ddolite.builder.data.loadBuilderData
 import ddolite.builder.model.Skill
@@ -16,6 +19,7 @@ import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
+import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreen
 import ddolite.prototype.skills.SkillsScreenState
@@ -109,6 +113,23 @@ fun main(args: Array<String>) {
         println("Slots: " + trees.slots.toList())
         check(secondTreeY > 0)
     }
+
+    // A real build from Save/: the main window's summary, its skills and its trees.
+    val bytes = Files.readAllBytes(repoRoot.resolve("Save").resolve("Kensei Warpriest.build"))
+    prototype.openBuild(readBuildFile(bytes, data, BuildPoints.ADVENTURER))
+    ImageComposeScene(width = 460, height = 1400, density = Density(1f)) { MainWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("7-opened-main.png"))
+    }
+    ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
+        save(scene, outDir.resolve("8-opened-skills.png"))
+    }
+    ImageComposeScene(width = 900, height = 640, density = Density(1f)) { TreeSlotsWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("9-opened-trees.png"))
+    }
+    val rules = prototype.prepareSave()!!
+    val resaved = writeBuildFile(rules)
+    println("Kensei Warpriest re-saved: " + resaved.size + " bytes, same as a direct save: " +
+        resaved.contentEquals(writeBuildFile(readBuildFile(bytes, data, BuildPoints.ADVENTURER).rules)))
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
 

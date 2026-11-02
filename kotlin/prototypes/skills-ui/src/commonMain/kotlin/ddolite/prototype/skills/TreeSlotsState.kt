@@ -5,7 +5,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ddolite.builder.build.Build
+import ddolite.builder.build.BuildRules
+import ddolite.builder.build.BuildTree
 import ddolite.builder.data.BuilderData
+import ddolite.builder.model.TreeStyle
 import ddolite.builder.data.BuilderRecordFile
 import ddolite.builder.data.ParsedLine
 import ddolite.builder.data.parseLine
@@ -117,8 +121,81 @@ class TreeSlotsState(
         slots[0] = RACE_NAME
     }
 
-    /** True for the race's own tree slot, which is fixed. */
-    fun isRaceSlot(slot: Int): Boolean = slot == 0
+    /** True for the race's own tree slot, which is fixed (wherever it is: an opened build may list it last). */
+    fun isRaceSlot(slot: Int): Boolean = slots[slot] == skills.raceName
+
+    /**
+     * Shows an opened build's trees, in its order (`build.Tree(1 To .Trees)`). The rules' InitBuildTrees has
+     * already added the race tree and dropped trees the build can't use.
+     */
+    fun openBuild(build: Build) {
+        selectedTree = null
+        selectedSlot = null
+        for (i in 0 until TREE_SLOTS) {
+            if (i < build.trees.size) {
+                slots[i] = build.trees[i].treeName
+            } else {
+                slots[i] = null
+            }
+        }
+    }
+
+    /**
+     * Puts the slots back into `build.Tree` for saving: trees still chosen keep their abilities;
+     * a tree added here is set up as frmEnhancements.AddBuildTree (:1564) does, with its source
+     * the first of the build's classes that has it (the class the available list shows it under).
+     * Empty slots are left out.
+     */
+    fun storeInto(rules: BuildRules) {
+        val build = rules.build
+        val old = ArrayList<BuildTree>(build.trees)
+        build.trees.clear()
+        for (name in slots) {
+            if (name == null) {
+                continue
+            }
+            var tree: BuildTree? = null
+            for (existing in old) {
+                if (existing.treeName == name) {
+                    tree = existing
+                    break
+                }
+            }
+            if (tree == null) {
+                tree = newBuildTree(rules, name)
+            }
+            build.trees.add(tree)
+        }
+        rules.initLevelingGuide()
+    }
+
+    /** A tree just added to the build. Ported from frmEnhancements.AddBuildTree (:1564) and ClassLevels (:1595). */
+    private fun newBuildTree(rules: BuildRules, name: String): BuildTree {
+        val tree = BuildTree(name)
+        for (split in rules.classSplit()) {
+            if (split.characterClass.trees.contains(name)) {
+                tree.source = split.characterClass
+                break
+            }
+        }
+        val source = tree.source
+        if (source == null) {
+            tree.classLevels = rules.build.maxLevels
+            val dataTree = data.findTree(name)
+            if (dataTree != null) {
+                tree.treeType = dataTree.style
+            }
+        } else {
+            tree.classLevels = 0
+            for (level in 1..rules.heroicLevels()) {
+                if (rules.build.levelClass(level) == source) {
+                    tree.classLevels = tree.classLevels + 1
+                }
+            }
+            tree.treeType = TreeStyle.CLASS
+        }
+        return tree
+    }
 
     /**
      * The trees the build could add: its classes' trees, then its race's trees, then global trees,
@@ -138,7 +215,7 @@ class TreeSlotsState(
                 }
             }
         }
-        val race = data.findRace(RACE_NAME)
+        val race = data.findRace(skills.raceName)
         if (race != null) {
             for (treeName in race.trees) {
                 addIfAllowed(result, treeName, race.name)

@@ -15,6 +15,7 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
@@ -60,9 +61,10 @@ fun main(args: Array<String>) {
     val themes = loadThemes(repoRoot.resolve("Settings"))
     val skills = SkillsScreenState(data, themes, prototypePresets())
     val state = PrototypeState(skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills))
+    val files = BuildFiles(data, repoRoot.resolve("Save").toFile())
 
     application {
-        BuilderWindows(state)
+        BuilderWindows(state, files)
     }
 }
 
@@ -115,10 +117,42 @@ private class OpenWindows {
 }
 
 /**
+ * Whether a screen can be opened: it exists in the prototype, and the Skills grid has levels to
+ * show. (VB's OpenForm, basMain.bas:131, also refuses screens until the build has what they need.)
+ */
+private fun canOpen(screen: EditScreen, state: PrototypeState): Boolean {
+    if (!screen.built) {
+        return false
+    }
+    if (screen == EditScreen.SKILLS) {
+        return state.skills.hasLevels()
+    }
+    return true
+}
+
+/**
+ * The main window's title: the build's name, with the file name if it differs; the program's name
+ * if the build has no name. Ported from basDocuments.SetAppCaption (Build/basDocuments.bas:172),
+ * without the "*" for unsaved changes (the prototype doesn't track them yet).
+ */
+private fun appCaption(files: BuildFiles, state: PrototypeState): String {
+    val opened = state.opened
+    if (opened == null || opened.build.buildName.isEmpty()) {
+        return "Character Builder Lite (Kotlin prototype)"
+    }
+    var caption = opened.build.buildName
+    val file = files.file
+    if (file != null && caption != file.nameWithoutExtension) {
+        caption = caption + " (" + file.name + ")"
+    }
+    return caption
+}
+
+/**
  * Keyboard shortcuts on the main window: a plain letter opens a screen.
  * Ported from frmMain.Form_KeyDown (frmMain.frm:751); Escape (VB: unload frmMain) isn't copied.
  */
-private fun mainWindowKey(event: KeyEvent, windows: OpenWindows): Boolean {
+private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: PrototypeState): Boolean {
     if (event.type != KeyEventType.KeyDown) {
         return false
     }
@@ -126,7 +160,7 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows): Boolean {
         return false // VB: If Shift <> 0 Then Exit Sub
     }
     for (screen in EditScreen.entries) {
-        if (screen.built && event.key == screen.key) {
+        if (canOpen(screen, state) && event.key == screen.key) {
             windows.open(screen)
             return true
         }
@@ -136,22 +170,28 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows): Boolean {
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles) {
     val windows = remember { OpenWindows() }
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Character Builder Lite (Kotlin prototype)",
+        title = appCaption(files, state),
         state = rememberWindowState(position = WindowPosition(40.dp, 40.dp), width = 460.dp, height = 640.dp),
-        onKeyEvent = { event -> mainWindowKey(event, windows) },
+        onKeyEvent = { event -> mainWindowKey(event, windows, state) },
     ) {
         MenuBar {
+            // frmMain's File menu (frmMain.frm:160), with the items the prototype has.
             Menu("File", mnemonic = 'F') {
+                Item("Open...", mnemonic = 'O', shortcut = KeyShortcut(Key.O, ctrl = true), onClick = { files.open(window, state) })
+                Separator()
+                Item("Save", mnemonic = 'S', shortcut = KeyShortcut(Key.S, ctrl = true), enabled = state.opened != null, onClick = { files.save(window, state) })
+                Item("Save As...", mnemonic = 'A', enabled = state.opened != null, onClick = { files.saveAs(window, state) })
+                Separator()
                 Item("Exit", mnemonic = 'x', onClick = ::exitApplication)
             }
             Menu("Edit", mnemonic = 'E') {
                 for (screen in EditScreen.entries) {
-                    Item(screen.title, mnemonic = screen.mnemonic, enabled = screen.built, onClick = { windows.open(screen) })
+                    Item(screen.title, mnemonic = screen.mnemonic, enabled = canOpen(screen, state), onClick = { windows.open(screen) })
                 }
             }
             // frmMain's Window menu lists the open screens (tmrWindowMenu_Timer, frmMain.frm:819).

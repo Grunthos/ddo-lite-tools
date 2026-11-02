@@ -25,6 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.mutableStateOf
+import ddolite.builder.build.BuildLoadResult
+import ddolite.builder.build.BuildRules
 import ddolite.builder.model.Skill
 import ddolite.builder.rules.formatRanks
 import ddolite.common.theme.ColorGroup
@@ -35,6 +38,31 @@ import ddolite.common.theme.Theme
 class PrototypeState(val skills: SkillsScreenState, val trees: TreeSlotsState) {
     /** 0 = skills grid, 1 = enhancement tree slots. */
     var tab by mutableIntStateOf(0)
+
+    /** The opened .build file, with what loading it reported; null while showing a made-up preset. */
+    var opened: BuildLoadResult? by mutableStateOf(null)
+        private set
+
+    /** Shows an opened build in every screen. */
+    fun openBuild(result: BuildLoadResult) {
+        opened = result
+        skills.openBuild(result.build, result.rules.heroicLevels())
+        trees.openBuild(result.build)
+    }
+
+    /**
+     * The opened build's rules with the screens' changes copied back into the build, ready for
+     * writeBuildFile; null if no build is open.
+     */
+    fun prepareSave(): BuildRules? {
+        val result = opened
+        if (result == null) {
+            return null
+        }
+        skills.storeInto(result.build)
+        trees.storeInto(result.rules)
+        return result.rules
+    }
 }
 
 /** The prototype's whole window: a tab bar, the chosen screen, and anything being dragged. */
@@ -159,8 +187,12 @@ fun MainWindowContent(state: PrototypeState) {
     val text = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val revision = skills.revision // read so this redraws when the build changes
     val lines = ArrayList<String>()
-    lines.add("Build: " + skills.presets[skills.presetIndex].name + " (" + RACE_NAME + ")   [revision " + revision + "]")
+    lines.add("Build: " + skills.buildTitle() + "   [revision " + revision + "]")
     lines.add("")
+    val opened = state.opened
+    if (opened != null) {
+        lines.addAll(openedBuildLines(opened))
+    }
     lines.add("Skills (total ranks):")
     for (skill in Skill.entries) {
         val ranks = skills.grid.totalRanks(skills.spend, skill)
@@ -177,7 +209,7 @@ fun MainWindowContent(state: PrototypeState) {
         }
     }
     lines.add("")
-    lines.add("Open screens from the Edit menu (or press K / E), in the VB app's order.")
+    lines.add("Open a build with File > Open (Ctrl+O). Open screens from the Edit menu (or press K / E), in the VB app's order.")
     Box(
         modifier = Modifier.fillMaxSize()
             .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
@@ -201,7 +233,7 @@ fun TreeSlotsScreen(state: TreeSlotsState, skills: SkillsScreenState) {
     val ctlText = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
 
     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        BasicText("Build: " + skills.presets[skills.presetIndex].name + " (Human)", style = text)
+        BasicText("Build: " + skills.buildTitle(), style = text)
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
             // Available trees. Also a drop target, so a tree dragged back here is removed.
             Column(

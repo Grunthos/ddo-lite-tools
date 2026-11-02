@@ -4,9 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ddolite.builder.build.Build
 import ddolite.builder.data.BuilderData
 import ddolite.builder.model.CharacterClass
 import ddolite.builder.model.Skill
+import ddolite.builder.rules.HEROIC_LEVELS
 import ddolite.builder.rules.SkillGrid
 import ddolite.builder.rules.SkillSpend
 import ddolite.common.theme.Theme
@@ -26,8 +28,8 @@ enum class PointerButton { PRIMARY, SECONDARY, TERTIARY }
  * numbering: row 0 = the header rows, rows 1-21 = skills; column 0 = the skill names,
  * columns 1-20 = levels; -1 = outside.
  *
- * Simplifications for the prototype: the build is a fixed [BuildPreset] with a Human, and the
- * Intelligence modifier is one number for every level (VB works it out per level from stats,
+ * Simplifications for the prototype: the build is an opened .build file or a made-up
+ * [BuildPreset] with a Human, and the Intelligence modifier is one number for every level (VB works it out per level from stats,
  * level-ups and tomes).
  */
 class SkillsScreenState(
@@ -44,6 +46,13 @@ class SkillsScreenState(
         private set
     var intModifier by mutableIntStateOf(2)
         private set
+
+    /** The build opened from a file, or null while a made-up [BuildPreset] is shown. (Declared before [grid], which reads it.) */
+    var openedBuild: Build? by mutableStateOf(null)
+        private set
+
+    // Heroic levels of the opened build (basBuild.GetHeroicLevels).
+    private var openedLevels = 0
 
     /** The skill points spent. Kept when the preset changes, as VB keeps build.Skills when classes change. */
     val spend = SkillSpend()
@@ -70,10 +79,60 @@ class SkillsScreenState(
 
     val theme: Theme get() = themes[themeIndex]
 
+    /** The build's race: the opened build's, else the prototype's Human. */
+    val raceName: String
+        get() {
+            val race = openedBuild?.race
+            if (race != null) {
+                return race.name
+            }
+            return RACE_NAME
+        }
+
+    /** Choosing a made-up level plan leaves the opened build (its skill points stay in [spend]). */
     fun selectPreset(index: Int) {
         presetIndex = index
+        openedBuild = null
         grid = makeGrid()
     }
+
+    /**
+     * Shows an opened build: its classes by level, its race and its skill points.
+     * VB's frmSkills reads `build.Skills` directly; here the screen keeps its own [SkillSpend]
+     * and [storeInto] copies it back before saving.
+     */
+    fun openBuild(build: Build, heroicLevels: Int) {
+        openedBuild = build
+        openedLevels = heroicLevels
+        for (skill in Skill.entries) {
+            for (level in 1..HEROIC_LEVELS) {
+                spend.set(skill, level, build.skills[skill.ordinal][level - 1])
+            }
+        }
+        grid = makeGrid()
+        changed()
+    }
+
+    /** Copies the skill points into [build] (`build.Skills`), for saving. */
+    fun storeInto(build: Build) {
+        for (skill in Skill.entries) {
+            for (level in 1..HEROIC_LEVELS) {
+                build.skills[skill.ordinal][level - 1] = spend.get(skill, level)
+            }
+        }
+    }
+
+    /** "name (race)" for the opened build or the chosen preset. */
+    fun buildTitle(): String {
+        val build = openedBuild
+        if (build != null) {
+            return openedBuildLabel(build) + " (" + raceName + ")"
+        }
+        return presets[presetIndex].name + " (" + raceName + ")"
+    }
+
+    /** True if the grid has levels to show (an opened build may have no class at level 1). */
+    fun hasLevels(): Boolean = grid.levels > 0
 
     fun selectTheme(index: Int) {
         themeIndex = index
@@ -96,6 +155,9 @@ class SkillsScreenState(
     }
 
     fun isMulticlass(): Boolean {
+        if (grid.levels == 0) {
+            return false
+        }
         val first = grid.classAt(1)
         for (level in 2..grid.levels) {
             if (grid.classAt(level) != first) {
@@ -205,17 +267,30 @@ class SkillsScreenState(
 
     private fun makeGrid(): SkillGrid {
         val classes = ArrayList<CharacterClass>()
-        for (name in presets[presetIndex].classNames) {
-            val c = data.findClass(name)
-            if (c == null) {
-                throw IllegalStateException("Class $name not found in Classes.txt")
+        val build = openedBuild
+        if (build != null) {
+            // The grid needs a class at every level, so it stops at the first level without one
+            // (VB's Skills screen can't be opened until every level has a class).
+            for (level in 1..openedLevels) {
+                val c = build.levelClass(level)
+                if (c == null) {
+                    break
+                }
+                classes.add(c)
             }
-            classes.add(c)
+        } else {
+            for (name in presets[presetIndex].classNames) {
+                val c = data.findClass(name)
+                if (c == null) {
+                    throw IllegalStateException("Class $name not found in Classes.txt")
+                }
+                classes.add(c)
+            }
         }
         var raceSkillPoints = 0
-        val human = data.findRace("Human")
-        if (human != null) {
-            raceSkillPoints = human.skillPoints
+        val race = data.findRace(raceName)
+        if (race != null) {
+            raceSkillPoints = race.skillPoints
         }
         val modifiers = ArrayList<Int>()
         for (i in classes.indices) {

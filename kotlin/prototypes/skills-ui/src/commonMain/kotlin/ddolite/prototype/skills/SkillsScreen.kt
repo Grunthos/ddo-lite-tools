@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ddolite.builder.build.Build
 import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
@@ -49,8 +50,12 @@ fun SkillsScreen(state: SkillsScreenState) {
         // Level plans.
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             BasicText("Build:", style = label)
+            val opened = state.openedBuild
+            if (opened != null) {
+                ChoiceButton(theme, openedBuildLabel(opened), selected = true) {}
+            }
             for (i in state.presets.indices) {
-                ChoiceButton(theme, state.presets[i].name, selected = i == state.presetIndex) { state.selectPreset(i) }
+                ChoiceButton(theme, state.presets[i].name, selected = opened == null && i == state.presetIndex) { state.selectPreset(i) }
             }
         }
 
@@ -91,6 +96,14 @@ fun SkillsScreen(state: SkillsScreenState) {
             style = label.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM), fontSize = 12.sp),
         )
     }
+}
+
+/** The opened build's name for the build row, or a placeholder if it has none. */
+internal fun openedBuildLabel(build: Build): String {
+    if (build.buildName.isEmpty()) {
+        return "(opened build)"
+    }
+    return build.buildName
 }
 
 /** A small clickable label, in the navigation colours (the VB userHeader links). */
