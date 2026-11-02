@@ -149,19 +149,87 @@ class BuildRules(val data: BuilderData, val build: Build) {
         return 99
     }
 
-    /**
-     * Everything VB recalculates after a build is opened. Ported from
-     * `basMain.CascadeChanges(cceAll)` (basMain.bas:250), build part only (InitBuildSkills only
-     * fills the skills screen's grid, so it isn't needed here).
-     */
+    /** Everything VB recalculates after a build is opened: [cascadeChanges] with [CascadeChange.ALL]. */
     fun cascadeAll() {
-        if (build.levelClass(1) != null) {
-            calculateBab()
-            initBuildSpells()
-            initBuildFeats()
-            initLevelingGuide()
+        cascadeChanges(CascadeChange.ALL)
+    }
+
+    /**
+     * Recalculates what depends on [change]. Ported from the build part of `basMain.CascadeChanges`
+     * (basMain.bas:250); refreshing or closing the open windows is the screens' job.
+     *
+     * Not ported here: `InitBuildSkills` only fills the Skills screen's own grid (the screen
+     * builds its grid from the build), and `CheckSlotErrors` marks feat slots in error for the
+     * Feats screen, which comes with that screen.
+     */
+    fun cascadeChanges(change: CascadeChange) {
+        val hasClass = build.levelClass(1) != null
+        when (change) {
+            CascadeChange.ALL, CascadeChange.MAX_LEVEL -> {
+                if (hasClass) {
+                    calculateBab()
+                    initBuildSpells()
+                    initBuildFeats()
+                    initLevelingGuide()
+                }
+                initBuildTrees()
+            }
+            CascadeChange.CLASS -> {
+                if (hasClass) {
+                    initBuildSpells()
+                    initBuildFeats()
+                    initLevelingGuide()
+                }
+                initBuildTrees()
+            }
+            CascadeChange.RACE -> {
+                if (hasClass) {
+                    initBuildFeats()
+                }
+                initBuildTrees()
+                initLevelingGuide()
+            }
+            CascadeChange.ALIGNMENT, CascadeChange.STATS, CascadeChange.SKILL -> {
+                // VB: CheckSlotErrors (and InitBuildSkills for stats); see above.
+            }
+            CascadeChange.FEAT -> {
+                if (hasClass) {
+                    initBuildSpells()
+                }
+                initLevelingGuide()
+            }
+            CascadeChange.ENHANCEMENTS -> initLevelingGuide()
         }
-        initBuildTrees()
+    }
+
+    /**
+     * The points a point-buy column has to spend: 28/32/34/36, 4 fewer for Drow except Adventurer.
+     * Ported from `GetBuildPoints` (basEnum.bas:281).
+     */
+    fun buildPointsFor(points: BuildPoints): Int {
+        var offset = 0
+        val race = build.race
+        if (race != null && race.vbIndex == RACE_DROW) {
+            offset = -4
+        }
+        return when (points) {
+            BuildPoints.ADVENTURER -> 28
+            BuildPoints.CHAMPION -> 32 + offset
+            BuildPoints.HERO -> 34 + offset
+            BuildPoints.LEGEND -> 36 + offset
+        }
+    }
+
+    /**
+     * Empties the leveling guide. Ported from frmOverview.ClearLevelingGuide (frmOverview.frm:1632),
+     * which every change of race or class calls; VB's `Guide` (here [guideTrees]) is rebuilt by
+     * the next [initLevelingGuide].
+     */
+    fun clearLevelingGuide() {
+        build.guide.trees.clear()
+        build.guide.enhancements.clear()
+        guideTrees = emptyList()
+        guideTreeLookup = IntArray(0)
     }
 
     // ---------------------------------------------------------------- BAB

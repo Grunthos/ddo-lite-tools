@@ -16,6 +16,12 @@ const val MAX_LEVELUPS = 9
 /** Heroic levels, which are the only ones with a class (`build.Class(1 To 20)`). */
 const val HEROIC_LEVELS = 20
 
+/** VB's `reDrow`: the Drow's [ddolite.builder.model.Race.vbIndex] (see KNOWN_RACES), which several rules single out. */
+const val RACE_DROW = 2
+
+/** What changed, for [BuildRules.cascadeChanges]. Ported from `CascadeChangeEnum` (basEnum.bas:246). */
+enum class CascadeChange { ALL, MAX_LEVEL, RACE, ALIGNMENT, CLASS, STATS, SKILL, FEAT, ENHANCEMENTS }
+
 /**
  * Which point-buy the build is planned for. Ported from `BuildPointsEnum` (basEnum.bas) with
  * `GetBuildPointsName`/`GetBuildPointsID` (basFormatLite.bas:274, :875). Order matters: VB uses the
