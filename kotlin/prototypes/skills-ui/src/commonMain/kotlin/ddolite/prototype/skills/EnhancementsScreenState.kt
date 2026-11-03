@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ddolite.builder.build.TreeEdits
 import ddolite.builder.build.AbilityDetails
 import ddolite.builder.build.BLANK_ABILITY
 import ddolite.builder.build.BuildAbility
@@ -150,13 +151,9 @@ class EnhancementsScreenState(private val session: PrototypeState) {
      * tree (dropped below level 12). The combo of trees is refilled (PopulateCombo).
      */
     private fun loadData() {
-        val r = session.rules ?: return
-        val build = r.build
+        val edits = edits() ?: return
         sourceRow = 0
-        if (build.maxLevels < 12 && build.tier5.isNotEmpty()) {
-            EnhancementRules(r).shaveTree(build.tier5)
-            build.tier5 = ""
-        }
+        edits.loadDataLimits()
         populateCombo()
         guide.loadData()
     }
@@ -373,25 +370,19 @@ class EnhancementsScreenState(private val session: PrototypeState) {
      */
     fun chooseTreeMenu(index: Int) {
         treeMenuRow = 0
-        val r = session.rules ?: return
-        val build = r.build
+        val edits = edits() ?: return
         when (index) {
             0 -> {
-                val row = selectedTreeRow()
-                if (row == 0 || build.trees[row - 1].treeType == TreeStyle.RACE) {
+                if (!edits.deleteTree(selectedTreeRow())) {
                     return
                 }
-                build.trees.removeAt(row - 1)
                 populateCombo()
             }
             1 -> {
                 if (!session.ask("Delete all trees?")) {
                     return
                 }
-                build.trees.clear()
-                val race = BuildTree(build.race?.name ?: "")
-                race.treeType = TreeStyle.RACE
-                build.trees.add(race)
+                edits.deleteAllTrees()
                 populateCombo()
             }
             3 -> {
@@ -399,15 +390,13 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                 if (row == 0) {
                     return
                 }
-                build.trees[row - 1].abilities.clear()
+                edits.resetTree(row)
             }
             4 -> {
                 if (!session.ask("Reset all trees?")) {
                     return
                 }
-                for (bt in build.trees) {
-                    bt.abilities.clear()
-                }
+                edits.resetAllTrees()
             }
             else -> return
         }
@@ -418,15 +407,10 @@ class EnhancementsScreenState(private val session: PrototypeState) {
     /** usrTree_SlotDblClick (:1333): removes the tree (not the race's), clearing it as the tier 5 tree. */
     fun doubleClickTree(row: Int) {
         treeListIndex = -1
-        val build = session.rules?.build ?: return
-        val bt = build.trees.getOrNull(row - 1) ?: return
-        if (bt.treeType == TreeStyle.RACE) {
+        val edits = edits() ?: return
+        if (!edits.removeTree(row)) {
             return
         }
-        if (build.tier5 == bt.treeName) {
-            build.tier5 = ""
-        }
-        build.trees.removeAt(row - 1)
         showTrees(drop = false, add = false)
         populateCombo()
         treesChanged()
@@ -452,36 +436,17 @@ class EnhancementsScreenState(private val session: PrototypeState) {
         treesChanged()
     }
 
-    /**
-     * Puts the highlighted list tree in row [row], replacing what's there or adding a tree. Ported
-     * from AddBuildTree (:1564) and ClassLevels (:1595): a class tree gets that class's levels,
-     * anything else the max level and its own type.
-     */
+    /** The build's tree edits (core [TreeEdits]), or null with no build open. */
+    private fun edits(): TreeEdits? {
+        val r = session.rules ?: return null
+        return TreeEdits(r, destinies = false)
+    }
+
+    /** Puts the highlighted list tree in row [row], replacing what's there or adding a tree (AddBuildTree, :1564). */
     private fun addBuildTree(row: Int) {
-        val r = session.rules ?: return
+        val edits = edits() ?: return
         val listed = availableTrees().getOrNull(treeListIndex) ?: return
-        val build = r.build
-        val bt = BuildTree(listed.name)
-        val c = r.data.findClass(listed.source)
-        if (c == null) {
-            bt.classLevels = build.maxLevels
-            bt.treeType = r.data.findTree(listed.name)?.style
-        } else {
-            bt.source = c
-            var levels = 0
-            for (level in 1..r.heroicLevels()) {
-                if (build.levelClass(level) == c) {
-                    levels++
-                }
-            }
-            bt.classLevels = levels
-            bt.treeType = TreeStyle.CLASS
-        }
-        if (row > build.trees.size) {
-            build.trees.add(bt)
-        } else {
-            build.trees[row - 1] = bt
-        }
+        edits.putTree(row, edits.newEnhancementTree(listed.name, listed.source))
     }
 
     /** A tree drag is starting: from the list, ShowTrees(True, True) (lstTree_MouseMove, :1507); from a row, usrTree_RequestDrag (:1553). */
@@ -521,9 +486,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                     addBuildTree(target.row)
                     changedTrees = true
                 } else if (item is EnhancementDrag.TreeRow && item.row != target.row) {
-                    val swap = build.trees[item.row - 1]
-                    build.trees[item.row - 1] = build.trees[target.row - 1]
-                    build.trees[target.row - 1] = swap
+                    edits()?.swapTrees(item.row, target.row)
                     changedTrees = true
                 }
             }
@@ -554,7 +517,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
     /** usrspnRacialAP_Change (:1236). */
     fun setRacialAp(value: Int) {
         val r = session.rules ?: return
-        r.build.racialAP = value
+        TreeEdits(r, destinies = false).setRacialAp(value)
         var lives = 0
         if (value > r.data.tomes.racialApMax) {
             lives = value - r.data.tomes.racialApMax
@@ -585,8 +548,8 @@ class EnhancementsScreenState(private val session: PrototypeState) {
 
     /** usrspnUniversalAP_Change (:1255). */
     fun setUniversalAp(value: Int) {
-        val r = session.rules ?: return
-        r.build.universalAP = value
+        val edits = edits() ?: return
+        edits.setUniversalAp(value)
         treesChanged()
     }
 
@@ -850,10 +813,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
         if (!session.ask("Reset $comboTree?")) {
             return
         }
-        bt.abilities.clear()
-        if (r.build.tier5 == bt.treeName) {
-            EnhancementRules(r).setTier5("")
-        }
+        TreeEdits(r, destinies = false).resetAbilities(bt)
         showAbilities()
         showAvailable()
         noSelection()
@@ -870,18 +830,10 @@ class EnhancementsScreenState(private val session: PrototypeState) {
      * another tree (whose tier 5 abilities are then removed).
      */
     private fun clearSlot(row: Int) {
-        val r = session.rules ?: return
+        val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        if (row < 1 || row > bt.abilities.size) {
+        if (!edits.clearSlot(bt, row)) {
             return
-        }
-        val er = EnhancementRules(r)
-        bt.abilities[row - 1] = bt.abilities[row - 1].copy(ability = BLANK_ABILITY)
-        er.removeBlanks(bt)
-        if (bt.abilities.isEmpty()) {
-            er.setTier5("")
-        } else if (bt.abilities[bt.abilities.size - 1].tier < 5 && r.build.tier5 == bt.treeName) {
-            er.setTier5("")
         }
         showAbilities()
         showAvailable()
@@ -891,9 +843,9 @@ class EnhancementsScreenState(private val session: PrototypeState) {
 
     /** A rank arrow on slot [row] (usrList_RankChange, :2001). */
     fun changeRank(row: Int, ranks: Int) {
+        val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        val a = bt.abilities.getOrNull(row - 1) ?: return
-        bt.abilities[row - 1] = a.copy(rank = ranks)
+        val a = edits.setRanks(bt, row, ranks) ?: return
         showAbilities()
         showAvailable()
         showDetails(a.tier, a.ability, a.selector, row)
@@ -958,17 +910,14 @@ class EnhancementsScreenState(private val session: PrototypeState) {
      * tree there. Returns false if the user says no.
      */
     private fun confirmTier5(): Boolean {
-        val r = session.rules ?: return true
+        val edits = edits() ?: return true
         val choice = userChoice() ?: return true
         val bt = currentBuildTree() ?: return true
-        val tier5 = r.build.tier5
-        if (choice.first == 5 && tier5.isNotEmpty() && tier5 != bt.treeName) {
-            if (session.ask("Make " + bt.treeName + " your Tier 5 tree?\n\n(This will clear Tier 5 enhancements from the " + tier5 + " tree.)")) {
-                EnhancementRules(r).setTier5(bt.treeName)
-            } else {
-                return false
-            }
+        val question = edits.tier5Question(bt, choice.first) ?: return true
+        if (!session.ask(question)) {
+            return false
         }
+        edits.confirmTier5(bt)
         return true
     }
 
@@ -997,21 +946,12 @@ class EnhancementsScreenState(private val session: PrototypeState) {
      * to drop onto when [blank]. A tier 5 ability makes this the tier 5 tree.
      */
     private fun addAbility(blank: Boolean): Boolean {
-        val r = session.rules ?: return false
+        val edits = edits() ?: return false
         val tree = currentTree() ?: return false
         val bt = currentBuildTree() ?: return false
         val choice = userChoice() ?: return false
-        val er = EnhancementRules(r)
-        val insert = er.insertionPoint(bt, choice.first, choice.second)
-        if (blank) {
-            bt.abilities.add(insert, BuildAbility(0, BLANK_ABILITY, 0, 0))
-        } else {
-            val ranks = tree.tiers[choice.first][choice.second].ranks
-            bt.abilities.add(insert, BuildAbility(choice.first, choice.second, ranks, choice.third))
-            if (choice.first == 5) {
-                er.setTier5(bt.treeName)
-            }
-        }
+        val ranks = tree.tiers[choice.first][choice.second].ranks
+        val insert = edits.insertAbility(bt, choice.first, choice.second, ranks, choice.third, blank)
         showAbilities()
         slotHover = insert + 1
         return true
@@ -1075,8 +1015,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                 val tree = currentTree()
                 if (choice != null && tree != null) {
                     dragComplete = true
-                    bt.abilities[target.row - 1] = BuildAbility(choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
-                    // VB's DropAbility doesn't set the tier 5 tree; ConfirmTier5Change only moves an existing one.
+                    TreeEdits(r, destinies = false).dropAbility(bt, target.row, choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
                     showAbilities()
                     slotHover = target.row
                     showAvailable()
@@ -1085,7 +1024,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
             }
         }
         if (!dragComplete && bt != null) {
-            EnhancementRules(r ?: return).removeBlanks(bt)
+            TreeEdits(r ?: return, destinies = false).removeBlanks(bt)
             showAbilities()
             slotHover = 0
         }

@@ -49,6 +49,16 @@ class OverviewGridRow(
 class OverviewRules(val rules: BuildRules) {
     val build: Build get() = rules.build
 
+    /** txtName_Change (frmOverview.frm:1644). */
+    fun setName(name: String) {
+        build.buildName = name
+    }
+
+    /** txtNotes_Change (frmOverview.frm:1675). */
+    fun setNotes(notes: String) {
+        build.notes = notes
+    }
+
     /** VB's `CheckGuide` asks before anything that erases a leveling guide with steps. */
     fun hasLevelingGuide(): Boolean = build.guide.enhancements.isNotEmpty()
 

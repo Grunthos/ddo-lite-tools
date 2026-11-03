@@ -205,6 +205,13 @@ class StatRules(val rules: BuildRules) {
     }
 
     /** True if the column's Include box can be changed: not Champion for a Drow (userStats.ShowPoints, :453). */
+    /** LoadData (frmStats.frm:1090): Drow builds have no Champion column, so it's never included. */
+    fun loadDataIncludes() {
+        if (!canInclude(BuildPoints.CHAMPION)) {
+            build.includePoints[BuildPoints.CHAMPION.ordinal] = false
+        }
+    }
+
     fun canInclude(column: BuildPoints): Boolean = !(column == BuildPoints.CHAMPION && isDrow())
 
     private fun isDrow(): Boolean {

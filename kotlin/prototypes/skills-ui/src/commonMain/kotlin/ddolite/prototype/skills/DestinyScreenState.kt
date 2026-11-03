@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ddolite.builder.build.TreeEdits
 import ddolite.builder.build.AbilityDetails
 import ddolite.builder.build.BLANK_ABILITY
 import ddolite.builder.build.Build
@@ -111,16 +112,9 @@ class DestinyScreenState(private val session: PrototypeState) {
      * it's kept but not shown).
      */
     private fun loadData() {
-        val r = session.rules ?: return
-        val build = r.build
+        val edits = edits() ?: return
         sourceRow = 0
-        if (build.permDestinyPoints < r.data.tomes.permDestinyPointMin) {
-            build.permDestinyPoints = r.data.tomes.permDestinyPointMin
-        }
-        if (build.maxLevels < 29 && build.destinyTier5.isNotEmpty()) {
-            EnhancementRules(r).shaveDestiny(build.destinyTier5)
-            build.destinyTier5 = ""
-        }
+        edits.loadDataLimits()
         populateCombo()
     }
 
@@ -248,21 +242,19 @@ class DestinyScreenState(private val session: PrototypeState) {
      */
     fun chooseTreeMenu(index: Int) {
         treeMenuRow = 0
-        val build = build() ?: return
+        val edits = edits() ?: return
         when (index) {
             0 -> {
-                val row = selectedTreeRow()
-                if (row == 0) {
+                if (!edits.deleteTree(selectedTreeRow())) {
                     return
                 }
-                build.destinies.removeAt(row - 1)
                 populateCombo()
             }
             1 -> {
                 if (!session.ask("Delete all trees?")) {
                     return
                 }
-                build.destinies.clear()
+                edits.deleteAllTrees()
                 populateCombo()
             }
             3 -> {
@@ -270,15 +262,13 @@ class DestinyScreenState(private val session: PrototypeState) {
                 if (row == 0) {
                     return
                 }
-                build.destinies[row - 1].abilities.clear()
+                edits.resetTree(row)
             }
             4 -> {
                 if (!session.ask("Reset all trees?")) {
                     return
                 }
-                for (bt in build.destinies) {
-                    bt.abilities.clear()
-                }
+                edits.resetAllTrees()
             }
             else -> return
         }
@@ -289,12 +279,10 @@ class DestinyScreenState(private val session: PrototypeState) {
     /** usrTree_SlotDblClick (:866): removes the destiny, clearing it as the tier 5 destiny. */
     fun doubleClickTree(row: Int) {
         listIndex = -1
-        val build = build() ?: return
-        val bt = build.destinies.getOrNull(row - 1) ?: return
-        if (build.destinyTier5 == bt.treeName) {
-            build.destinyTier5 = ""
+        val edits = edits() ?: return
+        if (!edits.removeTree(row)) {
+            return
         }
-        build.destinies.removeAt(row - 1)
         showDestinies(drop = false, add = false)
         populateCombo()
         destiniesChanged()
@@ -322,15 +310,15 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** AddBuildDestiny (:1080): the highlighted destiny into row [row], replacing or adding. */
     private fun addBuildDestiny(row: Int) {
-        val build = build() ?: return
+        val edits = edits() ?: return
         val name = availableDestinies().getOrNull(listIndex) ?: return
-        val bt = BuildTree(name)
-        bt.treeType = TreeStyle.DESTINY
-        if (row > build.destinies.size) {
-            build.destinies.add(bt)
-        } else {
-            build.destinies[row - 1] = bt
-        }
+        edits.putTree(row, edits.newDestiny(name))
+    }
+
+    /** The build's destiny edits (core [TreeEdits]), or null with no build open. */
+    private fun edits(): TreeEdits? {
+        val r = session.rules ?: return null
+        return TreeEdits(r, destinies = true)
     }
 
     /** A destiny drag is starting: from the list (lstTree_MouseMove, :1018) or a row (usrTree_RequestDrag, :1068). */
@@ -369,9 +357,7 @@ class DestinyScreenState(private val session: PrototypeState) {
                     addBuildDestiny(target.row)
                     changedTrees = true
                 } else if (item is EnhancementDrag.TreeRow && item.row != target.row) {
-                    val swap = build.destinies[item.row - 1]
-                    build.destinies[item.row - 1] = build.destinies[target.row - 1]
-                    build.destinies[target.row - 1] = swap
+                    edits()?.swapTrees(item.row, target.row)
                     changedTrees = true
                 }
             }
@@ -393,8 +379,8 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** usrspnPDP_Change (:790). */
     fun setPdp(value: Int) {
-        val build = build() ?: return
-        build.permDestinyPoints = value
+        val edits = edits() ?: return
+        edits.setPermDestinyPoints(value)
         destiniesChanged()
     }
 
@@ -598,10 +584,7 @@ class DestinyScreenState(private val session: PrototypeState) {
         if (!session.ask("Reset $comboTree?")) {
             return
         }
-        bt.abilities.clear()
-        if (build()?.destinyTier5 == bt.treeName) {
-            r.setDestinyTier5("")
-        }
+        edits()?.resetAbilities(bt)
         showAbilities()
         showAvailable()
         noSelection()
@@ -614,17 +597,10 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** ClearSlot (:1438). VB quirk kept: emptying any destiny clears the tier 5 destiny. */
     private fun clearSlot(row: Int) {
-        val r = rules ?: return
+        val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        if (row < 1 || row > bt.abilities.size) {
+        if (!edits.clearSlot(bt, row)) {
             return
-        }
-        bt.abilities[row - 1] = bt.abilities[row - 1].copy(ability = BLANK_ABILITY)
-        r.removeBlanks(bt)
-        if (bt.abilities.isEmpty()) {
-            r.setDestinyTier5("")
-        } else if (bt.abilities[bt.abilities.size - 1].tier < 5 && build()?.destinyTier5 == bt.treeName) {
-            r.setDestinyTier5("")
         }
         showAbilities()
         showAvailable()
@@ -634,9 +610,9 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** usrList_RankChange (:1477). */
     fun changeRank(row: Int, ranks: Int) {
+        val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        val a = bt.abilities.getOrNull(row - 1) ?: return
-        bt.abilities[row - 1] = a.copy(rank = ranks)
+        val a = edits.setRanks(bt, row, ranks) ?: return
         showAbilities()
         showAvailable()
         showDetails(a.tier, a.ability, a.selector, row)
@@ -693,17 +669,14 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** ConfirmDestinyTier5Change (:1355). */
     private fun confirmTier5(): Boolean {
-        val r = rules ?: return true
+        val edits = edits() ?: return true
         val choice = userChoice() ?: return true
         val bt = currentBuildTree() ?: return true
-        val tier5 = build()?.destinyTier5 ?: ""
-        if (choice.first == 5 && tier5.isNotEmpty() && tier5 != bt.treeName) {
-            if (session.ask("Make " + bt.treeName + " your Tier 5 tree?\n\n(This will clear Tier 5 destinies from the " + tier5 + " tree.)")) {
-                r.setDestinyTier5(bt.treeName)
-            } else {
-                return false
-            }
+        val question = edits.tier5Question(bt, choice.first) ?: return true
+        if (!session.ask(question)) {
+            return false
         }
+        edits.confirmTier5(bt)
         return true
     }
 
@@ -729,19 +702,12 @@ class DestinyScreenState(private val session: PrototypeState) {
 
     /** AddAbility (:1267). */
     private fun addAbility(blank: Boolean): Boolean {
-        val r = rules ?: return false
+        val edits = edits() ?: return false
         val tree = currentTree() ?: return false
         val bt = currentBuildTree() ?: return false
         val choice = userChoice() ?: return false
-        val insert = r.insertionPoint(bt, choice.first, choice.second)
-        if (blank) {
-            bt.abilities.add(insert, BuildAbility(0, BLANK_ABILITY, 0, 0))
-        } else {
-            bt.abilities.add(insert, BuildAbility(choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third))
-            if (choice.first == 5) {
-                r.setDestinyTier5(bt.treeName)
-            }
-        }
+        val ranks = tree.tiers[choice.first][choice.second].ranks
+        val insert = edits.insertAbility(bt, choice.first, choice.second, ranks, choice.third, blank)
         showAbilities()
         slotHover = insert + 1
         return true
@@ -802,7 +768,7 @@ class DestinyScreenState(private val session: PrototypeState) {
                 val tree = currentTree()
                 if (choice != null && tree != null) {
                     dragComplete = true
-                    bt.abilities[target.row - 1] = BuildAbility(choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
+                    edits()?.dropAbility(bt, target.row, choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
                     showAbilities()
                     slotHover = target.row
                     showAvailable()
@@ -811,7 +777,7 @@ class DestinyScreenState(private val session: PrototypeState) {
             }
         }
         if (!dragComplete && bt != null && r != null) {
-            r.removeBlanks(bt)
+            edits()?.removeBlanks(bt)
             showAbilities()
             slotHover = 0
         }

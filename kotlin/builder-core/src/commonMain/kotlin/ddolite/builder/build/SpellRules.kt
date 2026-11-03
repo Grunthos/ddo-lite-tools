@@ -121,6 +121,28 @@ class SpellRules(val rules: BuildRules) {
         level.slots.add(0, slot)
     }
 
+    /** ClearSlot (frmSpells.frm:511): a standard or free slot emptied; an emptied free slot is removed. */
+    fun clearSlot(c: CharacterClass, spellLevel: Int, slot: BuildSpellSlot) {
+        if (slot.type == SpellSlotType.STANDARD || slot.type == SpellSlotType.FREE) {
+            slot.spell = ""
+        }
+        if (slot.type == SpellSlotType.FREE) {
+            removeEmptyFreeSlots(c, spellLevel)
+        }
+    }
+
+    /** ChooseSpell / DropSpell (frmSpells.frm): [name] in [slot]. */
+    fun setSpell(slot: BuildSpellSlot, name: String) {
+        slot.spell = name
+    }
+
+    /** A slot dragged onto another (usrList_OLEDragDrop, frmSpells.frm:565): their spells change places. */
+    fun swapSpells(a: BuildSpellSlot, b: BuildSpellSlot) {
+        val swap = a.spell
+        a.spell = b.spell
+        b.spell = swap
+    }
+
     /**
      * Removes empty free slots. Ported from `RemoveEmptyFreeSlots` (basBuild.bas:2158).
      *

@@ -321,12 +321,7 @@ class SpellsScreenState(private val session: PrototypeState) {
         val r = rules ?: return
         val c = spellClass ?: return
         val slot = rows().getOrNull(row - 1) ?: return
-        if (slot.type == SpellSlotType.STANDARD || slot.type == SpellSlotType.FREE) {
-            slot.spell = ""
-        }
-        if (slot.type == SpellSlotType.FREE) {
-            r.removeEmptyFreeSlots(c, spellLevel)
-        }
+        r.clearSlot(c, spellLevel, slot)
         initSlots()
         showAvailable()
         details = FeatDetails("Details", emptyList())
@@ -370,7 +365,7 @@ class SpellsScreenState(private val session: PrototypeState) {
         if (row == 0) {
             return
         }
-        rows()[row - 1].spell = name
+        (rules ?: return).setSpell(rows()[row - 1], name)
         initSlots()
         showAvailable()
         selectRow(row)
@@ -443,15 +438,13 @@ class SpellsScreenState(private val session: PrototypeState) {
             if (target is SpellSlotKey && dropStates.getOrNull(target.row - 1) == DropState.CAN_DROP) {
                 val slots = rows()
                 if (item is SpellDrag.FromList) {
-                    slots[target.row - 1].spell = item.display
+                    r.setSpell(slots[target.row - 1], item.display)
                     showAvailable()
                     showDetails(item.display)
                     hoverRow = target.row
                     spellsChanged()
                 } else if (item is SpellDrag.FromSlot && sourceRow != 0) {
-                    val swap = slots[target.row - 1].spell
-                    slots[target.row - 1].spell = slots[sourceRow - 1].spell
-                    slots[sourceRow - 1].spell = swap
+                    r.swapSpells(slots[target.row - 1], slots[sourceRow - 1])
                     showAvailable()
                     spellsChanged()
                 }

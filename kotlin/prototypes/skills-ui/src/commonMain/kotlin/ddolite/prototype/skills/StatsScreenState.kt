@@ -50,10 +50,7 @@ class StatsScreenState(private val session: PrototypeState) {
     fun refresh() {
         val r = rules ?: return
         r.recountPoints()
-        // LoadData (:1090): Drow builds have no Champion column.
-        if (!r.canInclude(BuildPoints.CHAMPION)) {
-            r.build.includePoints[BuildPoints.CHAMPION.ordinal] = false
-        }
+        r.loadDataIncludes()
         r.enforceTomeMax()
         templateClass = r.defaultTemplateClass()
         warningIndex = -1

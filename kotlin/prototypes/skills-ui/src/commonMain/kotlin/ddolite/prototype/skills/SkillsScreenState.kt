@@ -373,16 +373,14 @@ class SkillsScreenState(
     /** usrspnSkill_Change (:1390). */
     fun setTome(skill: Skill, value: Int) {
         val build = openedBuild ?: return
-        build.skillTomes[skill.ordinal] = value
+        ddolite.builder.build.SkillTomes.set(build, skill, value)
         changed()
     }
 
     /** "Clear Tomes" after the user agreed: Erase build.SkillTome (tmrFocus_Timer, :1229). */
     fun clearTomes() {
         val build = openedBuild ?: return
-        for (i in build.skillTomes.indices) {
-            build.skillTomes[i] = 0
-        }
+        ddolite.builder.build.SkillTomes.clear(build)
         changed()
     }
 

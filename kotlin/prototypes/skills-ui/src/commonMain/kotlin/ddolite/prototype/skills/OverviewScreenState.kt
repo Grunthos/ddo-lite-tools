@@ -127,14 +127,14 @@ class OverviewScreenState(private val session: PrototypeState) {
     /** txtName_Change (:1644). */
     fun setName(name: String) {
         val r = rules ?: return
-        r.build.buildName = name
+        r.setName(name)
         session.buildChanged(null, mergeKey = "name") // typing makes one undo step
     }
 
     /** txtNotes_Change (:1675). */
     fun setNotes(notes: String) {
         val r = rules ?: return
-        r.build.notes = notes
+        r.setNotes(notes)
         session.buildChanged(null, mergeKey = "notes")
     }
 
