@@ -138,6 +138,18 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     same build re-saved by VB 4.15 has lost its `DestinyTier5: Machrotechnic`. *Fix:*
     `Case "destinytier5": build.DestinyTier5 = mstrValue`.
 
+18g. **The Leveling Guide's default filter doesn't filter.** `Forms/Build/frmEnhancements.frm:2736`
+    `GuideSelected` returns True straight away for "Selected and Available" (the default), and
+    `ShowGuideAvailable` (:2668) skips the level and requirement checks for it, so it lists every
+    rank not yet in the guide, the same as "Show All". Only "Available" checks, and only "All
+    Selected" limits the list to the build's choices. *Fix:* treat "Selected and Available" as
+    "All Selected" plus the checks.
+
+18h. **Leveling guide: a destiny requirement always fails.** `Modules/Build/basBuild.bas:3750`
+    `CheckGuideErrorReq` has no case for destiny requirements, so one in an "all of" list makes the
+    step an error reading just "Requires ". (`CheckGuideReq` in frmEnhancements, :2830, has the same
+    gap, marked TODO.)
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`
@@ -175,6 +187,14 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     `chkIgnore_Click` (and `UpdateBuild`) call `ShowMessages` after `ResolveMessage` has unloaded the
     form, which loads it again without showing it. *Fix:* `If CountMessages() = 0 Then Exit Sub`
     after `ResolveMessage`.
+
+22e. **Leveling Guide details never show the level requirements.** `Forms/Build/frmEnhancements.frm:3544`
+    `ShowGuideDetails` writes "Level requirements:" and its lines to `Me.usrDetails` (the
+    Enhancements tab's box) instead of `Me.usrdetGuide`. *Fix:* use `usrdetGuide`.
+
+22f. **"Reset <tree>" command details can name the wrong tree.** `frmEnhancements.frm:3483`
+    `GuideDetails` looks up `Guide.Tree(ItemData - 100)`, but that number is a `build.Guide.Tree`
+    index. *Fix:* `Guide.Tree(Guide.TreeLookup(lngItemData - 100))`.
 
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.

@@ -53,12 +53,15 @@ class AbilitySlotRow(val tier: String, val caption: String, val cost: String, va
  * module variables and handlers (Source/Forms/Build/frmEnhancements.frm). The rules are in
  * builder-core's [EnhancementRules]; this edits `build.Tree` directly, as VB does.
  *
- * Rows are numbered from 1 as VB's userList; 0 means none. The Leveling Guide tab isn't ported yet.
+ * Rows are numbered from 1 as VB's userList; 0 means none. The Leveling Guide tab's state is [guide].
  */
 class EnhancementsScreenState(private val session: PrototypeState) {
     /** The tab showing (mlngTab): 0 Trees, 1 Enhancements, 2 Leveling Guide. */
     var tab by mutableIntStateOf(0)
         private set
+
+    /** The Leveling Guide tab. */
+    val guide = GuideScreenState(session)
 
     /** Bumped after each change, so the window redraws. */
     var revision by mutableIntStateOf(0)
@@ -136,6 +139,8 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                 showAbilities()
                 showAvailable()
             }
+        } else if (tab == 2) {
+            guide.show()
         }
     }
 
@@ -152,6 +157,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
             build.tier5 = ""
         }
         populateCombo()
+        guide.loadData()
     }
 
     /** Footer: "< Spells" for casters, else "< Feats"; "Destiny >" from level 20. */

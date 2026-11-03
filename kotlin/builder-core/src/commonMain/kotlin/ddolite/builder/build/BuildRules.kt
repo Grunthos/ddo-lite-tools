@@ -80,6 +80,18 @@ class GuideTree(val treeName: String, val tree: Tree?, val characterClass: Chara
     var maxTier = 0
     var buildGuideTree = 0
     var buildTree = 0
+
+    /**
+     * VB's `.BuildTree`: the abilities the whole guide takes in this tree (resets empty it), for
+     * checking requirements; built by `AddGuideBuildAbility`.
+     */
+    val guideBuildTree = BuildTree(treeName)
+
+    init {
+        guideBuildTree.source = characterClass
+        guideBuildTree.classLevels = classLevels
+        guideBuildTree.treeType = tree?.style
+    }
 }
 
 /**
@@ -103,14 +115,18 @@ class BuildRules(val data: BuilderData, val build: Build) {
 
     /** VB's `Guide.Tree`. */
     var guideTrees: List<GuideTree> = emptyList()
-        private set
+        internal set
 
     /**
      * VB's `Guide.TreeLookup`: for each [BuildGuide.trees] entry (1-based, index 0 unused), the
      * 1-based position in [guideTrees], 0 if it isn't there.
      */
     var guideTreeLookup: IntArray = IntArray(0)
-        private set
+        internal set
+
+    /** VB's `Guide.Enhancement`: each guide step with its level, cost and error (index 0 is step 1). */
+    var guideEnhancements: List<GuideEnhancement> = emptyList()
+        internal set
 
     // ---------------------------------------------------------------- defaults and levels
 
@@ -274,6 +290,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
         build.guide.enhancements.clear()
         guideTrees = emptyList()
         guideTreeLookup = IntArray(0)
+        guideEnhancements = emptyList()
     }
 
     // ---------------------------------------------------------------- BAB
@@ -945,8 +962,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
 
     /**
      * The trees the leveling guide can use. Ported from `InitLevelingGuide` (basBuild.bas:3140)
-     * and `InitGuideTrees` (:3145); the step costs, levels and errors of `InitGuideEnhancements`
-     * come with the Leveling Guide screen.
+     * and `InitGuideTrees` (:3145), then the steps' costs, levels and errors ([GuideRules.initGuideEnhancements]).
      */
     fun initLevelingGuide() {
         val trees = ArrayList<GuideTree>()
@@ -954,6 +970,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
         guideTreeLookup = IntArray(0)
         val race = build.race
         if (build.levelClass(1) == null || race == null) {
+            GuideRules(this).initGuideEnhancements()
             return
         }
         addGuideTree(trees, race.name, null, build.maxLevels)
@@ -987,6 +1004,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
             }
             guideTreeLookup = lookup
         }
+        GuideRules(this).initGuideEnhancements()
     }
 
     /**

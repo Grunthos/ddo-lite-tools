@@ -372,7 +372,7 @@ class EnhancementRules(val rules: BuildRules) {
         return null
     }
 
-    private fun rankRequirements(details: List<ddolite.builder.model.RankDetail>?, rank: Int): Requirements {
+    internal fun rankRequirements(details: List<ddolite.builder.model.RankDetail>?, rank: Int): Requirements {
         if (details == null || rank < 2 || rank - 2 >= details.size) {
             return Requirements.EMPTY
         }
@@ -961,7 +961,7 @@ class EnhancementRules(val rules: BuildRules) {
         return AbilityDetails("Tier $tier: " + data.name, out.build(), "Ranks: " + data.ranks, costDescrip(data, selector), progression)
     }
 
-    private fun detailsReqs(out: DetailsBuilder, tree: Tree, reqs: Requirements, rank: Int) {
+    internal fun detailsReqs(out: DetailsBuilder, tree: Tree, reqs: Requirements, rank: Int) {
         val names = listOf("all", "one", "none")
         val groups = listOf(reqs.all, reqs.one, reqs.none)
         for (group in 0..2) {
@@ -979,14 +979,14 @@ class EnhancementRules(val rules: BuildRules) {
         }
     }
 
-    private fun rankReqs(out: DetailsBuilder, tree: Tree, details: List<ddolite.builder.model.RankDetail>?) {
+    internal fun rankReqs(out: DetailsBuilder, tree: Tree, details: List<ddolite.builder.model.RankDetail>?) {
         for (rank in 2..3) {
             detailsReqs(out, tree, rankRequirements(details, rank), rank)
         }
     }
 
     /** Ported from `TierLink` (Source/Modules/basWiki.bas:36). */
-    private fun tierLink(tier: Int): String = when (tier) {
+    internal fun tierLink(tier: Int): String = when (tier) {
         0 -> "#Core_abilities"
         1 -> "#Tier_One"
         2 -> "#Tier_Two"

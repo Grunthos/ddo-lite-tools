@@ -210,14 +210,25 @@ private fun SkillTomes(skills: SkillsScreenState, theme: Theme) {
 /** Windows' menu colours (VB's pop-up menus are system menus, whatever the theme). */
 private val MENU_BACKGROUND = Color(0xFFF2F2F2)
 private val MENU_BORDER = Color(0xFFCCCCCC)
+private val MENU_DISABLED = Color(0xFF6D6D6D)
 
 /**
  * A pop-up menu at [at] (pixels in the window), like VB's PopupMenu: "-" is a separator, item
  * [checked] has a tick (-1 = none). An item is chosen when pressed (not released, so the right-click
- * that opened the menu can't choose one); a press anywhere else closes it.
+ * that opened the menu can't choose one); a press anywhere else closes it. An item [enabled] says no to is
+ * grey and does nothing.
  */
 @Composable
-internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: Float, onChoose: (Int) -> Unit, onDismiss: () -> Unit, clientWidth: Int = CLIENT_WIDTH) {
+internal fun PopupMenu(
+    items: List<String>,
+    checked: Int,
+    at: Offset,
+    density: Float,
+    onChoose: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    clientWidth: Int = CLIENT_WIDTH,
+    enabled: (Int) -> Boolean = { true },
+) {
     val width = 190
     var height = 4
     for (item in items) {
@@ -260,9 +271,10 @@ internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: F
                 }
                 continue
             }
-            var style = TextStyle(fontSize = FONT_SIZE, color = Color.Black)
+            val itemEnabled = enabled(i)
+            var style = TextStyle(fontSize = FONT_SIZE, color = if (itemEnabled) Color.Black else MENU_DISABLED)
             var back = Color.Transparent
-            if (i == hover) {
+            if (i == hover && itemEnabled) {
                 style = style.copy(color = HIGHLIGHT_TEXT)
                 back = HIGHLIGHT
             }
@@ -278,7 +290,9 @@ internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: F
                                     hover = -1
                                 } else if (event.type == PointerEventType.Press) {
                                     event.changes[0].consume()
-                                    onChoose(i)
+                                    if (itemEnabled) {
+                                        onChoose(i)
+                                    }
                                 }
                             }
                         }

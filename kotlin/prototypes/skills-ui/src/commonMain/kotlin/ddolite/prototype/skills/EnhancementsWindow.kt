@@ -37,7 +37,8 @@ private const val ENH_FOOTER_TOP = 528
  * The Enhancements window (Source/Forms/Build/frmEnhancements.frm): the header (Trees,
  * Enhancements, Leveling Guide; Help), the tab, and the footer ("< Feats" or "< Spells",
  * "Destiny >" from level 20). Laid out from the form's positions (tools/form-layout's
- * frmEnhancements.md); the client area is 815 x 555 at 100%. The Leveling Guide tab isn't ported yet.
+ * frmEnhancements.md); the client area is 815 x 555 at 100%. The Leveling Guide tab is [GuideTab]; its
+ * Export link (the guide as csv) comes with the build output.
  *
  * [onNavigate] gets the footer's links.
  */
@@ -46,7 +47,7 @@ fun EnhancementsWindowContent(state: PrototypeState, onNavigate: (String) -> Uni
     val screen = state.enhancements
     val theme = state.skills.theme
     @Suppress("UNUSED_VARIABLE")
-    val revision = state.revision + screen.revision // read so this redraws after changes
+    val revision = state.revision + screen.revision + screen.guide.revision // read so this redraws after changes
     val density = LocalDensity.current.density
     var pointer by remember { mutableStateOf(Offset.Zero) }
     var menuAt by remember { mutableStateOf<Offset?>(null) }
@@ -67,11 +68,7 @@ fun EnhancementsWindowContent(state: PrototypeState, onNavigate: (String) -> Uni
             when (screen.tab) {
                 0 -> TreesTab(screen, theme) { menuAt = pointer }
                 1 -> AbilitiesTab(screen, theme) { menuAt = pointer }
-                else -> BasicText(
-                    "The Leveling Guide tab isn't ported yet.",
-                    style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)),
-                    modifier = Modifier.offset(24.dp, 48.dp),
-                )
+                else -> GuideTab(screen.guide, theme) { menuAt = pointer }
             }
         }
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -129,6 +126,20 @@ fun EnhancementsWindowContent(state: PrototypeState, onNavigate: (String) -> Uni
                 menuAt = null
                 screen.closeTreeMenu()
             }, clientWidth = ENH_WIDTH)
+        } else if (at != null && screen.tab == 2 && screen.guide.menuRow != 0) {
+            // mnuMain(2): the guide's row menu (PopupGuideMenu, :3299).
+            val items = screen.guide.menuItems()
+            val captions = ArrayList<String>()
+            for (item in items) {
+                captions.add(item.first)
+            }
+            PopupMenu(captions, -1, at, density, onChoose = { index ->
+                menuAt = null
+                screen.guide.chooseMenu(index)
+            }, onDismiss = {
+                menuAt = null
+                screen.guide.closeMenu()
+            }, clientWidth = ENH_WIDTH, enabled = { index -> items[index].second })
         } else if (at != null && screen.slotMenuRow != 0) {
             PopupMenu(listOf("Clear this ability", "Reset tree"), -1, at, density, onChoose = { index ->
                 menuAt = null

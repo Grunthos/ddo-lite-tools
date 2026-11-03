@@ -71,6 +71,65 @@ fun enhancementsScreenshots(prototype: PrototypeState, repoRoot: Path, outDir: P
         shot(scene, outDir.resolve("34-enh-after.png"))
         println("After: " + screen.apCaption().first + ", dirty " + prototype.dirty)
     }
+    guideScreenshots(prototype, repoRoot, outDir)
+}
+
+/**
+ * The Leveling Guide tab: Kensei Warpriest (whose saved guide is dropped on loading, as in VB),
+ * a guide built from the lists (the Kensei core, then the first few offered, a bank and a reset),
+ * rows selected, and the row menu.
+ */
+private fun guideScreenshots(prototype: PrototypeState, repoRoot: Path, outDir: Path) {
+    val file = repoRoot.resolve("Save").resolve("Kensei Warpriest.build")
+    prototype.openBuild(readBuildFile(Files.readAllBytes(file), prototype.data, BuildPoints.ADVENTURER))
+    val screen = prototype.enhancements
+    screen.opened()
+    val guide = screen.guide
+    ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
+        screen.chooseTab(2)
+        println("Guide: trees " + guide.trees.map { it.first } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
+        guide.clickTree(guide.trees.indexOfFirst { it.first == "Kensei" })
+        println("  Kensei offers " + guide.choices.size + ": " + guide.choices.take(4).map { it.text })
+        guide.clickChoice(0)
+        println("  selectors showing " + guide.selectorsShowing + ": " + guide.selectors.map { it.first })
+        shot(scene, outDir.resolve("40-guide-selectors.png"))
+        guide.clickSelector(0)
+        guide.chooseAbility()
+        for (n in 0 until 9) {
+            var added = false
+            for (i in guide.choices.indices) {
+                guide.clickChoice(i)
+                if (!guide.selectorsShowing) {
+                    guide.chooseAbility()
+                    added = true
+                    break
+                }
+            }
+            if (!added) {
+                break
+            }
+        }
+        guide.clickTree(guide.trees.indexOfFirst { it.second == 0 })
+        println("  commands: " + guide.choices.map { it.text })
+        guide.clickChoice(0)
+        guide.chooseAbility()
+        println("  " + guide.rows().size + " rows; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption() + ", " + guide.totals?.spentCaption())
+        for (e in guide.rows()) {
+            println("    L" + e.level + " " + e.display + e.rankText + " " + e.errorText)
+        }
+        guide.pressRow(2, right = false, ctrl = false, shift = false)
+        guide.releaseRow(2)
+        shot(scene, outDir.resolve("41-guide-grid.png"))
+        guide.pressRow(5, right = false, ctrl = false, shift = true)
+        guide.pressRow(4, right = true, ctrl = false, shift = false)
+        println("  menu: " + guide.menuItems())
+        guide.chooseMenu(0) // Move Rows
+        guide.pressRow(9, right = true, ctrl = false, shift = false)
+        println("  menu now: " + guide.menuItems())
+        guide.chooseMenu(0) // Insert Rows Here
+        println("  after moving rows 2-5 before row 9: " + guide.rows().map { it.display + it.rankText })
+        shot(scene, outDir.resolve("42-guide-moved.png"))
+    }
 }
 
 private fun shot(scene: ImageComposeScene, file: Path) {

@@ -658,9 +658,14 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         (DestinyTier5 never read), 22b-d in `VB-BUGS.md`.
       - [ ] Destinies still open: Help, the mouse wheel, the ability list's scroll position. (VB's
         older frmDestiny, with twists and fate points, isn't used by the Edit menu.)
-      - [ ] Enhancements still open: the Leveling Guide tab (about half of frmEnhancements, with
-        `InitGuideEnhancements` and the guide's errors in basBuild.bas), Export, Help, the mouse wheel,
-        keeping the ability list's scroll position, "Destiny >" and "< Spells" (need those windows).
+      - [x] Leveling Guide tab: `GuideRules` (InitGuideEnhancements, GuideAbilityML, CalculateGuideLevels,
+        CheckGuideErrors and the tab's lists, selectors, adding, row moves and deletes, details) with
+        tests; the tab as frmEnhancements' picTab(2) with the 20-row grid, row selection (click, Ctrl,
+        Shift, drag), the row menu and the scroll bar. VB bugs kept: 18g (default filter shows all), 18h,
+        22f; 22e (level requirements written to the other tab's box) shows the same, without the stray lines.
+      - [ ] Enhancements still open: Export (the guide as csv, with the build output), Help, the mouse
+        wheel on the other tabs, keeping the ability list's scroll position, auto-scroll while
+        drag-selecting guide rows (tmrScroll).
       - VB quirks kept: emptying any tree clears the tier 5 tree even if it's another tree; deleting or
         resetting a tree from the menu leaves the tier 5 tree set; "Delete All Trees" loses the race
         tree's abilities; a tier 5 ability added by drag doesn't make its tree the tier 5 tree (only

@@ -146,6 +146,18 @@ look for anything different.
 - [ ] **VB bug to confirm:** after File › New, Tools › Messages is still there (22c).
 - [ ] **VB bug to confirm:** set a tier 5 destiny, save, reopen: it's gone (18f).
 
+## 7c. Leveling Guide (Enhancements window, third tab)
+
+- [ ] Build a short guide in both on the same build (e.g. Kensei Warpriest: Kensei core with a
+      selector, a few more, a Bank, a Reset): the same Level, Tier, Tree, AP and Prog columns, the
+      same red rows and error texts in the details, and the same "Cur. Level / Available / Spent".
+- [ ] The tree list (and Show All), "(Commands)", each filter's list, the selector list and
+      "Back to Trees"; double-click to add; choosing rank 3 adds ranks 1-3.
+- [ ] Rows: click, Ctrl-click, Shift-click, drag down the Ability column; the right-click menu (Move
+      Rows → Insert Rows Here, Delete Rows, Delete to End, Delete All with its question).
+- [ ] Save and reopen: the same guide.
+- [ ] **VB bug to confirm:** "Selected and Available" lists the same as "Show All" (VB-BUGS 18g).
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.

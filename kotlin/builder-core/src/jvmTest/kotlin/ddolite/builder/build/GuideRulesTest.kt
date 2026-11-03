@@ -1,0 +1,121 @@
+package ddolite.builder.build
+
+import ddolite.builder.data.LoadLog
+import ddolite.builder.data.loadBuilderData
+import ddolite.dataformat.DirectoryDataSource
+import java.nio.file.Path
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+/**
+ * The leveling guide's rules ([GuideRules]) on Kensei Warpriest. Its saved guide starts with an
+ * ability the data no longer has, so (as in VB) it opens with no guide; these tests build one.
+ */
+class GuideRulesTest {
+    private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
+
+    private fun open(): BuildRules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+
+    private fun guideTree(g: GuideRules, display: String): Int = g.treeList(false).first { it.first == display }.second
+
+    @Test
+    fun emptyGuide() {
+        val rules = open()
+        val g = GuideRules(rules)
+        assertTrue(rules.build.guide.enhancements.isEmpty())
+        val totals = g.totals()
+        assertEquals("Cur. Level: 1", totals.levelCaption())
+        assertEquals("Available: 4 + 0r + 0u", totals.apCaption())
+        assertEquals("Spent: 0 + 0r +0u", totals.spentCaption())
+        assertEquals("(Commands)", g.treeList(false).last().first)
+        assertTrue(g.treeList(true).size >= g.treeList(false).size)
+        assertEquals(listOf("Bank 4 AP"), g.commands(4).map { it.text })
+    }
+
+    @Test
+    fun levelsBanksResetsAndErrors() {
+        val rules = open()
+        val g = GuideRules(rules)
+        val kensei = guideTree(g, "Kensei")
+        // Kensei Focus (a selector) at level 1, then Spiritual Bond, which needs 5 AP in the tree.
+        g.addAbility(kensei, 0, 0, 1, 1)
+        g.addAbility(kensei, 0, 1, 0, 1)
+        var steps = rules.guideEnhancements
+        assertEquals(1, steps[0].level)
+        assertEquals("", steps[0].errorText)
+        assertEquals(steps[1].ml, steps[1].level)
+        assertEquals("Requires 5 AP spent in tree, only 1 AP spent", steps[1].errorText)
+        // Rank 3 of a tier 1 ability adds ranks 1 to 3.
+        g.addAbility(kensei, 1, 0, 0, 3)
+        steps = rules.guideEnhancements
+        assertEquals(5, steps.size)
+        assertEquals(listOf(1, 2, 3), listOf(steps[2].rank, steps[3].rank, steps[4].rank))
+        assertEquals(" III", steps[4].rankText)
+        // Bank what's left at that level; the next step comes a level later.
+        g.addCommand(200)
+        steps = rules.guideEnhancements
+        val bank = steps[5]
+        assertEquals(GuideStepStyle.BANK_AP, bank.style)
+        assertEquals(bank.level * 4 - bank.spent, bank.bank)
+        assertEquals("Bank " + bank.bank + " AP", bank.display)
+        // Reset the tree: a level after the step before, and its AP back.
+        g.addCommand(100 + rules.guideTrees[kensei - 1].buildGuideTree)
+        steps = rules.guideEnhancements
+        val reset = steps[6]
+        assertEquals(GuideStepStyle.RESET_TREE, reset.style)
+        assertEquals(bank.level + 1, reset.level)
+        assertEquals("Reset Kensei", reset.display)
+        assertEquals(0, reset.spent)
+        assertTrue(g.commands(4).map { it.text }.containsAll(listOf("Reset Kensei", "Reset all trees")))
+        // The file writes and reads it back the same.
+        val saved = writeBuildFile(rules)
+        val reread = readBuildFile(saved, data, BuildPoints.ADVENTURER)
+        assertEquals(rules.build.guide.enhancements.size, reread.build.guide.enhancements.size)
+        assertEquals(steps.map { it.level }, reread.rules.guideEnhancements.map { it.level })
+    }
+
+    @Test
+    fun rankRequiresTheRankBefore() {
+        val rules = open()
+        val g = GuideRules(rules)
+        val kensei = guideTree(g, "Kensei")
+        g.addAbility(kensei, 0, 0, 1, 1)
+        g.addAbility(kensei, 1, 0, 0, 2)
+        // Move rank 2 above rank 1.
+        val moved = g.insertRows(listOf(false, false, true), 2)
+        assertEquals(Pair(2, 1), moved)
+        rules.initLevelingGuide()
+        assertEquals(2, rules.guideEnhancements[1].rank)
+        assertEquals("Rank 2 requires first taking Rank 1", rules.guideEnhancements[1].errorText)
+        g.deleteRows(listOf(false, true, false))
+        rules.initLevelingGuide()
+        assertEquals(2, rules.guideEnhancements.size)
+        g.deleteToEnd(1)
+        rules.initLevelingGuide()
+        assertTrue(rules.build.guide.enhancements.isEmpty())
+        assertTrue(rules.build.guide.trees.isEmpty())
+    }
+
+    @Test
+    fun filters() {
+        val rules = open()
+        val g = GuideRules(rules)
+        val kensei = guideTree(g, "Kensei")
+        val all = g.availableAbilities(kensei, GuideFilter.ALL_ENHANCEMENTS, 1)
+        // VB quirk: "Selected and Available" lists everything, as "Show All".
+        assertEquals(all.map { it.text }, g.availableAbilities(kensei, GuideFilter.SELECTED_AVAILABLE, 1).map { it.text })
+        val selected = g.availableAbilities(kensei, GuideFilter.ALL_SELECTED, 1)
+        assertTrue(selected.size < all.size)
+        assertTrue(selected.any { it.text.startsWith("0: Kensei Focus: ") }) // the build's selector
+        val available = g.availableAbilities(kensei, GuideFilter.ALL_AVAILABLE, 1)
+        assertTrue(available.size < all.size)
+        // A taken rank isn't offered again.
+        g.addAbility(kensei, 0, 0, 1, 1)
+        assertEquals(all.size - 1, g.availableAbilities(kensei, GuideFilter.ALL_ENHANCEMENTS, 1).size)
+        val details = g.details(kensei, 0, 0, 0, 1, 0)!!
+        assertEquals("Tier 0: Kensei Focus", details.caption)
+        assertEquals("Min Level: 1", details.levels)
+        assertEquals("Cost: 1 AP", details.cost)
+    }
+}
