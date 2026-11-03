@@ -86,6 +86,9 @@ In rough order of value for the effort:
 
 ## 4. Open questions
 
+- **Dynamic layout** (Philip, 2026-11-05, to think about, not act on yet): some windows need layouts that
+  respond to their size and content, and the screens have nothing like that today: they place everything
+  at VB's fixed positions. Whichever option is chosen, this is the underlying piece of work.
 - Keep the classic layout for good, as an option, or drop it once the new one is accepted?
 - Should the output panel follow the screen being edited (as VB's does) or always show the whole
   build, scrolled to the section?

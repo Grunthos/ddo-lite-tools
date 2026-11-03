@@ -29,7 +29,7 @@ compose.desktop {
     application {
         mainClass = "ddolite.builder.desktop.MainKt"
         nativeDistributions {
-            packageName = "CharacterBuilderKotlin"
+            packageName = "CharacterBuilderLiteNG"
             packageVersion = "0.1.0"
             description = "DDO Character Builder Lite - Kotlin"
             vendor = "DDO Lite Tools"
@@ -46,13 +46,13 @@ tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
 // The portable app: createDistributable's folder (launcher + bundled runtime) plus the repository's
 // Data/ and Settings/ beside the launcher, as in the VB release. The app finds them by looking
 // next to its .exe (Main.kt findAppRoot). Built for the OS Gradle runs on.
-val portableDir = layout.buildDirectory.dir("portable/CharacterBuilderKotlin")
+val portableDir = layout.buildDirectory.dir("portable/CharacterBuilderLiteNG")
 
 val portableApp = tasks.register<Sync>("portableApp") {
     group = "distribution"
     description = "Portable app folder in build/portable (launcher, runtime, Data, Settings)"
     dependsOn("createDistributable")
-    from(layout.buildDirectory.dir("compose/binaries/main/app/CharacterBuilderKotlin"))
+    from(layout.buildDirectory.dir("compose/binaries/main/app/CharacterBuilderLiteNG"))
     from(rootDir.resolve("../Data")) { into("Data") }
     from(rootDir.resolve("../Settings")) { into("Settings") }
     into(portableDir)
@@ -62,8 +62,8 @@ tasks.register<Zip>("portableZip") {
     group = "distribution"
     description = "Zips the portable app folder"
     dependsOn(portableApp)
-    from(portableDir) { into("CharacterBuilderKotlin") }
-    archiveFileName = "CharacterBuilderKotlin-" + System.getProperty("os.name").split(" ")[0].lowercase() + ".zip"
+    from(portableDir) { into("CharacterBuilderLiteNG") }
+    archiveFileName = "CharacterBuilderLiteNG-" + System.getProperty("os.name").split(" ")[0].lowercase() + ".zip"
     destinationDirectory = layout.buildDirectory.dir("portable")
 }
 

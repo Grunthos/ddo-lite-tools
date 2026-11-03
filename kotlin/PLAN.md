@@ -48,7 +48,8 @@ UI ideas for after parity (one window with navigation, editor and output; proble
        (`TreeEdits` for Enhancements and Destinies, SpellRules, OverviewRules, StatRules, SkillTomes); undo
        and redo (`BuildHistory`, Edit menu, Ctrl+Z / Ctrl+Y); the modules renamed `builder-ui`,
        `builder-desktop`, `builder-android` (packages `ddolite.builder.ui` …, the session class
-       `BuilderSession`, the exe `CharacterBuilderKotlin`). Still to do from it: the child-windows option
+       `BuilderSession`, the exe `CharacterBuilderLiteNG`). Each spinner click or rank arrow stays one undo step (Philip,
+       2026-11-05); only typing in a text box is merged. Still to do from it: the child-windows option
        (the windows made dialogs owned by the main one), and screens that fill their window (UI-IDEAS.md §3).
 8. [ ] Packaging (portable zip with Data/ and Settings/, file association for .build).
 9. [ ] Android; then Cannith Crafting and the Compendium.
@@ -537,7 +538,7 @@ the problem is fundamental.**
       tree-slot column is squeezed): phone layouts are phase G work, not a toolkit problem.
       Other mouse buttons still need §2a.5 alternatives.
       Emulator from Git Bash: set `ANDROID_AVD_HOME=C:\Users\pjw\.android\avd` (Cygwin's HOME hides the AVDs).
-- [x] Portable Windows app: `:builder-desktop:portableZip` builds `CharacterBuilderKotlin.exe` with its own
+- [x] Portable Windows app: `:builder-desktop:portableZip` builds `CharacterBuilderLiteNG.exe` with its own
       Java runtime and Data/ + Settings/ beside it (zip 55 MB, 122 MB unpacked). Unzipped outside the repo and
       started from another folder, it finds its data next to the .exe and runs (2026-11-02). Figures for D-11.
 - [x] Multi-window shell like the VB Builder (§8.0): main window with File / Edit / Window menus and an output
