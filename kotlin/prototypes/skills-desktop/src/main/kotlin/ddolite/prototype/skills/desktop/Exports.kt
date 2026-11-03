@@ -1,6 +1,7 @@
 package ddolite.prototype.skills.desktop
 
 import ddolite.builder.output.GuideExport
+import ddolite.builder.output.PlannerExport
 import ddolite.dataformat.Windows1252
 import ddolite.prototype.skills.PrototypeState
 import java.awt.Desktop
@@ -56,6 +57,22 @@ class Exports(private val files: BuildFiles) {
                 // VB's xp.File.Run ignores failures too.
             }
         }
+    }
+
+    /**
+     * File › Export › to Ron's Planner (ExportFileRon, basFormatRon.bas:123) and to DDO Builder
+     * (ExportFileBuilder, basFormatBuilder.bas:89), through SaveAsDialog (basDocuments.bas:150): the
+     * build's name, asking before overwriting.
+     */
+    fun exportPlanner(parent: Frame, state: PrototypeState, ron: Boolean) {
+        val rules = state.rules ?: return
+        val extension = if (ron) "txt" else "ddocp"
+        val chosen = askSaveFile(parent, dosName(rules.build.buildName) + "." + extension, extension) ?: return
+        if (chosen.exists() && !state.prompts.confirm(chosen.name + " exists. Overwrite?")) {
+            return
+        }
+        val export = PlannerExport(rules)
+        write(parent, chosen, if (ron) export.ronFile() else export.builderFile())
     }
 
     private fun askSaveFile(parent: Frame, suggested: String, extension: String): File? {

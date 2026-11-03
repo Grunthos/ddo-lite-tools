@@ -278,7 +278,10 @@ Each step lists its deliverables and the test that marks it done.
       plain, forum and Reddit text by eye-verified lines; no VB goldens yet. VB bugs: 18i, 22g, 26a.
 - [x] The Export window (frmExport: formats from .bbcodes, sections, copy, save) and the leveling guide csv/txt export
       (`GuideExport`, ExportGuide in basDocuments) with the guide tab's Export link.
-- [ ] `basFormat` (export feat transposing, alignment, past lives) comes with the Ron's Planner and DDO Builder formats.
+- [x] Export to Ron's Planner and DDO Builder: `PlannerExport` (basFormat's alignment, stat raises, past lives,
+      feat transposing with VB's feat-map shellsort; ExportFileRon, ExportFileBuilder). VB bug 6a (Ron's export always
+      fails) isn't copied.
+- [ ] Import from Forums, Ron's Planner and DDO Builder (frmImport, the import halves of basFormatRon and basFormatBuilder).
 - [ ] Port `basFormatRon`, `basFormatBuilder` (import + export), leveling guide csv/txt.
 - **Done when:** golden output tests pass for all builds, formats and exports. From here on, porting more rules means making more golden diffs pass.
 

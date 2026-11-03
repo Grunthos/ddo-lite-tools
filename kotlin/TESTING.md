@@ -176,6 +176,8 @@ look for anything different.
 - [ ] The text box can be edited, and changes to the build replace it (as VB's Cascade).
 - [ ] File › Export › Leveling Guide › csv and txt, and the guide tab's Export link: the same files
       as VB's, asking before overwriting, then opening the file.
+- [ ] File › Export › to Ron's Planner and to DDO Builder: open the files in those planners (or compare with
+      VB's DDO Builder file; VB's Ron's export fails, VB-BUGS 6a).
 - [ ] **VB bug to confirm:** a txt guide export where every tree name has 5 letters or fewer (e.g.
       only Human) stops with an error in VB (the centred "Tree" heading).
 

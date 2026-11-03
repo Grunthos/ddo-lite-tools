@@ -37,6 +37,12 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
    guide tree names for duplicate trees, `basBuild.AddGuideTree` :3198) fails if the class's
    `Initial:` line gave fewer than four. *Fix:* fall back to the first initial.
 
+6a. **File › Export › to Ron's Planner always fails.** `Modules/Build/basFormatRon.bas:302`
+    `GetRonPastLife` writes `strLife(GetRonClassID(enClass))` for every class, but classes Ron's planner
+    doesn't have (Alchemist onwards) map to 0 and the array starts at 1: "Subscript out of range"
+    after the file is chosen, before anything is written. *Fix:* skip classes where `GetRonClassID`
+    returns `rceUnknown`.
+
 ## Data loss and wrong results
 
 7. **Deity feats saved by character level, read by class level.** Save: `Modules/Build/basFormatLite.bas:422`

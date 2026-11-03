@@ -308,11 +308,11 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Item("Save", mnemonic = 'S', shortcut = KeyShortcut(Key.S, ctrl = true), enabled = state.opened != null, onClick = { files.save(window, state) })
                 Item("Save As...", mnemonic = 'A', enabled = state.opened != null, onClick = { files.saveAs(window, state) })
                 Separator()
-                // The Export submenu (frmMain.frm:219). Ron's Planner and DDO Builder aren't ported yet.
+                // The Export submenu (frmMain.frm:219).
                 Menu("Export", mnemonic = 'E', enabled = state.opened != null) {
                     Item("to Forums...", mnemonic = 'F', onClick = { state.export.open() })
-                    Item("to Ron's Planner...", mnemonic = 'R', enabled = false, onClick = {})
-                    Item("to DDO Builder...", mnemonic = 'D', enabled = false, onClick = {})
+                    Item("to Ron's Planner...", mnemonic = 'R', onClick = { exports.exportPlanner(window, state, ron = true) })
+                    Item("to DDO Builder...", mnemonic = 'D', onClick = { exports.exportPlanner(window, state, ron = false) })
                     Separator()
                     // EnableMenus (basDocuments.bas:266): only with a guide.
                     Menu("Leveling Guide", mnemonic = 'G', enabled = (state.rules?.build?.guide?.enhancements?.size ?: 0) > 0) {
