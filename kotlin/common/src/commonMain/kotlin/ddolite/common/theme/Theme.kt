@@ -78,11 +78,37 @@ class Theme(val name: String) {
     private val colors = Array(ColorGroup.entries.size) { IntArray(ColorValue.entries.size) }
 
     init {
-        // Mid grey until a theme file sets a colour. (VB starts from defaults built into
-        // clsConfig.SetDefaults; every shipped theme sets every colour, so this rarely shows.)
-        for (group in ColorGroup.entries) {
-            for (value in ColorValue.entries) {
-                colors[group.ordinal][value.ordinal] = argb(128, 128, 128)
+        // VB's built-in colours until a theme file sets them: clsConfig.SetDefaults (:509) calls
+        // InitColors with each colour for the Wrk, Ctl, Nav, Drp and Out groups, as VB colour
+        // numbers (blue * 65536 + green * 256 + red). The .screen themes set every colour but the
+        // Output ones, so the output uses these unless an .output file is loaded.
+        val defaults = listOf(
+            longArrayOf(0, 3947580, 6316128, 6316128, 2236962), // Background
+            longArrayOf(19532, 32125, 24672, 32125, 19275), // BackHighlight
+            longArrayOf(76, 4934575, 96, 4934575, 75), // BackError
+            longArrayOf(4980736, 11488075, 6291456, 11488075, 4915200), // BackRelated
+            longArrayOf(12632256, 15461355, 14803425, 16777215, 16777215), // Text
+            longArrayOf(10132207, 10132207, 12632319, 12632319, 11579647), // TextError
+            longArrayOf(8553090, 11579568, 12895428, 11579568, 12632256), // TextDim
+            longArrayOf(16769480, 16769480, 16777215, 16762026, 16769480), // TextLink
+            longArrayOf(8421504, 7039851, 3947580, 2171169, 8421504), // BorderInterior
+            longArrayOf(12632256, 11579568, 3947580, 11513775, 12632256), // BorderExterior
+            longArrayOf(10526880, 16777215, 3947580, 16777215, 16777215), // BorderHighlight
+            longArrayOf(10395294, 12434877, 10395294, 10395294, 12434877), // LightGray
+            longArrayOf(10132207, 10132207, 10132207, 10132207, 10132207), // Red
+            longArrayOf(7795199, 7795199, 3927039, 3927039, 7795199), // Yellow
+            longArrayOf(16370320, 16370320, 16370320, 16370320, 16370320), // Blue
+            longArrayOf(14193614, 14193614, 14193614, 14193614, 14193614), // Purple
+            longArrayOf(8701825, 8701825, 10999461, 10999461, 8701825), // Green
+            longArrayOf(2533375, 5093375, 2533375, 2533375, 5093375), // Orange
+        )
+        for (value in ColorValue.entries) {
+            for (group in ColorGroup.entries) {
+                val vb = defaults[value.ordinal][group.ordinal]
+                val red = (vb and 0xFF).toInt()
+                val green = ((vb shr 8) and 0xFF).toInt()
+                val blue = ((vb shr 16) and 0xFF).toInt()
+                colors[group.ordinal][value.ordinal] = argb(red, green, blue)
             }
         }
     }

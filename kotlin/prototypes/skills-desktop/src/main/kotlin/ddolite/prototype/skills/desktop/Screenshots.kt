@@ -117,8 +117,12 @@ fun main(args: Array<String>) {
     // A real build from Save/: the main window's summary, its skills and its trees.
     val bytes = Files.readAllBytes(repoRoot.resolve("Save").resolve("Kensei Warpriest.build"))
     prototype.openBuild(readBuildFile(bytes, data, BuildPoints.ADVENTURER))
-    ImageComposeScene(width = 460, height = 1400, density = Density(1f)) { MainWindowContent(prototype) }.use { scene ->
+    ImageComposeScene(width = 900, height = 1500, density = Density(1f)) { MainWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("7-opened-main.png"))
+        // The Feats window active: only the header and feats.
+        prototype.outputView = ddolite.builder.output.OutputView.FEATS
+        save(scene, outDir.resolve("7b-opened-main-feats.png"))
+        prototype.outputView = ddolite.builder.output.OutputView.ALL
     }
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))

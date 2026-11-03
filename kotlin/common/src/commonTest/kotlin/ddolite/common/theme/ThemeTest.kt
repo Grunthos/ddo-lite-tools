@@ -27,10 +27,11 @@ class ThemeTest {
     fun screenFilesDontSetOutputColours() {
         val screen = loadTheme("OutText=1,2,3\nWrkText=4,5,6", "Test", ThemeFileKind.SCREEN)
         assertEquals(argb(4, 5, 6), screen.theme.get(ColorGroup.WORKSPACE, ColorValue.TEXT))
-        assertEquals(argb(128, 128, 128), screen.theme.get(ColorGroup.OUTPUT, ColorValue.TEXT))
+        assertEquals(argb(255, 255, 255), screen.theme.get(ColorGroup.OUTPUT, ColorValue.TEXT)) // VB's default
         val output = loadTheme("OutText=1,2,3\nWrkText=4,5,6", "Test", ThemeFileKind.OUTPUT)
         assertEquals(argb(1, 2, 3), output.theme.get(ColorGroup.OUTPUT, ColorValue.TEXT))
-        assertEquals(argb(128, 128, 128), output.theme.get(ColorGroup.WORKSPACE, ColorValue.TEXT))
+        assertEquals(argb(192, 192, 192), output.theme.get(ColorGroup.WORKSPACE, ColorValue.TEXT)) // VB's default
+        assertEquals(argb(0x22, 0x22, 0x22), screen.theme.get(ColorGroup.OUTPUT, ColorValue.BACKGROUND)) // VB's default
     }
 
     @Test

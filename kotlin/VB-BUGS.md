@@ -150,6 +150,13 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     step an error reading just "Requires ". (`CheckGuideReq` in frmEnhancements, :2830, has the same
     gap, marked TODO.)
 
+18i. **The output flags "Errors" on enhancement trees without their first core.**
+    `Modules/Build/basBuild.bas:2581` `GetSpentInTree` returns True only for a destiny or a tree
+    containing Tier 0 ability 1, and `basOutput.CheckSpentInTree` (:1832) treats False as an error, so
+    a build that skips a tree's first core (allowed in the game and in the Enhancements window) gets
+    "Enhancements … Errors" in the output. *Fix:* return True unconditionally (the flag is unused
+    elsewhere), or check what was meant.
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`
@@ -196,6 +203,11 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     `GuideDetails` looks up `Guide.Tree(ItemData - 100)`, but that number is a `build.Guide.Tree`
     index. *Fix:* `Guide.Tree(Guide.TreeLookup(lngItemData - 100))`.
 
+22g. **The main window shows almost nothing while the Destinies window is active.**
+    `Forms/Build/frmDestiny2.frm:583` activates with `oeDestiny2`, but basOutput's sections accept
+    `oeDestiny` (`ValidDestinies`, :2354) or the other windows' values, so only the name, classes and
+    race show. *Fix:* `ActivateForm oeDestiny` (or accept oeDestiny2 in `ValidDestinies`).
+
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
 
@@ -208,6 +220,11 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
 26. `Modules/Build/basBuild.bas:631` `InitStandardFeats` uses one index across the Standard and
     Legend lists, so the Legend slot is entry 15 of its list (14 empty entries before it) and Standard
     entry 15 is never set. Works, but wastes entries and is easy to break.
+
+26a. `Modules/Build/basOutput.bas:186` `ReDim mstrJoin(255)`, "enough that we never need to worry":
+    an export over 256 lines would stop with "Subscript out of range" (a long leveling guide, many
+    feats and spells). `AlignText` (:2555) centring with a gap of 1 would fail too (Mid$ at 0); nothing
+    centres today.
 
 ## Data files: VB stops instead of reporting
 

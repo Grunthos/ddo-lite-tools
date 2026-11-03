@@ -272,7 +272,11 @@ Each step lists its deliverables and the test that marks it done.
 - **Done when:** every `.build` in `Save/` and the golden set reads and re-writes identically; deprecation cases give the expected issues.
 
 ### B5 – Output, import and export
-- [ ] Port `basOutput` (`GenerateOutput`, `AlignText`, validation display), `basFormat`, `basFormatLite`, the BBCode formats from `common`.
+- [x] Port `basOutput`: `BuildOutput` (screen lines and export text, every section, Reddit, dots, lists, colours) and
+      `OutputFormat` (InitFormat, .bbcodes files); the main window shows it for the active window. VB's built-in
+      colours (clsConfig.SetDefaults) are now the theme defaults, so the Output colours match VB's. Tests check the
+      plain, forum and Reddit text by eye-verified lines; no VB goldens yet. VB bugs: 18i, 22g, 26a.
+- [ ] `basFormat` (export feat transposing, alignment, past lives) comes with the Ron's Planner and DDO Builder formats.
 - [ ] Port `basFormatRon`, `basFormatBuilder` (import + export), leveling guide csv/txt.
 - **Done when:** golden output tests pass for all builds, formats and exports. From here on, porting more rules means making more golden diffs pass.
 

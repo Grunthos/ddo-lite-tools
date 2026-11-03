@@ -110,61 +110,12 @@ private fun NotInPrototype(theme: Theme, message: String) {
     )
 }
 /**
- * The main window's content: a stand-in for frmMain's output view (the build summary that VB
- * regenerates as the build changes, `basOutput.GenerateOutput`, Build/basOutput.bas:154). Uses the workspace colours
- * (.screen themes have no output colours; VB keeps those in separate output colour files). Shows the chosen build and the
- * skill ranks, so changes made in the Skills window can be seen arriving in another window.
+ * The main window's content: frmMain's output view (picBuild), the build as basOutput writes it
+ * for the window that's active. See [OutputPane].
  */
 @Composable
 fun MainWindowContent(state: PrototypeState) {
-    val skills = state.skills
-    val theme = skills.theme
-    val text = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val revision = skills.revision + state.revision // read so this redraws when the build changes
-    val lines = ArrayList<String>()
-    val opened = state.opened
-    if (opened == null) {
-        lines.add("No build is open: start one with File > New (Ctrl+N), or open one with File > Open (Ctrl+O).")
-    } else {
-        lines.add("Build: " + skills.buildTitle() + "   [revision " + revision + "]")
-        lines.add("")
-        lines.addAll(openedBuildLines(opened))
-        appendScreenLines(state, lines)
-        lines.add("Open screens from the Edit menu (or press O / K / E), in the VB app's order.")
-    }
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
-            .verticalScroll(rememberScrollState())
-            .padding(12.dp),
-    ) {
-        BasicText(lines.joinToString("\n"), style = text)
-    }
-}
-
-/** The skill ranks and tree slots as the Skills and Enhancements windows have them. */
-private fun appendScreenLines(state: PrototypeState, lines: ArrayList<String>) {
-    val skills = state.skills
-    lines.add("Skills (total ranks):")
-    if (!skills.hasLevels()) {
-        lines.add("")
-        return
-    }
-    for (skill in Skill.entries) {
-        val ranks = skills.grid.totalRanks(skills.spend, skill)
-        if (ranks > 0) {
-            lines.add("  " + skill.displayName + ": " + formatRanks(ranks))
-        }
-    }
-    lines.add("")
-    lines.add("Enhancement trees:")
-    for (i in 0 until state.trees.slots.size) {
-        val tree = state.trees.slots[i]
-        if (tree != null) {
-            lines.add("  " + (i + 1) + ". " + tree)
-        }
-    }
-    lines.add("")
+    OutputPane(state)
 }
 
 /**

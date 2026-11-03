@@ -1,6 +1,8 @@
 package ddolite.prototype.skills.desktop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposeWindow
@@ -23,6 +25,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import ddolite.builder.build.BuildScreen
+import ddolite.builder.output.OutputView
 import ddolite.builder.build.closesAfterChange
 import ddolite.builder.build.openScreenNotice
 import ddolite.builder.data.LoadLog
@@ -52,6 +55,8 @@ import ddolite.prototype.skills.readTreeHeaders
 import java.awt.KeyboardFocusManager
 import java.nio.file.Files
 import java.nio.file.Path
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
 
 /**
@@ -251,6 +256,9 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    SideEffect {
+        state.enhancementsOpen = windows.isOpen(BuildScreen.ENHANCEMENTS)
+    }
     // The window part of CascadeChanges: close the screens that no longer make sense.
     state.onCascade = { change ->
         for (screen in BuildScreen.entries) {
@@ -337,43 +345,43 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
 
     if (windows.isOpen(BuildScreen.OVERVIEW)) {
         // The form's client area is 866 x 609 at 100%; the window adds its frame and title bar.
-        ScreenWindow(windows, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
+        ScreenWindow(windows, state, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
             OverviewWindowContent(state, icons) { link -> footerLink(link, BuildScreen.OVERVIEW, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.STATS)) {
         // The form's client area is 815 x 549 at 100%.
-        ScreenWindow(windows, BuildScreen.STATS, "Stats", 540, 60, 831, 592) {
+        ScreenWindow(windows, state, BuildScreen.STATS, "Stats", 540, 60, 831, 592) {
             StatsWindowContent(state) { link -> footerLink(link, BuildScreen.STATS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.SKILLS)) {
         // The form's client area is 870 x 517 at 100%.
-        ScreenWindow(windows, BuildScreen.SKILLS, "Skills", 520, 40, 886, 560) {
+        ScreenWindow(windows, state, BuildScreen.SKILLS, "Skills", 520, 40, 886, 560) {
             SkillsWindowContent(state, icons) { link -> footerLink(link, BuildScreen.SKILLS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.FEATS)) {
         // The form's client area is 815 x 593 at 100%.
-        ScreenWindow(windows, BuildScreen.FEATS, "Feats", 540, 60, 831, 636) {
+        ScreenWindow(windows, state, BuildScreen.FEATS, "Feats", 540, 60, 831, 636) {
             FeatsWindowContent(state) { link -> footerLink(link, BuildScreen.FEATS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.SPELLS)) {
         // The form's client area is 815 x 518 at 100%.
-        ScreenWindow(windows, BuildScreen.SPELLS, "Spells", 560, 80, 831, 561) {
+        ScreenWindow(windows, state, BuildScreen.SPELLS, "Spells", 560, 80, 831, 561) {
             SpellsWindowContent(state) { link -> footerLink(link, BuildScreen.SPELLS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.DESTINY)) {
         // The form's client area is 815 x 518 at 100%.
-        ScreenWindow(windows, BuildScreen.DESTINY, "Destinies", 580, 100, 831, 561) {
+        ScreenWindow(windows, state, BuildScreen.DESTINY, "Destinies", 580, 100, 831, 561) {
             DestinyWindowContent(state) { link -> footerLink(link, BuildScreen.DESTINY, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {
         // The form's client area is 815 x 555 at 100%.
-        ScreenWindow(windows, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
+        ScreenWindow(windows, state, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
             EnhancementsWindowContent(state) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
         }
     }
@@ -396,6 +404,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
 @Composable
 private fun ScreenWindow(
     windows: OpenWindows,
+    state: PrototypeState,
     screen: BuildScreen,
     title: String,
     x: Int,
@@ -405,13 +414,46 @@ private fun ScreenWindow(
     content: @Composable () -> Unit,
 ) {
     Window(
-        onCloseRequest = { windows.close(screen) },
+        onCloseRequest = {
+            windows.close(screen)
+            // UnloadForm (basMain.bas:224): with no other Edit window left, the output shows everything again.
+            var others = false
+            for (s in BuildScreen.entries) {
+                if (windows.isOpen(s)) {
+                    others = true
+                }
+            }
+            if (!others) {
+                state.outputView = OutputView.ALL
+            }
+        },
         title = title,
         state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp),
     ) {
         windows.awtWindows[screen] = window
+        // Form_Activate → ActivateForm: the main window's output shows this window's sections.
+        DisposableEffect(window) {
+            val listener = object : WindowAdapter() {
+                override fun windowGainedFocus(e: WindowEvent?) {
+                    state.outputView = outputViewFor(screen)
+                }
+            }
+            window.addWindowFocusListener(listener)
+            onDispose { window.removeWindowFocusListener(listener) }
+        }
         content()
     }
+}
+
+/** The output each Edit window asks for when activated; the Destinies window passes oeDestiny2 (frmDestiny2.frm:583). */
+private fun outputViewFor(screen: BuildScreen): OutputView = when (screen) {
+    BuildScreen.OVERVIEW -> OutputView.OVERVIEW
+    BuildScreen.STATS -> OutputView.STATS
+    BuildScreen.SKILLS -> OutputView.SKILLS
+    BuildScreen.FEATS -> OutputView.FEATS
+    BuildScreen.SPELLS -> OutputView.SPELLS
+    BuildScreen.ENHANCEMENTS -> OutputView.ENHANCEMENTS
+    BuildScreen.DESTINY -> OutputView.DESTINY2
 }
 
 /**

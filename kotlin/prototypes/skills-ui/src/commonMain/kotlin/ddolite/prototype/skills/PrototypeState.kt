@@ -63,6 +63,16 @@ class PrototypeState(
     /** Unsaved changes (VB's cfg.Dirty). */
     var dirty by mutableStateOf(false)
 
+    /**
+     * Which window's sections the main window's output shows (basOutput's menRemember): each Edit
+     * window sets it when it's activated (ActivateForm), and it goes back to all of them when the
+     * last one closes or a build is opened, started or closed.
+     */
+    var outputView by mutableStateOf(ddolite.builder.output.OutputView.ALL)
+
+    /** The Enhancements window is open (the output puts the leveling guide first when it's on that tab). */
+    var enhancementsOpen by mutableStateOf(false)
+
     /** Called after a change, with what changed, so the app can close windows that no longer make sense. */
     var onCascade: (CascadeChange) -> Unit = {}
 

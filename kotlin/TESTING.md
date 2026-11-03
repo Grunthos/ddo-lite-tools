@@ -158,6 +158,16 @@ look for anything different.
 - [ ] Save and reopen: the same guide.
 - [ ] **VB bug to confirm:** "Selected and Available" lists the same as "Show All" (VB-BUGS 18g).
 
+## 7d. Main window output
+
+- [ ] Each sample build: the main window's text against VB's, section by section (level order,
+      stats, skills grid, feats, spells, enhancements, leveling guide, destinies), including colours.
+- [ ] With each Edit window active, the main window shows that window's sections (and goes back to
+      everything when the last Edit window closes).
+- [ ] **VB bug to confirm:** with the Destinies window active, only the name, classes and race show
+      (VB-BUGS 22g).
+- [ ] **VB bug to confirm:** a tree without its first core makes "Enhancements … Errors" (18i).
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.
