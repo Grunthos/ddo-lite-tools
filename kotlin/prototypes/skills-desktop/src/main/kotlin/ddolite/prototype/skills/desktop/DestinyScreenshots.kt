@@ -17,10 +17,12 @@ import java.nio.file.Path
  * (level 36), the Destinies tab with a slot chosen and an ability added. Part of the screenshots tool.
  */
 fun destinyScreenshots(prototype: PrototypeState, repoRoot: Path, outDir: Path) {
-    val save = repoRoot.resolve("Save")
     val screen = prototype.destiny
-    for (name in listOf("Kensei Warpriest", "TEST")) {
-        prototype.openBuild(readBuildFile(Files.readAllBytes(save.resolve("$name.build")), prototype.data, BuildPoints.ADVENTURER))
+    // TEST.build (level 36) is kept in kotlin/test-builds since it left Save/.
+    val builds = listOf(repoRoot.resolve("Save").resolve("Kensei Warpriest.build"), repoRoot.resolve("kotlin").resolve("test-builds").resolve("TEST.build"))
+    for (path in builds) {
+        val name = path.fileName.toString().removeSuffix(".build")
+        prototype.openBuild(readBuildFile(Files.readAllBytes(path), prototype.data, BuildPoints.ADVENTURER))
         screen.opened()
         val file = name.replace(" ", "-").lowercase()
         ImageComposeScene(width = 815, height = 518, density = Density(1f)) { DestinyWindowContent(prototype) {} }.use { scene ->

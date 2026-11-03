@@ -4,23 +4,21 @@ import ddolite.builder.data.LoadLog
 import ddolite.builder.data.loadBuilderData
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.Windows1252
-import java.io.File
 import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Opens each build in the repository's Save folder (saved by VB6) with the real data, saves it
+ * Opens each build in the repository's Save folder and kotlin/test-builds (saved by VB6) with the real data, saves it
  * again and compares the text line by line. Differences are expected only where the current VB6
  * would write the file differently from the version that saved it; each is listed and explained.
  */
 class BuildRoundTripTest {
     private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
-    private val saveDir = File(System.getProperty("ddolite.saveDir"))
 
     private fun roundTrip(name: String): Pair<BuildLoadResult, List<String>> {
-        val bytes = File(saveDir, name).readBytes()
+        val bytes = SampleBuilds.file(name).readBytes()
         val loaded = readBuildFile(bytes, data, BuildPoints.ADVENTURER)
         val saved = writeBuildFile(loaded.rules)
         return Pair(loaded, lineDifferences(Windows1252.decode(bytes), Windows1252.decode(saved)))
@@ -54,16 +52,7 @@ class BuildRoundTripTest {
         return result
     }
 
-    private fun sampleBuilds(): List<String> {
-        val names = ArrayList<String>()
-        for (file in saveDir.listFiles()!!) {
-            if (file.name.endsWith(".build")) {
-                names.add(file.name)
-            }
-        }
-        names.sort()
-        return names
-    }
+    private fun sampleBuilds(): List<String> = SampleBuilds.names()
 
     /**
      * The samples were saved by older versions against older data, so they don't come back
@@ -101,7 +90,7 @@ class BuildRoundTripTest {
             assertEquals(deprecations.feats.size + deprecations.nameChanges.size, removedFeats, "$name feats")
             val expectedAdded = ArrayList<String>()
             // Versions before MAX_LEVELUPS = 9 don't write the level 36 line (TEST.build and newer saves do).
-            val original = Windows1252.decode(File(saveDir, name).readBytes())
+            val original = Windows1252.decode(SampleBuilds.file(name).readBytes())
             if (!original.contains("\r\nLevelup: 36\t")) {
                 expectedAdded.add("+Levelup: 36\t")
             }
@@ -127,7 +116,7 @@ class BuildRoundTripTest {
     @Test
     fun saveLoadSaveIsStable() {
         for (name in sampleBuilds()) {
-            val original = readBuildFile(File(saveDir, name).readBytes(), data, BuildPoints.ADVENTURER)
+            val original = readBuildFile(SampleBuilds.file(name).readBytes(), data, BuildPoints.ADVENTURER)
             val first = writeBuildFile(original.rules)
             val reloaded = readBuildFile(first, data, BuildPoints.ADVENTURER)
             assertEquals(emptyList(), reloaded.problems, name)

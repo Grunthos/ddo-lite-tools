@@ -666,7 +666,8 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         check passes; a description with no wiki page links to the wiki's base address; after a change
         while on the Granted tab, the details box stays wide without its "<<" link.
       - `Save/Eresh WFWizRog.build` (saved by a current VB) reads and writes back byte for byte: the first exact
-        golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`.
+        golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`, plus
+        `kotlin/test-builds/` (TEST.build, level 36, kept there after master removed it from `Save/`).
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.

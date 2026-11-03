@@ -13,10 +13,15 @@ val dataDir: File = rootDir.resolve("../Data").canonicalFile
 // Sample builds saved by VB6, used by the .build round-trip tests.
 val saveDir: File = rootDir.resolve("../Save").canonicalFile
 
+// More VB6 builds kept for the tests only: TEST.build (level 36) was removed from Save/.
+val testBuildsDir: File = rootDir.resolve("test-builds").canonicalFile
+
 subprojects {
     tasks.withType<Test>().configureEach {
         systemProperty("ddolite.dataDir", dataDir.absolutePath)
         systemProperty("ddolite.saveDir", saveDir.absolutePath)
+        systemProperty("ddolite.testBuildsDir", testBuildsDir.absolutePath)
         inputs.dir(saveDir)
+        inputs.dir(testBuildsDir)
     }
 }

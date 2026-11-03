@@ -24,7 +24,8 @@ look for anything different.
 - [ ] Save from Kotlin, open the saved file in VB: same build.
 - [ ] Save a build in a current VB, then open and save it in Kotlin: the file should be byte for byte the
       same (it is for `Eresh WFWizRog.build`). More such files (casters, epic, Drow, multiclass, Iconic races)
-      make good automatic tests: drop them in `Save/` and the round-trip tests use them.
+      make good automatic tests: drop them in `Save/` (or `kotlin/test-builds/` to commit them) and the
+      round-trip tests use them.
 - [ ] File › New, Close, Save As, and quitting with unsaved changes (Yes / No / Cancel) behave as in VB.
 - [ ] The title bar shows the build name, the file name if different, and `*` for unsaved changes.
 

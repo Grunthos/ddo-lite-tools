@@ -3,7 +3,6 @@ package ddolite.builder.build
 import ddolite.builder.data.LoadLog
 import ddolite.builder.data.loadBuilderData
 import ddolite.dataformat.DirectoryDataSource
-import java.io.File
 import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,9 +13,8 @@ import kotlin.test.assertTrue
 /** The feat rules ([FeatRules]) on the sample builds in Save/, with the real data. */
 class FeatRulesTest {
     private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
-    private val saveDir = File(System.getProperty("ddolite.saveDir"))
 
-    private fun open(name: String): BuildRules = readBuildFile(File(saveDir, name).readBytes(), data, BuildPoints.ADVENTURER).rules
+    private fun open(name: String): BuildRules = readBuildFile(SampleBuilds.file(name).readBytes(), data, BuildPoints.ADVENTURER).rules
 
     private fun slot(rules: BuildRules, level: Int, source: String): FeatListEntry {
         for (entry in rules.featList) {
