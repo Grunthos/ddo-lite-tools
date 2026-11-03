@@ -608,7 +608,7 @@ private class GridGeometry(measurer: TextMeasurer, normal: TextStyle, bold: Text
     fun rowTop(row: Int): Int = top + (row - 1) * rowHeight
 
     /** CoordsToCell (:2336): row 1-20 (0 = header or outside), column 1-4 (0 = elsewhere). */
-    fun cellAt(at: Offset, levels: Int): Pair<Int, Int> {
+    fun cellAt(at: Offset, levels: Int): GridCell {
         var row = 0
         if (at.y >= top) {
             row = ((at.y - top) / rowHeight).toInt() + 1
@@ -623,7 +623,7 @@ private class GridGeometry(measurer: TextMeasurer, normal: TextStyle, bold: Text
                 break
             }
         }
-        return Pair(row, col)
+        return GridCell(row, col)
     }
 
     fun textLeft(col: Int, textWidth: Int): Int {
@@ -676,11 +676,11 @@ private fun LevelGrid(
                         val at = event.changes.first().position
                         val cell = currentGeometry.cellAt(at, currentLevels)
                         if (event.type == PointerEventType.Move) {
-                            overview.hover(cell.first, cell.second)
+                            overview.hover(cell.row, cell.col)
                         } else if (event.type == PointerEventType.Press) {
-                            overview.press(cell.first, cell.second)
+                            overview.press(cell.row, cell.col)
                         } else if (event.type == PointerEventType.Release) {
-                            overview.release(cell.first, cell.second)
+                            overview.release(cell.row, cell.col)
                         } else if (event.type == PointerEventType.Exit) {
                             overview.hover(0, 0)
                         }
@@ -812,3 +812,6 @@ private fun DrawScope.drawCell(
     val x = geometry.textLeft(col, layout.size.width)
     drawText(layout, topLeft = Offset(x.toFloat(), (top + geometry.offsetY).toFloat()))
 }
+
+/** A cell of the level grid: row 1-20 (0 = header or outside) and column 1-4 (0 = elsewhere). */
+class GridCell(val row: Int, val col: Int)

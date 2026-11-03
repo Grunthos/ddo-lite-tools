@@ -59,7 +59,7 @@ class DragDropState<T> {
     }
 
     /** Ends the drag. Returns the item and the target it was dropped on (null if none). */
-    fun finish(): Pair<T, Any?>? {
+    fun finish(): Drop<T>? {
         val item = dragging
         val target = hoverTarget
         dragging = null
@@ -67,7 +67,7 @@ class DragDropState<T> {
         if (item == null) {
             return null
         }
-        return Pair(item, target)
+        return Drop(item, target)
     }
 
     fun cancel() {
@@ -133,7 +133,7 @@ fun <T> Modifier.dragSource(state: DragDropState<T>, item: T, onStart: (T) -> Bo
                 onDragEnd = {
                     val result = state.finish()
                     if (result != null) {
-                        currentOnDrop(result.first, result.second)
+                        currentOnDrop(result.item, result.target)
                     }
                 },
                 onDragCancel = { state.cancel() },
@@ -180,3 +180,6 @@ private class PlacementHolder {
         return c.localToWindow(local)
     }
 }
+
+/** A finished drag: what was dragged, and the target it was dropped on (null if none). */
+class Drop<T>(val item: T, val target: Any?)

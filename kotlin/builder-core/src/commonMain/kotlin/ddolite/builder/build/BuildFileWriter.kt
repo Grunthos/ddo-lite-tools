@@ -175,17 +175,17 @@ private class BuildFileWriter(private val rules: BuildRules) {
         addLine(";    ----  ----  ----  ----  ----")
         for (stat in Stat.entries) {
             val line = statLine(stat)
-            if (line.second) {
+            if (line.hasValues) {
                 include = true
             }
-            addLine(line.first)
+            addLine(line.text)
         }
         addLine(";    ----  ----  ----  ----")
         val total = statLine(null)
-        if (total.second) {
+        if (total.hasValues) {
             include = true
         }
-        addLine(total.first, 2)
+        addLine(total.text, 2)
         if (!include) {
             revertToLine(start)
         }
@@ -203,11 +203,14 @@ private class BuildFileWriter(private val rules: BuildRules) {
         }
     }
 
+    /** A row of the stats table, and whether it has anything in it. */
+    private class StatLine(val text: String, val hasValues: Boolean)
+
     /**
      * One row of the table ([stat] null for the totals), and whether it has anything in it.
      * Ported from `MakeStatLine` (basFormatLite.bas:241).
      */
-    private fun statLine(stat: Stat?): Pair<String, Boolean> {
+    private fun statLine(stat: Stat?): StatLine {
         var include = false
         val line = StringBuilder()
         line.append(if (stat == null) ";    " else stat.abbreviation.uppercase() + ": ")
@@ -229,7 +232,7 @@ private class BuildFileWriter(private val rules: BuildRules) {
                 include = true
             }
         }
-        return Pair(line.toString(), include)
+        return StatLine(line.toString(), include)
     }
 
     // ---------------------------------------------------------------- skills

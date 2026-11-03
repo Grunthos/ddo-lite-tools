@@ -133,6 +133,9 @@ private fun hex2(value: Int): String {
     return if (s.length < 2) "0$s" else s
 }
 
+/** A .bbcodes file: its name (without ".bbcodes") and its text. */
+class FormatFile(val name: String, val text: String)
+
 /**
  * The output formats there are: the three built in and the .bbcodes files in Settings. Ported
  * from clsConfig's GetFormatNames (:2583), InitFormat with LoadFormat (:847, :889) and
@@ -140,7 +143,7 @@ private fun hex2(value: Int): String {
  *
  * @param files each .bbcodes file's name (without ".bbcodes") and text, in folder order.
  */
-class OutputFormats(private val files: List<Pair<String, String>>) {
+class OutputFormats(private val files: List<FormatFile>) {
     /**
      * The names in the combo. VB quirk, kept: the list starts five long, so with fewer than two
      * extra files the combo has blank items at the end.
@@ -151,9 +154,9 @@ class OutputFormats(private val files: List<Pair<String, String>>) {
         names.add("Code Tags")
         names.add("Plain Text")
         for (file in files) {
-            val lower = file.first.lowercase()
+            val lower = file.name.lowercase()
             if (lower != "ddo forums" && lower != "code tags" && lower != "plain text") {
-                names.add(file.first)
+                names.add(file.name)
             }
         }
         while (names.size < 5) {
@@ -166,8 +169,8 @@ class OutputFormats(private val files: List<Pair<String, String>>) {
     fun load(name: String): OutputFormat? {
         var text: String? = null
         for (file in files) {
-            if (file.first.equals(name, ignoreCase = true)) {
-                text = file.second
+            if (file.name.equals(name, ignoreCase = true)) {
+                text = file.text
             }
         }
         if (text == null) {

@@ -29,16 +29,19 @@ import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import kotlinx.coroutines.delay
 
+/** A section in the combo: its name, and the part of the output it picks. */
+private class SectionChoice(val name: String, val view: OutputView)
+
 /** The section combo's items (cboSection, frmExport.frx), with the output section each picks. */
 private val EXPORT_SECTIONS = listOf(
-    Pair("All Sections", OutputView.ALL),
-    Pair("Overview", OutputView.OVERVIEW),
-    Pair("Stats", OutputView.STATS),
-    Pair("Skills", OutputView.SKILLS),
-    Pair("Feats", OutputView.FEATS),
-    Pair("Spells", OutputView.SPELLS),
-    Pair("Enhancements", OutputView.ENHANCEMENTS),
-    Pair("Destiny", OutputView.DESTINY),
+    SectionChoice("All Sections", OutputView.ALL),
+    SectionChoice("Overview", OutputView.OVERVIEW),
+    SectionChoice("Stats", OutputView.STATS),
+    SectionChoice("Skills", OutputView.SKILLS),
+    SectionChoice("Feats", OutputView.FEATS),
+    SectionChoice("Spells", OutputView.SPELLS),
+    SectionChoice("Enhancements", OutputView.ENHANCEMENTS),
+    SectionChoice("Destiny", OutputView.DESTINY),
 )
 
 /**
@@ -88,8 +91,8 @@ fun ExportWindowContent(state: BuilderSession, onCopy: (String) -> Unit, onSave:
         BasicText("Section:", style = nav, modifier = Modifier.offset(522.dp, 6.dp))
         var sectionName = ""
         for (s in EXPORT_SECTIONS) {
-            if (s.second == screen.section) {
-                sectionName = s.first
+            if (s.view == screen.section) {
+                sectionName = s.name
             }
         }
         ComboBox(theme, control, sectionName, 576, 2, 129, 21) { sectionOpen = !sectionOpen }
@@ -129,11 +132,11 @@ fun ExportWindowContent(state: BuilderSession, onCopy: (String) -> Unit, onSave:
         if (sectionOpen) {
             val names = ArrayList<String>()
             for (s in EXPORT_SECTIONS) {
-                names.add(s.first)
+                names.add(s.name)
             }
             DropList(theme, control, names, 576, 23, 129) { index ->
                 sectionOpen = false
-                screen.chooseSection(EXPORT_SECTIONS[index].second)
+                screen.chooseSection(EXPORT_SECTIONS[index].view)
             }
         }
     }

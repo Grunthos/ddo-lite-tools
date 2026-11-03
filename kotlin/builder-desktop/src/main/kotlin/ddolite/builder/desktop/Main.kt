@@ -63,6 +63,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ddolite.builder.ui.OutputFormats
+import ddolite.builder.ui.FormatFile
 import ddolite.builder.ui.OverviewWindowContent
 import ddolite.builder.ui.BuilderSession
 import ddolite.builder.ui.SkillsScreenState
@@ -538,8 +539,8 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
                     Separator()
                 }
                 for (entry in listed) {
-                    CheckboxItem(entry.first, checked = entry.second != null && entry.second === activeWindow.value, onCheckedChange = {
-                        entry.second?.toFront()
+                    CheckboxItem(entry.caption, checked = entry.window != null && entry.window === activeWindow.value, onCheckedChange = {
+                        entry.window?.toFront()
                     })
                 }
             }
@@ -803,17 +804,17 @@ private object BuilderIcons
 
 /** The .bbcodes files in [settings] by name, as Dir lists them (sorted). GetFormatNames (clsConfig.cls:2583). */
 internal fun loadFormats(settings: Path): OutputFormats {
-    val list = ArrayList<Pair<String, String>>()
+    val list = ArrayList<FormatFile>()
     try {
         Files.newDirectoryStream(settings, "*.bbcodes").use { files ->
             for (file in files) {
-                list.add(Pair(file.fileName.toString().removeSuffix(".bbcodes"), decodeText(Files.readAllBytes(file)).text))
+                list.add(FormatFile(file.fileName.toString().removeSuffix(".bbcodes"), decodeText(Files.readAllBytes(file)).text))
             }
         }
     } catch (e: Exception) {
         // No Settings folder: just the built-in formats.
     }
-    list.sortBy { it.first.lowercase() }
+    list.sortBy { it.name.lowercase() }
     return OutputFormats(list)
 }
 
@@ -988,6 +989,9 @@ private fun saveDialogPosition(settings: BuilderSettings, window: ComposeWindow?
 
 // ---------------------------------------------------------------- Window menu
 
+/** A Window menu entry: the window's caption, and the window (null until it has opened). */
+private class WindowEntry(val caption: String, val window: ComposeWindow?)
+
 /**
  * The Window menu's windows (frmMain.frm:409 onwards), each with its caption and AWT window, in VB's
  * order: Overview, Stats, Skills, Feats, Spells, Enhancements, Export, Import, Messages, Options,
@@ -1006,30 +1010,30 @@ private fun windowMenuEntries(
     optionsOpen: Boolean,
     formatWindow: Array<ComposeWindow?>,
     helpWindow: Array<ComposeWindow?>,
-): List<Pair<String, ComposeWindow?>> {
-    val list = ArrayList<Pair<String, ComposeWindow?>>()
+): List<WindowEntry> {
+    val list = ArrayList<WindowEntry>()
     for (screen in EditScreen.entries) {
         if (screen.screen != BuildScreen.DESTINY && windows.isOpen(screen.screen)) {
-            list.add(Pair(screen.title.removeSuffix("..."), windows.awtWindows[screen.screen]))
+            list.add(WindowEntry(screen.title.removeSuffix("..."), windows.awtWindows[screen.screen]))
         }
     }
     if (state.export.isOpen) {
-        list.add(Pair("Export", exportWindow[0]))
+        list.add(WindowEntry("Export", exportWindow[0]))
     }
     if (state.imports.isOpen) {
-        list.add(Pair("Import", importWindow[0]))
+        list.add(WindowEntry("Import", importWindow[0]))
     }
     if (state.messages.isOpen) {
-        list.add(Pair("Messages", messagesWindow[0]))
+        list.add(WindowEntry("Messages", messagesWindow[0]))
     }
     if (optionsOpen) {
-        list.add(Pair("Options", optionsWindow[0]))
+        list.add(WindowEntry("Options", optionsWindow[0]))
     }
     if (state.format.isOpen) {
-        list.add(Pair("Output Format", formatWindow[0]))
+        list.add(WindowEntry("Output Format", formatWindow[0]))
     }
     if (state.help.isOpen) {
-        list.add(Pair(state.help.topic?.caption() ?: "Help", helpWindow[0]))
+        list.add(WindowEntry(state.help.topic?.caption() ?: "Help", helpWindow[0]))
     }
     return list
 }

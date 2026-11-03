@@ -33,6 +33,9 @@ class ExportFeat(
     var builderType = ""
 }
 
+/** Past lives by VB class number (index 1 onwards), and how many there are in all. */
+class PastLives(val lives: IntArray, val count: Int)
+
 /**
  * Exports to Ron's Character Planner (.txt) and DDO Builder (.ddocp). Ported from basFormat.bas
  * (the shared helpers), basFormatRon.ExportFileRon (:123) and basFormatBuilder.ExportFileBuilder
@@ -108,7 +111,7 @@ class PlannerExport(private val rules: BuildRules) {
      * Past Life feat (all classes for Completionist); a hero build has exactly one, a legend build
      * at least two (made up with the main class). GetExportPastLives (:128).
      */
-    fun exportPastLives(): Pair<IntArray, Int> {
+    fun exportPastLives(): PastLives {
         var lives = IntArray(KNOWN_CLASSES.size + 1)
         var count = 0
         var lastClass = 0
@@ -163,7 +166,7 @@ class PlannerExport(private val rules: BuildRules) {
                 count = 2
             }
         }
-        return Pair(lives, count)
+        return PastLives(lives, count)
     }
 
     /** GetClassID: a class name to its VB number, 0 if unknown. */
@@ -494,7 +497,7 @@ class PlannerExport(private val rules: BuildRules) {
 
     /** GetRonPastLife (:293): lives in Ron's class order, then blanks to VB's class count. */
     private fun ronPastLives(): String {
-        val lives = exportPastLives().first
+        val lives = exportPastLives().lives
         val values = Array(KNOWN_CLASSES.size + 1) { "" }
         for (c in 1 until lives.size) {
             val ron = ronClass(c)
@@ -641,7 +644,9 @@ class PlannerExport(private val rules: BuildRules) {
 
     /** AddPastLives (:190). */
     private fun addPastLives() {
-        val (lives, count) = exportPastLives()
+        val pastLives = exportPastLives()
+        val lives = pastLives.lives
+        val count = pastLives.count
         if (count == 0) {
             nullTag("SpecialFeats")
             return

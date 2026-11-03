@@ -87,6 +87,15 @@ fun readBuildText(text: String, data: BuilderData, preferred: BuildPoints): Buil
     return BuildLoadResult(reader.build, reader.rules, reader.deprecations, reader.problems)
 }
 
+/** A feat slot: its kind and 0-based position among that kind. */
+private class SlotRef(val type: BuildFeatType, val index: Int)
+
+/** "text number" split at the last space (SplitCombo). */
+private class Combo(val text: String, val number: Int)
+
+/** An ability found in its tier: its 0-based position, and its selector (numbered from 1; 0 for none). */
+private class ResolvedAbility(val ability: Int, val selector: Int)
+
 /** The state of `LoadFileLite` while it reads one file (VB's module-level variables in basFormatLite). */
 private class BuildFileReader(private val data: BuilderData, preferred: BuildPoints) {
     val build = Build()
@@ -349,23 +358,23 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (field == "alternate" || field == "exchange") {
             type = if (field == "alternate") BuildFeatType.ALTERNATE else BuildFeatType.EXCHANGE
             val child = identifySlot(list[0]) ?: return
-            childType = child.first
-            childIndex = child.second
+            childType = child.type
+            childIndex = child.index
             index = addSlot(type)
             if (index < 0) {
                 throw VbRuntimeError(SUBSCRIPT_OUT_OF_RANGE) // AddSlot returned 0
             }
             val slot = build.feats(type)[index]
-            val childSlot = build.feats(child.first)[child.second]
-            slot.childType = child.first
-            slot.child = child.second
+            val childSlot = build.feats(child.type)[child.index]
+            slot.childType = child.type
+            slot.child = child.index
             slot.level = if (type == BuildFeatType.EXCHANGE) vbByte(Vb.valOf(list[1])) else childSlot.level
             slot.classLevel = childSlot.classLevel
             slot.source = childSlot.source
         } else {
             val found = identifySlot(list[0]) ?: return
-            type = found.first
-            index = found.second
+            type = found.type
+            index = found.index
         }
         val raw = list[listMax]
         val found = findFeat(raw)
@@ -433,10 +442,10 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * character level, class and deity slots by class level. Ported from `IdentifySlot`
      * (basFormatLite.bas:999) and `IdentifySlotType` (:1034).
      */
-    private fun identifySlot(raw: String): Pair<BuildFeatType, Int>? {
+    private fun identifySlot(raw: String): SlotRef? {
         val combo = splitCombo(raw) ?: return null
-        val text = combo.first
-        val number = combo.second
+        val text = combo.text
+        val number = combo.number
         val type = slotType(text) ?: return null
         val slots = build.feats(type)
         var index = 0
@@ -456,7 +465,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (index >= slots.size) {
             return null
         }
-        return Pair(type, index)
+        return SlotRef(type, index)
     }
 
     /** Ported from `IdentifySlotType` (basFormatLite.bas:1034). */
@@ -511,8 +520,8 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             return
         }
         val combo = splitCombo(list[0]) ?: return
-        val c = data.findClass(combo.first) ?: return
-        val spellLevel = combo.second
+        val c = data.findClass(combo.text) ?: return
+        val spellLevel = combo.number
         val spells = build.spellsFor(c) ?: throw VbRuntimeError(SUBSCRIPT_OUT_OF_RANGE) // build.Spell not set up
         if (spellLevel < 1 || spellLevel > spells.maxSpellLevel) {
             return
@@ -590,7 +599,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             deprecateAbility(ability)
             return
         }
-        buildTree.abilities.add(BuildAbility(ability.tier, resolved.first, ability.rank, resolved.second))
+        buildTree.abilities.add(BuildAbility(ability.tier, resolved.ability, ability.rank, resolved.selector))
     }
 
     /**
@@ -665,7 +674,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * An ability name with ": " in it (Warpriest's "Inflame: Energy Absorption") is found from its
      * two parsed halves.
      */
-    private fun resolveAbility(ability: DeprecatedAbility): Pair<Int, Int>? {
+    private fun resolveAbility(ability: DeprecatedAbility): ResolvedAbility? {
         val tree = (if (ability.isDestiny) data.findDestiny(ability.treeName) else data.findTree(ability.treeName))
             ?: return null
         if (ability.tier > tree.style.tierCount || ability.tier >= tree.tiers.size) {
@@ -708,7 +717,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (ability.rank > abilities[a].ranks) {
             return null
         }
-        return Pair(a, selector)
+        return ResolvedAbility(a, selector)
     }
 
     // ---------------------------------------------------------------- leveling guide
@@ -754,8 +763,8 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             }
             val step = BuildGuideEnhancement(lookup)
             step.tier = ability.tier
-            step.ability = resolved.first
-            step.selector = resolved.second
+            step.ability = resolved.ability
+            step.selector = resolved.selector
             step.rank = ability.rank
             build.guide.enhancements.add(step)
         }
@@ -833,7 +842,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * "text number" split at the last space: the text in lower case and the number, or null.
      * Ported from `SplitCombo` (basFormatLite.bas:753).
      */
-    private fun splitCombo(combo: String): Pair<String, Int>? {
+    private fun splitCombo(combo: String): Combo? {
         val pos = combo.lastIndexOf(' ') + 1 // InStrRev, 1-based
         if (pos < 2) {
             return null
@@ -842,7 +851,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (!Vb.isNumeric(number)) {
             return null
         }
-        return Pair(combo.substring(0, pos - 1).lowercase(), Vb.cLng(Vb.valOf(number)))
+        return Combo(combo.substring(0, pos - 1).lowercase(), Vb.cLng(Vb.valOf(number)))
     }
 
     /** Assignment to a VB Byte field: rounds like CByte and fails with "Overflow" outside 0-255. */

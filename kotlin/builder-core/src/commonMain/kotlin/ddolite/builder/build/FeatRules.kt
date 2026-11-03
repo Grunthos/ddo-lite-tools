@@ -1722,14 +1722,14 @@ class FeatRules(val rules: BuildRules) {
     }
 
     private fun addClassLevels(out: DetailsBuilder, classes: List<ClassLevel>) {
-        val sorted = ArrayList<Pair<CharacterClass, Int>>()
+        val sorted = ArrayList<ClassSplit>()
         for (classLevel in classes) {
             val c = data.findClass(classLevel.className) ?: continue
-            sorted.add(Pair(c, classLevel.level))
+            sorted.add(ClassSplit(c, classLevel.level))
         }
-        sorted.sortBy { it.first.vbIndex }
-        for (pair in sorted) {
-            out.addText(" - " + pair.first.name + " " + pair.second)
+        sorted.sortBy { it.characterClass.vbIndex }
+        for (entry in sorted) {
+            out.addText(" - " + entry.characterClass.name + " " + entry.levels)
         }
     }
 
