@@ -180,6 +180,7 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -
         dropState = { row -> screen.treeDropStates.getOrNull(row - 1) ?: ddolite.builder.build.DropState.DEFAULT },
         hoverRow = screen.treeHover,
         left = 80, top = 56, width = 361, height = 201, maxRows = 21,
+        fitRows = 7, // a build has at most seven trees
         drag = screen.drag,
         rowKey = { row -> TreeRowKey(row) },
         dragItem = { row -> EnhancementDrag.TreeRow(row) },

@@ -98,6 +98,7 @@ fun <T> UserList(
     onDoubleClick: (Int) -> Unit,
     onHover: (Int) -> Unit,
     onRankChange: (Int, Int) -> Unit = { _, _ -> },
+    fitRows: Int = 0,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val normal = TextStyle(fontSize = FONT_SIZE)
@@ -105,10 +106,19 @@ fun <T> UserList(
     // The measurer works in pixels; the layout below is in dp.
     val scale = LocalDensity.current.density
     val textHeight = (textMeasurer.measure("X", normal).size.height / scale).toInt()
-    val slotHeight = textHeight * 4 / 3
-    val marginY = slotHeight / 4
+    var slotHeight = textHeight * 4 / 3
+    var marginY = slotHeight / 4
     val marginX = (textMeasurer.measure("  ", normal).size.width / scale).toInt()
     val headerSpace = 30
+    // New: [fitRows] rows always fit without scrolling (VB's Verdana rows are shorter than this font's,
+    // so VB fits them in the same height). The slots and gaps shrink, keeping their 4:1 proportion.
+    if (fitRows > 0) {
+        val available = height - headerSpace - 2
+        if ((slotHeight + marginY) * fitRows + marginY * 2 > available) {
+            marginY = available / (fitRows * 5 + 2)
+            slotHeight = marginY * 4
+        }
+    }
     var clientWidth = width - 2
     if (rowCount > maxRows) {
         clientWidth -= 17
@@ -232,7 +242,8 @@ private fun <T> SlotBox(
         .dropTarget(drag, key)
         .background(background)
         .border(1.dp, border)
-        .pointerInput(key) {
+        // Keyed on what the handler reads, so a slot filled or re-ranked since it was first drawn gets its arrows.
+        .pointerInput(key, arrows, content.ranks, content.maxRanks, width, height) {
             awaitPointerEventScope {
                 while (true) {
                     val event = awaitPointerEvent()
