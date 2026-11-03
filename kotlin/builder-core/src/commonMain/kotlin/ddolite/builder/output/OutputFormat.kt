@@ -17,7 +17,7 @@ data class ListTags(
 /**
  * How exported output is formatted: BBCodes or plain text, dots for spaces, colours, and the tags
  * for each style. Ported from `OutputType` (clsConfig.cls) with `InitFormat` (:847),
- * `LoadFormat` (:883) and `ParseOutputData` (:812).
+ * `LoadFormat` (:889) and `ParseOutputData` (:812).
  *
  * The screen uses [textColors] and [color] too: coloured text on screen, and bold for the
  * preferred stat column only when colours aren't shown (`StatColumnBold`).
@@ -39,7 +39,7 @@ data class OutputFormat(
     val wrapper: Tags,
 ) {
     companion object {
-        /** The formats every install has, in VB's order (`GetFormatNames`, clsConfig.cls:2600). */
+        /** The formats every install has, in VB's order (`GetFormatNames`, clsConfig.cls:2583). */
         val BUILT_IN = listOf("DDO Forums", "Code Tags", "Plain Text")
 
         /**
@@ -105,7 +105,7 @@ data class OutputFormat(
 
         /**
          * Reads "Field=value" lines (tags are tab-separated) over [start]. Ported from
-         * `ParseOutputData` (clsConfig.cls:812) with `ParseLine` (:1105), `ParseTags` and
+         * `ParseOutputData` (clsConfig.cls:816) with `ParseLine` (:1105), `ParseTags` and
          * `ParseListTags`: a tag line without exactly three (or five) parts is ignored. As VB's
          * Trim$, only spaces are trimmed, so tabs at the ends of a tag line stay.
          *

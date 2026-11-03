@@ -290,7 +290,9 @@ Each step lists its deliverables and the test that marks it done.
       text, other tools' sections kept) with tests. The desktop reads Settings-Kotlin.txt, or VB's Settings.txt when
       there's none yet, and only writes Settings-Kotlin.txt (on exit). Used: theme and saved colours, output format
       and options, default build points, skills contrast, recent files, main window and dialog positions.
-- [ ] The Options window (frmOptions); child windows, icons, confirmation prompts, error log on startup.
+- [x] The Options window (frmOptions): every setting, saved when it closes; the output options, indent and class
+      icons take effect. Not yet: BBCodes (format editor), Colors (VB's Colors program), Help; stored but unused so
+      far: the screens' skill and feat orders, error log on startup, child windows, confirmation prompts.
 
 ### B6 – Rules (taken out of `basBuild`, `basProcess` and the forms, using the F0 inventory)
 Order: BAB/stats → skills → granted/deity/selected feats and exchanges → spells → enhancement trees → destinies and twists → leveling guide.

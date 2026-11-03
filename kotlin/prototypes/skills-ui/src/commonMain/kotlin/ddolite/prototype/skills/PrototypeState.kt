@@ -229,6 +229,15 @@ class PrototypeState(
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
 
+    /** Bumped when the settings change, so menus that show them (recent files) redraw. */
+    var settingsRevision by mutableIntStateOf(0)
+        private set
+
+    /** The settings changed (the Options window). */
+    fun settingsChanged() {
+        settingsRevision++
+    }
+
     /** Something the output depends on changed (colours, format, options) but not the build: redraw it. */
     fun markOutputChanged() {
         revision++

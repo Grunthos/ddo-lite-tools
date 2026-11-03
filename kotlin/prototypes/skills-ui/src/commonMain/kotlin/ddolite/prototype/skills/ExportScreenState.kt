@@ -135,8 +135,8 @@ private fun hex2(value: Int): String {
 
 /**
  * The output formats there are: the three built in and the .bbcodes files in Settings. Ported
- * from clsConfig's GetFormatNames (:2600), InitFormat with LoadFormat (:847, :883) and
- * IdentifyOutputFormat (:2580).
+ * from clsConfig's GetFormatNames (:2583), InitFormat with LoadFormat (:847, :889) and
+ * IdentifyOutputFormat (:2565).
  *
  * @param files each .bbcodes file's name (without ".bbcodes") and text, in folder order.
  */
@@ -181,7 +181,7 @@ class OutputFormats(private val files: List<Pair<String, String>>) {
 
     /**
      * IdentifyOutputFormat: the first name whose settings match [format], or "". As VB's
-     * CompareFormats (:2628), the Reddit setting isn't compared.
+     * CompareFormats (:2610), the Reddit setting isn't compared.
      */
     fun identify(format: OutputFormat): String {
         for (name in names()) {

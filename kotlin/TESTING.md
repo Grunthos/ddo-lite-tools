@@ -181,6 +181,14 @@ look for anything different.
 - [ ] **VB bug to confirm:** a txt guide export where every tree name has 5 letters or fewer (e.g.
       only Human) stops with an error in VB (the centred "Tree" heading).
 
+## 7f. Settings and Options
+
+- [ ] First run with VB's Settings.txt and no Settings-Kotlin.txt: the theme (with any colour changes), output
+      format, default build points, contrast, recent files and window places are VB's. Afterwards only
+      Settings-Kotlin.txt changes; VB's Settings.txt is untouched.
+- [ ] File menu recent files: open one; one that's gone asks to be removed from the list.
+- [ ] Tools › Options: each setting as VB; Show All Feats only shows in the output after the next change (as VB).
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.

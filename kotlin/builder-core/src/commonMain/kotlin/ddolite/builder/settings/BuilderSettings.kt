@@ -11,14 +11,14 @@ import ddolite.dataformat.Vb
 /** A window's place and size in twips (VB's `CoordsType`); a width or height of 0 means "keep the size". */
 data class Coords(val left: Int = 0, val top: Int = 0, val width: Int = 0, val height: Int = 0)
 
-/** How the main window opens (`WindowSizeEnum`, clsConfig.cls). */
-enum class WindowSize { REMEMBER, MAXIMIZED, FILL_DESKTOP }
+/** How the main window opens (`WindowSizeEnum`, clsConfig.cls:204), in VB's order. */
+enum class WindowSize { MAXIMIZED, FILL_DESKTOP, REMEMBER }
 
 /**
  * The settings VB keeps in Settings.txt next to the program, for the Character Builder: its own
  * section, the output format, and the shared colour settings. Ported from clsConfig.cls:
- * `SetDefaults` (:428), `LoadSettings` (:545), `LoadCharBuild` (:600), `LoadShared` (:787),
- * `ParseOutputData` (:812), and `SaveSettings` (:1123) with `MakeCharBuildSettings` (:1171),
+ * `SetDefaults` (:428), `LoadSettings` (:544), `LoadCharBuild` (:603), `LoadShared` (:786),
+ * `ParseOutputData` (:816), and `SaveSettings` (:1123) with `MakeCharBuildSettings` (:1179),
  * `MakeSharedSettings` (:1311) and `MakeOutputSettings` (:1323).
  *
  * The other programs' sections (Compendium, Paths) are kept as they were read and written back
@@ -104,7 +104,7 @@ class BuilderSettings {
 
         private fun number(value: String): Int = Vb.valOf(value).toInt()
 
-        /** ParseCoords (:741): four tab-separated numbers, else unchanged. */
+        /** ParseCoords (:749): four tab-separated numbers, else unchanged. */
         private fun coords(value: String, old: Coords): Coords {
             val parts = value.split('\t')
             if (parts.size != 4) {
@@ -129,7 +129,7 @@ class BuilderSettings {
         return result
     }
 
-    /** LoadCharBuild (:600). */
+    /** LoadCharBuild (:603). */
     private fun loadCharBuild(body: String) {
         var mruRaw = ""
         for ((field, value) in fields(body)) {
@@ -163,7 +163,7 @@ class BuilderSettings {
                 "contrast" -> contrast = number(value)
             }
         }
-        // SplitMRU (:668): the list is read after the count, whichever line came first.
+        // SplitMRU (:660): the list is read after the count, whichever line came first.
         if (mruCount > 9) {
             mruCount = 9
         }
@@ -176,7 +176,7 @@ class BuilderSettings {
         }
     }
 
-    /** LoadShared (:787). */
+    /** LoadShared (:786). */
     private fun loadShared(body: String) {
         for ((field, value) in fields(body)) {
             when (field) {
@@ -185,6 +185,17 @@ class BuilderSettings {
                 "outputcolors" -> outputColors = value
                 "colorversion" -> colorVersion = number(value)
             }
+        }
+    }
+
+    /**
+     * The Recent Files Menu count: 0 empties the list; more than 9 is 9; the list is cut to fit.
+     * `cfg.MRUCount` (clsConfig.cls:2690).
+     */
+    fun changeMruCount(count: Int) {
+        mruCount = if (count < 1) 0 else minOf(count, 9)
+        while (mruList.size > mruCount) {
+            mruList.removeAt(mruList.size - 1)
         }
     }
 
@@ -261,7 +272,7 @@ class BuilderSettings {
 
     private fun coordsText(c: Coords): String = c.left.toString() + "\t" + c.top + "\t" + c.width + "\t" + c.height
 
-    /** MakeCharBuildSettings (:1171). */
+    /** MakeCharBuildSettings (:1179). */
     private fun charBuildLines(): List<String> = listOf(
         "WindowSize=" + windowSize.ordinal,
         "Maximized=" + vbBool(maximized),

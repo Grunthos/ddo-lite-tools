@@ -135,6 +135,9 @@ fun main(args: Array<String>) {
         prototype.export.chooseFormat("DDO Forums")
     }
     prototype.export.close()
+    ImageComposeScene(width = 474, height = 428, density = Density(1f)) { ddolite.prototype.skills.OptionsWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("7e-options.png"))
+    }
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))
     }

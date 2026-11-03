@@ -51,6 +51,10 @@ import ddolite.dataformat.decodeText
 import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.MessagesWindowContent
 import ddolite.prototype.skills.ExportWindowContent
+import ddolite.prototype.skills.OptionsWindowContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import ddolite.prototype.skills.OutputFormats
 import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
@@ -283,6 +287,10 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val optionsWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    var optionsOpen by remember { mutableStateOf(false) }
+    @Suppress("UNUSED_VARIABLE")
+    val settingsRevision = state.settingsRevision // read so the menus and icons follow the Options window
     SideEffect {
         state.enhancementsOpen = windows.isOpen(BuildScreen.ENHANCEMENTS)
     }
@@ -381,6 +389,10 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                         RadioButtonItem(skills.themes[i].name, selected = skills.themeIndex == i, onClick = { chooseTheme(state, i) })
                     }
                 }
+                Item("Options...", mnemonic = 'O', onClick = {
+                    optionsOpen = true
+                    optionsWindow[0]?.toFront()
+                })
             }
             // frmMain's Window menu lists the open screens (tmrWindowMenu_Timer, frmMain.frm:819).
             Menu("Window", mnemonic = 'W') {
@@ -404,6 +416,25 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
         }
     }
+    if (optionsOpen) {
+        // frmOptions: the client area is 474 x 428 at 100%; closing saves the settings (Form_Unload).
+        Window(
+            onCloseRequest = {
+                val w = optionsWindow[0]
+                if (w != null) {
+                    state.settings.optionsCoords = Coords(w.x * TWIPS, w.y * TWIPS)
+                }
+                store.save(state.settings)
+                optionsOpen = false
+            },
+            title = "Options",
+            resizable = false,
+            state = rememberWindowState(position = optionsPosition(state.settings), width = 490.dp, height = 471.dp),
+        ) {
+            optionsWindow[0] = window
+            OptionsWindowContent(state)
+        }
+    }
     if (state.messages.isOpen) {
                     Item("Messages", onClick = { messagesWindow[0]?.toFront() })
                 }
@@ -415,7 +446,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     if (windows.isOpen(BuildScreen.OVERVIEW)) {
         // The form's client area is 866 x 609 at 100%; the window adds its frame and title bar.
         ScreenWindow(windows, state, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
-            OverviewWindowContent(state, icons) { link -> footerLink(link, BuildScreen.OVERVIEW, state, windows) }
+            OverviewWindowContent(state, if (state.settings.useIcons && state.settings.iconOverview) icons else emptyMap()) { link -> footerLink(link, BuildScreen.OVERVIEW, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.STATS)) {
@@ -427,7 +458,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     if (windows.isOpen(BuildScreen.SKILLS)) {
         // The form's client area is 870 x 517 at 100%.
         ScreenWindow(windows, state, BuildScreen.SKILLS, "Skills", 520, 40, 886, 560) {
-            SkillsWindowContent(state, icons) { link -> footerLink(link, BuildScreen.SKILLS, state, windows) }
+            SkillsWindowContent(state, if (state.settings.useIcons && state.settings.iconSkills) icons else emptyMap()) { link -> footerLink(link, BuildScreen.SKILLS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.FEATS)) {
@@ -555,7 +586,7 @@ internal fun loadClassIcons(): Map<String, ImageBitmap> {
 /** Something in this module to find resources from. */
 private object BuilderIcons
 
-/** The .bbcodes files in [settings] by name, as Dir lists them (sorted). GetFormatNames (clsConfig.cls:2600). */
+/** The .bbcodes files in [settings] by name, as Dir lists them (sorted). GetFormatNames (clsConfig.cls:2583). */
 internal fun loadFormats(settings: Path): OutputFormats {
     val list = ArrayList<Pair<String, String>>()
     try {
@@ -693,7 +724,7 @@ private fun mainWindowState(settings: BuilderSettings): WindowState {
     return WindowState(position = WindowPosition((c.left / TWIPS).dp, (c.top / TWIPS).dp), width = (c.width / TWIPS).dp, height = (c.height / TWIPS).dp)
 }
 
-/** Leaving: the main window's place (SaveWindowSize, :1574), the skills contrast, then SaveSettings. */
+/** Leaving: the main window's place (SaveWindowSize, :1572), the skills contrast, then SaveSettings. */
 private fun quit(state: PrototypeState, store: SettingsStore, window: ComposeWindow?) {
     val settings = state.settings
     if (window != null) {
@@ -706,11 +737,20 @@ private fun quit(state: PrototypeState, store: SettingsStore, window: ComposeWin
     store.save(settings)
 }
 
-/** Where a dialog opens: the saved DialogCoords (MoveForm, :1603), or [x], [y] when there are none. */
+/** Where a dialog opens: the saved DialogCoords (MoveForm, :1599), or [x], [y] when there are none. */
 private fun dialogPosition(settings: BuilderSettings, x: Int, y: Int): WindowPosition {
     val c = settings.dialogCoords
     if (c.left == 0 && c.top == 0) {
         return WindowPosition(x.dp, y.dp)
+    }
+    return WindowPosition((c.left / TWIPS).dp, (c.top / TWIPS).dp)
+}
+
+/** Where the Options window opens: OptionsCoords, or the middle of the screen (MoveForm). */
+private fun optionsPosition(settings: BuilderSettings): WindowPosition {
+    val c = settings.optionsCoords
+    if (c.left == 0 && c.top == 0) {
+        return WindowPosition(androidx.compose.ui.Alignment.Center)
     }
     return WindowPosition((c.left / TWIPS).dp, (c.top / TWIPS).dp)
 }
