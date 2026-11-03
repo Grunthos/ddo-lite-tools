@@ -69,7 +69,7 @@ fun OutputPane(state: PrototypeState) {
             .horizontalScroll(rememberScrollState()),
     ) {
         if (rules != null) {
-            val lines = BuildOutput(rules, OutputFormat.DEFAULT, outputSettings(state)).display(state.outputView)
+            val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
             OutputLines(lines, theme)
         }
     }

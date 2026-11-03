@@ -224,7 +224,9 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
 26a. `Modules/Build/basOutput.bas:186` `ReDim mstrJoin(255)`, "enough that we never need to worry":
     an export over 256 lines would stop with "Subscript out of range" (a long leveling guide, many
     feats and spells). `AlignText` (:2555) centring with a gap of 1 would fail too (Mid$ at 0); nothing
-    centres today.
+    centres in the build output; `basDocuments.ExportGuideTXT` (:465) does, and fails when the "Tree" or
+    "Enhancement" heading is no more than one character narrower than its column (a guide using only
+    trees named in 5 letters or fewer).
 
 ## Data files: VB stops instead of reporting
 

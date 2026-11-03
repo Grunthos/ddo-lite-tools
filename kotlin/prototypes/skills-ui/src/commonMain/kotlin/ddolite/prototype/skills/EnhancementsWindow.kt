@@ -43,7 +43,7 @@ private const val ENH_FOOTER_TOP = 528
  * [onNavigate] gets the footer's links.
  */
 @Composable
-fun EnhancementsWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
+fun EnhancementsWindowContent(state: PrototypeState, onExportGuide: () -> Unit = {}, onNavigate: (String) -> Unit) {
     val screen = state.enhancements
     val theme = state.skills.theme
     @Suppress("UNUSED_VARIABLE")

@@ -248,7 +248,7 @@ class DesktopPrompts(private val parent: () -> Component?) : BuilderPrompts {
  * A build name made safe for a file name. Ported from clsFile.MakeNameDOS (Source/Classes/clsFile.cls:391).
  * Quirk kept: "+" is removed although Windows allows it.
  */
-private fun dosName(name: String): String {
+internal fun dosName(name: String): String {
     var file = name.replace(":", "-")
     file = file.replace("\\", "")
     file = file.replace("/", "")

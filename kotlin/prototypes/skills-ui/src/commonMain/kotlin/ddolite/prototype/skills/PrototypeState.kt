@@ -73,6 +73,16 @@ class PrototypeState(
     /** The Enhancements window is open (the output puts the leveling guide first when it's on that tab). */
     var enhancementsOpen by mutableStateOf(false)
 
+    /** The output formats there are (the .bbcodes files in Settings); the app sets these at start. */
+    var formats = OutputFormats(emptyList())
+
+    /** The output format in use (VB's `mtypOutput`, "Default" to start) and its name (`cfg.BBCodes`). */
+    var outputFormat by mutableStateOf(ddolite.builder.output.OutputFormat.DEFAULT)
+    var formatName by mutableStateOf("Default")
+
+    /** The Export window (frmExport). */
+    val export = ExportScreenState(this)
+
     /** Called after a change, with what changed, so the app can close windows that no longer make sense. */
     var onCascade: (CascadeChange) -> Unit = {}
 
@@ -167,6 +177,7 @@ class PrototypeState(
         }
         dirty = true
         revision++
+        export.refreshIfChanged() // SetDirty: frmExport.Cascade
         if (change != null) {
             onCascade(change)
         }
@@ -197,6 +208,7 @@ class PrototypeState(
         skills.storeInto(result.build)
         dirty = true
         revision++
+        export.refreshIfChanged() // SetDirty: frmExport.Cascade
         val r = rules ?: return
         r.cascadeChanges(CascadeChange.SKILL)
         feats.cascade()
@@ -211,12 +223,14 @@ class PrototypeState(
         trees.storeInto(result.rules)
         dirty = true
         revision++
+        export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
 
     /** A window changed the build without a cascade (VB's SetDirty alone). */
     fun markDirty() {
         dirty = true
         revision++
+        export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
 
     /** The Enhancements window changed the trees or AP: SetDirty, and keep the demo's copy in step. */
@@ -225,6 +239,7 @@ class PrototypeState(
         trees.openBuild(result.build)
         dirty = true
         revision++
+        export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
 
     /**

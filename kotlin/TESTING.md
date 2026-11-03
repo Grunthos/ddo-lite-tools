@@ -168,6 +168,17 @@ look for anything different.
       (VB-BUGS 22g).
 - [ ] **VB bug to confirm:** a tree without its first core makes "Enhancements … Errors" (18i).
 
+## 7e. Export
+
+- [ ] File › Export › to Forums: the same text as VB's Export window for each format (DDO Forums,
+      Code Tags, Plain Text, Reddit, Something Awful, The Vault) and each section; Copy to Clipboard
+      ("Copied!" for a second) and Save to File (Windows-1252 text).
+- [ ] The text box can be edited, and changes to the build replace it (as VB's Cascade).
+- [ ] File › Export › Leveling Guide › csv and txt, and the guide tab's Export link: the same files
+      as VB's, asking before overwriting, then opening the file.
+- [ ] **VB bug to confirm:** a txt guide export where every tree name has 5 letters or fewer (e.g.
+      only Human) stops with an error in VB (the centred "Tree" heading).
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.

@@ -85,6 +85,7 @@ fun main(args: Array<String>) {
     // The enhancement trees tab: drag two trees into slots, then swap them.
     val trees = TreeSlotsState(data, readTreeHeaders(DirectoryDataSource(repoRoot.resolve("Data"))), state)
     val prototype = PrototypeState(data, state, trees, ScriptPrompts)
+    prototype.formats = loadFormats(repoRoot.resolve("Settings"))
     ImageComposeScene(width = 900, height = 640, density = Density(1f)) { TreeSlotsWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("4-trees-start.png"))
 
@@ -124,6 +125,16 @@ fun main(args: Array<String>) {
         save(scene, outDir.resolve("7b-opened-main-feats.png"))
         prototype.outputView = ddolite.builder.output.OutputView.ALL
     }
+    // The Export window (File > Export > to Forums), and the Plain Text format.
+    prototype.export.open()
+    ImageComposeScene(width = 815, height = 518, density = Density(1f)) { ddolite.prototype.skills.ExportWindowContent(prototype, {}, {}) }.use { scene ->
+        save(scene, outDir.resolve("7c-export-forums.png"))
+        prototype.export.chooseFormat("Plain Text")
+        save(scene, outDir.resolve("7d-export-plain.png"))
+        println("Export formats: " + prototype.export.formatItems() + "; now " + prototype.export.currentFormatName())
+        prototype.export.chooseFormat("DDO Forums")
+    }
+    prototype.export.close()
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))
     }

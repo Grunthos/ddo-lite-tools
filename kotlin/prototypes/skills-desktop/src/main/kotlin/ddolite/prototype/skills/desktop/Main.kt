@@ -40,6 +40,8 @@ import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
 import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.MessagesWindowContent
+import ddolite.prototype.skills.ExportWindowContent
+import ddolite.prototype.skills.OutputFormats
 import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
@@ -82,10 +84,12 @@ fun main(args: Array<String>) {
     val prompts = DesktopPrompts { KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow }
     val state = PrototypeState(data, skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills), prompts)
     val files = BuildFiles(data, repoRoot.resolve("Save").toFile())
+    val exports = Exports(files)
+    state.formats = loadFormats(repoRoot.resolve("Settings"))
     val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files, icons)
+        BuilderWindows(state, files, exports, icons)
     }
 }
 
@@ -252,7 +256,7 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, icons: Map<String, ImageBitmap>) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, icons: Map<String, ImageBitmap>) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
@@ -287,6 +291,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Item("New...", mnemonic = 'N', shortcut = KeyShortcut(Key.N, ctrl = true), onClick = {
                     windows.closeAll()
                     state.messages.close() // CloseForm "All" closes frmDeprecate too
+                    state.export.close()
                     if (files.new(window, state)) {
                         openScreen(EditScreen.OVERVIEW, state, windows)
                     }
@@ -296,11 +301,25 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                     if (files.close(window, state)) {
                         windows.closeAll()
                         state.messages.close()
+                        state.export.close()
                     }
                 })
                 Separator()
                 Item("Save", mnemonic = 'S', shortcut = KeyShortcut(Key.S, ctrl = true), enabled = state.opened != null, onClick = { files.save(window, state) })
                 Item("Save As...", mnemonic = 'A', enabled = state.opened != null, onClick = { files.saveAs(window, state) })
+                Separator()
+                // The Export submenu (frmMain.frm:219). Ron's Planner and DDO Builder aren't ported yet.
+                Menu("Export", mnemonic = 'E', enabled = state.opened != null) {
+                    Item("to Forums...", mnemonic = 'F', onClick = { state.export.open() })
+                    Item("to Ron's Planner...", mnemonic = 'R', enabled = false, onClick = {})
+                    Item("to DDO Builder...", mnemonic = 'D', enabled = false, onClick = {})
+                    Separator()
+                    // EnableMenus (basDocuments.bas:266): only with a guide.
+                    Menu("Leveling Guide", mnemonic = 'G', enabled = (state.rules?.build?.guide?.enhancements?.size ?: 0) > 0) {
+                        Item("csv", mnemonic = 'c', onClick = { exports.exportGuide(window, state, "csv") })
+                        Item("txt", mnemonic = 't', onClick = { exports.exportGuide(window, state, "txt") })
+                    }
+                }
                 Separator()
                 Item("Exit", mnemonic = 'x', onClick = {
                     if (!files.checkDirty(window, state)) {
@@ -335,7 +354,18 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                         Item(screen.title.removeSuffix("..."), onClick = { windows.show(screen.screen) })
                     }
                 }
-                if (state.messages.isOpen) {
+                if (state.export.isOpen) {
+        // frmExport: the client area is 815 x 518 at 100%.
+        Window(
+            onCloseRequest = { state.export.close() },
+            title = "Export",
+            resizable = false,
+            state = rememberWindowState(position = WindowPosition(520.dp, 100.dp), width = 831.dp, height = 561.dp),
+        ) {
+            ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
+        }
+    }
+    if (state.messages.isOpen) {
                     Item("Messages", onClick = { messagesWindow[0]?.toFront() })
                 }
             }
@@ -382,7 +412,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {
         // The form's client area is 815 x 555 at 100%.
         ScreenWindow(windows, state, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
-            EnhancementsWindowContent(state) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
+            EnhancementsWindowContent(state, onExportGuide = { exports.exportGuide(windows.awtWindows[BuildScreen.ENHANCEMENTS] ?: mainWindow[0]!!, state, "csv") }) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
         }
     }
     if (state.messages.isOpen) {
@@ -481,6 +511,22 @@ internal fun loadClassIcons(): Map<String, ImageBitmap> {
 
 /** Something in this module to find resources from. */
 private object BuilderIcons
+
+/** The .bbcodes files in [settings] by name, as Dir lists them (sorted). GetFormatNames (clsConfig.cls:2600). */
+internal fun loadFormats(settings: Path): OutputFormats {
+    val list = ArrayList<Pair<String, String>>()
+    try {
+        Files.newDirectoryStream(settings, "*.bbcodes").use { files ->
+            for (file in files) {
+                list.add(Pair(file.fileName.toString().removeSuffix(".bbcodes"), decodeText(Files.readAllBytes(file)).text))
+            }
+        }
+    } catch (e: Exception) {
+        // No Settings folder: just the built-in formats.
+    }
+    list.sortBy { it.first.lowercase() }
+    return OutputFormats(list)
+}
 
 /** Every .screen file in [settings], with "Black" first (VB's default theme, clsConfig.LoadColors). */
 private fun loadThemes(settings: Path): List<Theme> {
