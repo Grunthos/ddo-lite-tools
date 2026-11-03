@@ -19,6 +19,7 @@ Needs JDK 21. The Android target also needs the Android SDK: set `ANDROID_HOME`,
 ```
 ./gradlew build                  # compile all targets, run all tests
 ./gradlew :tools:validate:run    # check ../Data for problems
+./gradlew jvmCoverage           # test coverage: build/reports/jacoco/jvmCoverage in each module
 ```
 
 ## Modules
@@ -44,6 +45,9 @@ later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io
 - **Plain Kotlin.** Write code that readers from Java, C# or VB can follow: loops, `if`
   statements, explicit null checks and named variables. Use Kotlin idioms (lambdas,
   scope functions like `let`/`apply`, operator chains) only where they're genuinely clearer or faster.
+- **Name what you return.** Return a small class with named fields, not `Pair`/`Triple` (`.first`,
+  `.second` tell the reader nothing). Don't use `!!`: check for null into a local, or throw an error
+  that names the impossible case.
 - **Copy VB behaviour exactly first.** Use `Vb.trim`, `Vb.split`, `Vb.isNumeric`, `Vb.valOf`,
   `Vb.cLng` rather than the Kotlin equivalents wherever the difference could change a result.
   Improve on VB only once tests prove the behaviour is unchanged.
