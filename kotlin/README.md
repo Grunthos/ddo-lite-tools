@@ -48,10 +48,11 @@ later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io
   `Vb.cLng` rather than the Kotlin equivalents wherever the difference could change a result.
   Improve on VB only once tests prove the behaviour is unchanged.
 
-## The Character Builder app (still in the `prototypes` modules)
+## The Character Builder app
 
-Started as the Compose test drive (PLAN.md §8.2) and grew into the Builder; the modules are to be renamed
-in the tidy-up step.
+Started as the Compose test drive (PLAN.md §8.2) and grew into the Builder. The rules are all in
+`builder-core`: the screens' state classes in `builder-ui` hold only what a window shows and call
+`builder-core` to change the build, and every change goes into the undo history (`BuildHistory`).
 
 It reads `Data/` and `Settings/` from the repository (or next to the .exe), and writes only its own files
 there: `Settings-Kotlin.txt` (started from VB's Settings.txt the first time), `Error-Kotlin.log` and
@@ -59,14 +60,14 @@ there: `Settings-Kotlin.txt` (started from VB's Settings.txt the first time), `E
 opened at start.
 
 ```
-./gradlew :prototypes:skills-desktop:run           # open the prototype window
-./gradlew :prototypes:skills-desktop:portableZip   # portable Windows app: build/portable/ (folder + zip, .exe with its own Java runtime)
-./gradlew :prototypes:skills-desktop:screenshots   # render it off-screen with simulated clicks → build/screenshots
-./gradlew :prototypes:skills-android:assembleDebug # Android APK (same screens, data bundled)
+./gradlew :builder-desktop:run           # open the Character Builder
+./gradlew :builder-desktop:portableZip   # portable Windows app: build/portable/ (folder + zip, .exe with its own Java runtime)
+./gradlew :builder-desktop:screenshots   # render it off-screen with simulated clicks → build/screenshots
+./gradlew :builder-android:assembleDebug # Android APK (same screens, data bundled)
 ```
 
 | Module | What it is |
 |---|---|
-| `prototypes/skills-ui` | The screens and their state (desktop + Android): every Builder window |
-| `prototypes/skills-desktop` | The desktop app (windows, menus, file dialogs, settings file) and the off-screen screenshot tool |
-| `prototypes/skills-android` | Android app wrapping the same screens |
+| `builder-ui` | The screens and their state (desktop + Android): every Builder window |
+| `builder-desktop` | The desktop app (windows, menus, file dialogs, settings file) and the off-screen screenshot tool |
+| `builder-android` | Android app wrapping the same screens |

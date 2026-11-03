@@ -15,7 +15,7 @@ Convert Builds and Colors, and is ready for a side-by-side comparison with VB (c
 [TESTING.md](TESTING.md), VB bugs found in [VB-BUGS.md](VB-BUGS.md)). Everything is committed on the
 `kotlin` branch; nothing is pushed.
 
-**Built** (rules in `builder-core`, screens in `prototypes/skills-ui`, the app in `prototypes/skills-desktop`):
+**Built** (rules in `builder-core`, screens in `builder-ui`, the app in `builder-desktop`):
 - All data files and the `ProcessData` checks; `.build` reading and writing (byte for byte on current files);
   renamed/removed items and the Messages window.
 - Windows: Overview, Stats (with Customize and user templates), Skills, Feats, Spells, Enhancements (with the
@@ -42,9 +42,14 @@ UI ideas for after parity (one window with navigation, editor and output; proble
 3. [x] Settings and Options.
 4. [x] Import and the format editor.
 5. [x] Help, Tools and loose ends (B8 below), except the child-windows option.
-6. [ ] **Compare with VB** (Philip, using TESTING.md); fix what's found.
-7. [ ] Logic/screen tidy-up: move the rules still in the `*ScreenState` classes into `builder-core`; make
-       the windows dialogs owned by the main window (the child-windows option); rename the prototype modules.
+6. [ ] **Compare with VB** (Philip, using TESTING.md): started 2026-11-04 (findings below), paused for the
+       tidy-up; to carry on with the tidied version.
+7. [x] Logic/screen tidy-up (2026-11-05): the build edits left in the screens moved to `builder-core`
+       (`TreeEdits` for Enhancements and Destinies, SpellRules, OverviewRules, StatRules, SkillTomes); undo
+       and redo (`BuildHistory`, Edit menu, Ctrl+Z / Ctrl+Y); the modules renamed `builder-ui`,
+       `builder-desktop`, `builder-android` (packages `ddolite.builder.ui` …, the session class
+       `BuilderSession`, the exe `CharacterBuilderKotlin`). Still to do from it: the child-windows option
+       (the windows made dialogs owned by the main one), and screens that fill their window (UI-IDEAS.md §3).
 8. [ ] Packaging (portable zip with Data/ and Settings/, file association for .build).
 9. [ ] Android; then Cannith Crafting and the Compendium.
 
@@ -433,7 +438,7 @@ through them in the order of frmMain's **Edit** menu (`frmMain.frm:311`, handler
   Destiny: Destiny Trees;Destinies), right links such as Help (and Contrast on Skills); and a **footer** with
   "< previous" / "next >" links in Edit-menu order, which open the neighbouring window and close this one
   (`usrFooter_Click`), so the windows also work as a step-by-step wizard. The F2 widget kit needs this as
-  one shared `HeaderBar` (prototype: `prototypes/skills-ui/HeaderBar.kt`).
+  one shared `HeaderBar` (prototype: `builder-ui/HeaderBar.kt`).
 - **Gating** (`basMain.OpenForm`, Build/basMain.bas:131): a window only opens once the earlier steps make
   sense – Stats/Skills/Feats/Enhancements need a race; Stats/Skills/Feats/Spells/Enhancements need a class
   at level 1; Skills/Feats need all build points spent in Stats; Spells needs a caster; Destiny needs
@@ -525,14 +530,14 @@ the problem is fundamental.**
       (AWT on desktop, ClipData on Android), so shared code would need per-platform versions. A small
       shared implementation (`DragAndDrop.kt`, ~150 lines) works the same for mouse and touch; use that.
       The ability-onto-slot drag uses the same mechanism and is left for F3.
-- [x] 4. Android: the same screens build into an APK (`:prototypes:skills-android:assembleDebug`) with the
+- [x] 4. Android: the same screens build into an APK (`:builder-android:assembleDebug`) with the
       data bundled as assets. **Run on the Pixel 3a API 34 emulator (2026-11-02):** data loads, theme
       draws, tapping cells adds points, touch-dragging a tree into a slot works (same shared code as desktop).
       As expected the desktop layout doesn't fit a phone (only 8 level columns show, buttons wrap, the
       tree-slot column is squeezed): phone layouts are phase G work, not a toolkit problem.
       Other mouse buttons still need §2a.5 alternatives.
       Emulator from Git Bash: set `ANDROID_AVD_HOME=C:\Users\pjw\.android\avd` (Cygwin's HOME hides the AVDs).
-- [x] Portable Windows app: `:prototypes:skills-desktop:portableZip` builds `CharacterBuilderPrototype.exe` with its own
+- [x] Portable Windows app: `:builder-desktop:portableZip` builds `CharacterBuilderKotlin.exe` with its own
       Java runtime and Data/ + Settings/ beside it (zip 55 MB, 122 MB unpacked). Unzipped outside the repo and
       started from another folder, it finds its data next to the .exe and runs (2026-11-02). Figures for D-11.
 - [x] Multi-window shell like the VB Builder (§8.0): main window with File / Edit / Window menus and an output
@@ -547,7 +552,7 @@ the problem is fundamental.**
       the press restarts the drag handler and the drag is lost.
 - [ ] 100%/150% display scaling check, by eye on a real desktop (the off-screen renderer runs at 100%).
 - **Findings for later:** AndroidX Compose needs `compileSdk` 37 (UI modules only); the default font is used
-  (Verdana not yet bundled, F2); an off-screen renderer (`:prototypes:skills-desktop:screenshots`) can
+  (Verdana not yet bundled, F2); an off-screen renderer (`:builder-desktop:screenshots`) can
   drive the UI with simulated clicks and save PNGs, which is useful for UI regression checks in F3/F4.
 - **Recommendation:** confirm D-2 (Compose Multiplatform) once the Android run and the scaling check pass.
 

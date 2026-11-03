@@ -1,7 +1,7 @@
 # Manual checks: Kotlin against VB
 
 Things to compare by hand when there's time. Run the Kotlin version with
-`./gradlew :prototypes:skills-desktop:run` (from `kotlin/`), and the VB Character Builder Lite next to it
+`./gradlew :builder-desktop:run` (from `kotlin/`), and the VB Character Builder Lite next to it
 on the same build. Tick items off, or note what differs under the item.
 
 The most useful first pass: open each file in `Save/` in both, then go through the windows in order and
@@ -223,7 +223,7 @@ look for anything different.
       end the program without saving (Task Manager). At the next start: "A backup build was autosaved.
       Open it now?"; Yes opens it unsaved with no file name; No deletes it. (Kotlin's file is
       Backup-Kotlin.build; VB's Backup.bld is left alone.)
-- [ ] Command line: `CharacterBuilderPrototype.exe "Kensei Warpriest.build"` opens it (a bare name is
+- [ ] Command line: `CharacterBuilderKotlin.exe "Kensei Warpriest.build"` opens it (a bare name is
       looked for in the program's folder, then Save).
 - [ ] Stats › Customize: Edit Custom Templates (copies the shipped file to Save\Templates.txt and opens
       it), Reload Templates, Delete Custom Templates (only with a custom file), Edit System Templates.

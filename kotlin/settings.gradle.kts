@@ -21,7 +21,7 @@ include(
     ":builder-core",
     ":tools:validate",
     ":tools:form-layout",
-    ":prototypes:skills-ui",
-    ":prototypes:skills-desktop",
-    ":prototypes:skills-android",
+    ":builder-ui",
+    ":builder-desktop",
+    ":builder-android",
 )
