@@ -71,9 +71,17 @@ class PrototypeState(
         set(value) {
             dirtyState = value
             if (!value) {
+                history.markSaved()
                 onDeleteBackup()
             }
         }
+
+    /** Undo and redo for the open build (new: VB has none). */
+    val history = ddolite.builder.build.BuildHistory(data)
+
+    /** Bumped when the history changes, so Edit › Undo and Redo enable and disable. */
+    var historyRevision by mutableIntStateOf(0)
+        private set
 
     /** The platform's autosave: write the backup (SaveBackup's SaveBuild), and delete it (DeleteBackup). */
     var onSaveBackup: () -> Unit = {}
@@ -174,6 +182,7 @@ class PrototypeState(
     fun importBuild(result: BuildLoadResult) {
         show(result)
         dirty = true
+        history.markUnsaved()
     }
 
     /** Shows an opened build in every screen. */
@@ -191,16 +200,27 @@ class PrototypeState(
     fun restoreBackup(result: BuildLoadResult) {
         openBuild(result)
         dirty = true
+        history.markUnsaved()
     }
 
     /** No build open (basDocuments.BuildClose, :99). */
     fun closeBuild() {
         opened = null
         dirty = false
+        history.clear()
+        historyRevision++
         revision++
     }
 
+    /** Shows a newly opened, new or imported build; its undo history starts again. */
     private fun show(result: BuildLoadResult) {
+        history.reset(result.build)
+        historyRevision++
+        display(result)
+    }
+
+    /** Every screen shows [result]. */
+    private fun display(result: BuildLoadResult) {
         opened = result
         overview.opened()
         stats.refresh()
@@ -214,11 +234,51 @@ class PrototypeState(
     }
 
     /**
+     * After every change to the build: its state goes into the undo history. The Skills grid keeps
+     * its own copy of the points, so they'"'"'re copied back first.
+     */
+    private fun recordChange(mergeKey: String? = null) {
+        val result = opened ?: return
+        skills.storeInto(result.build)
+        history.record(result.build, mergeKey)
+        historyRevision++
+    }
+
+    /** Edit › Undo: the build as it was before the last change. */
+    fun undo() {
+        showHistory(history.undo())
+    }
+
+    /** Edit › Redo: the change undone last, again. */
+    fun redo() {
+        showHistory(history.redo())
+    }
+
+    /**
+     * Shows a state from the history in every window, as if just opened (selections are cleared and
+     * windows that no longer apply close). It'"'"'s unsaved unless it'"'"'s the state last saved.
+     */
+    private fun showHistory(state: Pair<Build, BuildRules>?) {
+        if (state == null) {
+            return
+        }
+        display(BuildLoadResult(state.first, state.second, Deprecations(), emptyList()))
+        if (history.atSaved) {
+            dirtyState = false
+            onDeleteBackup()
+        } else {
+            dirtyState = true
+        }
+        export.refreshIfChanged()
+        historyRevision++
+    }
+
+    /**
      * The build changed. [change] is what VB passes to CascadeChanges, or null for a change that
      * doesn't cascade (the name, the notes). The build rules have already run; this refreshes the
      * screens, marks the build dirty and lets the app close windows that no longer apply.
      */
-    fun buildChanged(change: CascadeChange?) {
+    fun buildChanged(change: CascadeChange?, mergeKey: String? = null) { // [mergeKey]: see BuildHistory.record
         // VB cascades to the Stats window only for these (CascadeChanges, basMain.bas:282).
         if (change == CascadeChange.ALL || change == CascadeChange.CLASS || change == CascadeChange.RACE || change == CascadeChange.MAX_LEVEL) {
             stats.refresh()
@@ -239,6 +299,7 @@ class PrototypeState(
             enhancements.cascade()
         }
         dirty = true
+        recordChange(mergeKey)
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
         if (change != null) {
@@ -282,6 +343,7 @@ class PrototypeState(
         val result = opened ?: return
         skills.storeInto(result.build)
         dirty = true
+        recordChange()
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
         val r = rules ?: return
@@ -297,6 +359,7 @@ class PrototypeState(
         val result = opened ?: return
         trees.storeInto(result.rules)
         dirty = true
+        recordChange()
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
@@ -330,6 +393,7 @@ class PrototypeState(
     /** A window changed the build without a cascade (VB's SetDirty alone). */
     fun markDirty() {
         dirty = true
+        recordChange()
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }
@@ -339,6 +403,7 @@ class PrototypeState(
         val result = opened ?: return
         trees.openBuild(result.build)
         dirty = true
+        recordChange()
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
     }

@@ -128,14 +128,14 @@ class OverviewScreenState(private val session: PrototypeState) {
     fun setName(name: String) {
         val r = rules ?: return
         r.build.buildName = name
-        session.buildChanged(null)
+        session.buildChanged(null, mergeKey = "name") // typing makes one undo step
     }
 
     /** txtNotes_Change (:1675). */
     fun setNotes(notes: String) {
         val r = rules ?: return
         r.build.notes = notes
-        session.buildChanged(null)
+        session.buildChanged(null, mergeKey = "notes")
     }
 
     /** The race list's rows (userRaceCombo.InitRows), made when a build is opened. */

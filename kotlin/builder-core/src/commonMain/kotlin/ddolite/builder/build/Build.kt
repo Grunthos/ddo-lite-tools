@@ -268,4 +268,88 @@ class Build {
         }
         return null
     }
+
+    /**
+     * A copy sharing nothing that can change (the data's races, classes and the immutable
+     * [BuildAbility] values are shared). New code, for undo: VB has no undo.
+     */
+    fun deepCopy(): Build {
+        val c = Build()
+        c.notes = notes
+        c.buildName = buildName
+        c.race = race
+        c.alignment = alignment
+        c.maxLevels = maxLevels
+        buildClasses.copyInto(c.buildClasses)
+        levelClasses.copyInto(c.levelClasses)
+        bab.copyInto(c.bab)
+        for (i in statPoints.indices) {
+            statPoints[i].copyInto(c.statPoints[i])
+        }
+        statTotals.copyInto(c.statTotals)
+        c.buildPoints = buildPoints
+        includePoints.copyInto(c.includePoints)
+        levelups.copyInto(c.levelups)
+        tomes.copyInto(c.tomes)
+        c.tomeAll = tomeAll
+        for (i in skills.indices) {
+            skills[i].copyInto(c.skills[i])
+        }
+        skillTomes.copyInto(c.skillTomes)
+        for (i in feats.indices) {
+            for (f in feats[i]) {
+                c.feats[i].add(f.copy())
+            }
+        }
+        canCastSpell.copyInto(c.canCastSpell)
+        for (s in classSpells) {
+            val cs = BuildClassSpells(s.characterClass)
+            cs.classLevels = s.classLevels
+            cs.maxSpellLevel = s.maxSpellLevel
+            for (level in s.levels) {
+                val cl = BuildSpellLevel()
+                for (slot in level.slots) {
+                    cl.slots.add(slot.copy())
+                }
+                cl.baseSlots = level.baseSlots
+                cl.freeSlots = level.freeSlots
+                cl.mandatory = level.mandatory
+                cs.levels.add(cl)
+            }
+            c.classSpells.add(cs)
+        }
+        for (t in trees) {
+            c.trees.add(copyTree(t))
+        }
+        for (t in guide.trees) {
+            c.guide.trees.add(BuildGuideTree(t.treeName, t.characterClass))
+        }
+        for (e in guide.enhancements) {
+            val ce = BuildGuideEnhancement(e.id)
+            ce.tier = e.tier
+            ce.ability = e.ability
+            ce.selector = e.selector
+            ce.rank = e.rank
+            c.guide.enhancements.add(ce)
+        }
+        c.tier5 = tier5
+        c.racialAP = racialAP
+        c.universalAP = universalAP
+        for (t in destinies) {
+            c.destinies.add(copyTree(t))
+        }
+        c.destinyTier5 = destinyTier5
+        c.destinyAP = destinyAP
+        c.permDestinyPoints = permDestinyPoints
+        return c
+    }
+
+    private fun copyTree(t: BuildTree): BuildTree {
+        val c = BuildTree(t.treeName)
+        c.treeType = t.treeType
+        c.source = t.source
+        c.classLevels = t.classLevels
+        c.abilities.addAll(t.abilities)
+        return c
+    }
 }

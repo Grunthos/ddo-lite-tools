@@ -26,5 +26,8 @@ kotlin {
             api(compose.foundation)
             api(compose.ui)
         }
+        jvmTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }

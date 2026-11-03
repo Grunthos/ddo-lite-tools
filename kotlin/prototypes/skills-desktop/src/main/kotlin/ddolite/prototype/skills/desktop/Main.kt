@@ -284,6 +284,26 @@ private fun appCaption(files: BuildFiles, state: PrototypeState): String {
  * Keyboard shortcuts on the main window: a plain letter opens a screen.
  * Ported from frmMain.Form_KeyDown (frmMain.frm:751); Escape (VB: unload frmMain) isn't copied.
  */
+/**
+ * Ctrl+Z (undo) and Ctrl+Y or Ctrl+Shift+Z (redo) in a window other than the main one, whose menu
+ * shortcuts only work while it has the focus. A text box being edited takes these keys first for its
+ * own text. New: VB has no undo.
+ */
+private fun undoKey(event: KeyEvent, state: PrototypeState): Boolean {
+    if (event.type != KeyEventType.KeyDown || !event.isCtrlPressed) {
+        return false
+    }
+    if (event.key == Key.Z && !event.isShiftPressed) {
+        state.undo()
+        return true
+    }
+    if (event.key == Key.Y || (event.key == Key.Z && event.isShiftPressed)) {
+        state.redo()
+        return true
+    }
+    return false
+}
+
 private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: PrototypeState): Boolean {
     if (event.type != KeyEventType.KeyDown) {
         return false
@@ -469,6 +489,12 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 }
             }
             Menu("Edit", mnemonic = 'E') {
+                // New: VB has no undo. Ctrl+Z and Ctrl+Y also work in the build windows (undoKey).
+                @Suppress("UNUSED_VARIABLE")
+                val historyRevision = state.historyRevision
+                Item("Undo", mnemonic = 'U', shortcut = KeyShortcut(Key.Z, ctrl = true), enabled = state.history.canUndo, onClick = { state.undo() })
+                Item("Redo", mnemonic = 'R', shortcut = KeyShortcut(Key.Y, ctrl = true), enabled = state.history.canRedo, onClick = { state.redo() })
+                Separator()
                 for (screen in EditScreen.entries) {
                     Item(screen.title, mnemonic = screen.mnemonic, enabled = menuEnabled(screen, state), onClick = { openScreen(screen, state, windows) })
                 }
@@ -713,6 +739,7 @@ private fun ScreenWindow(
             }
         },
         title = title,
+        onKeyEvent = { event -> undoKey(event, state) },
         // The Edit windows are Fixed Dialogs in VB (BorderStyle 3): no resizing or maximizing.
         resizable = false,
         state = rememberWindowState(position = dialogPosition(state.settings, x, y), width = width.dp, height = height.dp),
