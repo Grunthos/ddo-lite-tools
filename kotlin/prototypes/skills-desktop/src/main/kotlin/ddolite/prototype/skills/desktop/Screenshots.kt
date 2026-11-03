@@ -137,6 +137,7 @@ fun main(args: Array<String>) {
     enhancementsScreenshots(prototype, repoRoot, outDir)
     spellsScreenshots(prototype, repoRoot, outDir)
     destinyScreenshots(prototype, repoRoot, outDir)
+    messagesScreenshots(prototype, repoRoot, outDir)
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
 

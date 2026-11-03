@@ -308,7 +308,7 @@ private fun <T> SlotBox(
  * A ListBox in the controls colours, with Windows' selection colours. An item is chosen as the
  * button goes down; [onPress] also gets whether Ctrl was held. [itemColumn] puts text after a tab
  * at that x (a ListBox's tab stops). [dragItem] lets an item be dragged; [dropKey] makes the list a
- * drop target.
+ * drop target. A list that isn't [enabled] shows its items dim and ignores the mouse.
  */
 @Composable
 fun <T> ListBox(
@@ -327,6 +327,7 @@ fun <T> ListBox(
     onDrop: (T, Any?) -> Unit = { _, _ -> },
     dropKey: Any? = null,
     itemColumn: Int = 0,
+    enabled: Boolean = true,
 ) {
     var modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
     if (dropKey != null) {
@@ -343,16 +344,19 @@ fun <T> ListBox(
             for (i in items.indices) {
                 var back = Color.Transparent
                 var color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
+                if (!enabled) {
+                    color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM)
+                }
                 if (isSelected(i)) {
                     back = HIGHLIGHT
                     color = HIGHLIGHT_TEXT
                 }
                 var itemModifier = Modifier.size((width - 2).dp, 15.dp).background(back)
-                    .pointerInput(i, items.size) {
+                    .pointerInput(i, items.size, enabled) {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                if (event.type == PointerEventType.Press) {
+                                if (event.type == PointerEventType.Press && enabled) {
                                     buttons[0] = pressedButton(event)
                                     if (buttons[0] == PointerButton.PRIMARY && clicks.isDoubleClick(i)) {
                                         onDoubleClick(i)

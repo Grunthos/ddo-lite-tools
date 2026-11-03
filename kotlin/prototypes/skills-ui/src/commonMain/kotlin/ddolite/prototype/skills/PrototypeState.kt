@@ -78,6 +78,9 @@ class PrototypeState(
 
     val destiny = DestinyScreenState(this)
 
+    /** The Messages window (frmDeprecate) and VB's gtypDeprecate. */
+    val messages = MessagesScreenState(this)
+
     init {
         skills.onChanged = { skillsChanged() }
         trees.onChanged = { storeTrees() }
@@ -104,6 +107,7 @@ class PrototypeState(
     fun openBuild(result: BuildLoadResult) {
         show(result)
         dirty = false
+        messages.buildOpened(result.deprecations)
     }
 
     /** No build open (basDocuments.BuildClose, :99). */

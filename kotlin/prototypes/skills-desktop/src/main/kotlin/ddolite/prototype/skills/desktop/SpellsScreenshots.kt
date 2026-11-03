@@ -47,7 +47,7 @@ fun spellsScreenshots(prototype: PrototypeState, repoRoot: Path, outDir: Path) {
         }
         shot(scene, outDir.resolve("42-spells-after.png"))
     }
-    val eresh = save.resolve("Eresh WFWizRog.build")
+    val eresh = save.resolve("Eresh WFWizRog-v4.15.build")
     if (Files.exists(eresh)) {
         prototype.openBuild(readBuildFile(Files.readAllBytes(eresh), prototype.data, BuildPoints.ADVENTURER))
         screen.opened()

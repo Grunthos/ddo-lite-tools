@@ -36,6 +36,7 @@ import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
 import ddolite.dataformat.decodeText
 import ddolite.prototype.skills.MainWindowContent
+import ddolite.prototype.skills.MessagesWindowContent
 import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
@@ -249,6 +250,7 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, icons: Map<String, ImageBitmap>) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     // The window part of CascadeChanges: close the screens that no longer make sense.
     state.onCascade = { change ->
         for (screen in BuildScreen.entries) {
@@ -276,6 +278,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             Menu("File", mnemonic = 'F') {
                 Item("New...", mnemonic = 'N', shortcut = KeyShortcut(Key.N, ctrl = true), onClick = {
                     windows.closeAll()
+                    state.messages.close() // CloseForm "All" closes frmDeprecate too
                     if (files.new(window, state)) {
                         openScreen(EditScreen.OVERVIEW, state, windows)
                     }
@@ -284,6 +287,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Item("Close", mnemonic = 'C', enabled = state.opened != null, onClick = {
                     if (files.close(window, state)) {
                         windows.closeAll()
+                        state.messages.close()
                     }
                 })
                 Separator()
@@ -304,6 +308,11 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             // frmMain's Tools menu (frmMain.frm:357). VB's Colors... opens a dialog for editing colours;
             // here it lists the themes in Settings/ to choose from.
             Menu("Tools", mnemonic = 'T') {
+                // Messages... shows only while there are messages to resolve (UpdateToolsMenu, frmMain.frm:603).
+                if (state.messages.deprecated) {
+                    Item("Messages...", mnemonic = 'M', onClick = { state.messages.showDeprecated() })
+                    Separator()
+                }
                 Menu("Colors", mnemonic = 'C') {
                     val skills = state.skills
                     for (i in skills.themes.indices) {
@@ -317,6 +326,9 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                     if (windows.isOpen(screen.screen)) {
                         Item(screen.title.removeSuffix("..."), onClick = { windows.show(screen.screen) })
                     }
+                }
+                if (state.messages.isOpen) {
+                    Item("Messages", onClick = { messagesWindow[0]?.toFront() })
                 }
             }
         }
@@ -363,6 +375,19 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         // The form's client area is 815 x 555 at 100%.
         ScreenWindow(windows, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
             EnhancementsWindowContent(state) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
+        }
+    }
+    if (state.messages.isOpen) {
+        // frmDeprecate: the client area is 815 x 517 at 100%; a fixed dialog, opened after a build file
+        // with things the data no longer has (tmrDeprecate, frmMain.frm:673) or from Tools › Messages.
+        Window(
+            onCloseRequest = { state.messages.close() },
+            title = "Messages",
+            resizable = false,
+            state = rememberWindowState(position = WindowPosition(500.dp, 120.dp), width = 831.dp, height = 560.dp),
+        ) {
+            messagesWindow[0] = window
+            MessagesWindowContent(state)
         }
     }
 }

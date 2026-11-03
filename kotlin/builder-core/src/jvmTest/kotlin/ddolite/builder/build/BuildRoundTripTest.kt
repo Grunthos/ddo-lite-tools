@@ -58,7 +58,8 @@ class BuildRoundTripTest {
      * The samples were saved by older versions against older data, so they don't come back
      * byte for byte. Every difference must be one of: the Levelup line for level 36 (MAX_LEVELUPS
      * went from 8 to 9), a line for something the current data no longer has (each one recorded as
-     * deprecated), or a feat renamed by NameChange.txt.
+     * deprecated), a feat renamed by NameChange.txt, a selector dropped from a feat that no longer
+     * has selectors, or the DestinyTier5 line (which VB doesn't read).
      */
     @Test
     fun differencesFromVbAreExplained() {
@@ -72,13 +73,29 @@ class BuildRoundTripTest {
             var removedFeats = 0
             var removedGuide = 0
             val added = ArrayList<String>()
+            // A selector on a feat that no longer has selectors is dropped without a message
+            // (FindFeat, basFormatLite.bas:970): "-Standard: …\tFeat: Selector" with "+Standard: …\tFeat".
+            val remaining = ArrayList(differences)
             for (line in differences) {
+                val tab = line.indexOf('\t')
+                val colon = line.indexOf(':', tab + 1)
+                if (line.startsWith("-Standard: ") && tab > 0 && colon > 0) {
+                    val without = "+" + line.substring(1, colon)
+                    if (remaining.contains(without)) {
+                        remaining.remove(without)
+                        remaining.remove(line)
+                    }
+                }
+            }
+            for (line in remaining) {
                 if (line.startsWith("-Ability: ")) {
                     removedAbilities++
                 } else if (line.startsWith("-Guide: ")) {
                     removedGuide++
                 } else if (line.startsWith("-Standard: ")) {
                     removedFeats++
+                } else if (line.startsWith("-DestinyTier5: ")) {
+                    // VB writes DestinyTier5 but LoadDestinyText never reads it (VB-BUGS 18f).
                 } else if (line.startsWith("+")) {
                     added.add(line)
                 } else {

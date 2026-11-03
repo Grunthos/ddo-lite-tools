@@ -556,6 +556,9 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * Ported from `LoadDestinyText` (basFormatLite.bas:1134), including its fix for builds that
      * name the destiny "Macrotechnic" (4.4 and earlier). An ability line before any "Destiny:" line
      * is a VB "Subscript out of range" problem.
+     *
+     * VB bug, kept: there's no case for "DestinyTier5", which the writer saves, so the tier 5
+     * destiny is lost each time a build is opened (VB-BUGS 18f).
      */
     private fun loadDestiny() {
         when (field) {

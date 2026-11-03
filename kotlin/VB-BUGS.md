@@ -132,6 +132,12 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     window uses 11/12 consistently.) Deleting or resetting a destiny from the menu also leaves
     `DestinyTier5` set, as #12.
 
+18f. **The tier 5 destiny is lost every time a build is opened.** `Modules/Build/basFormatLite.bas:1134`
+    `LoadDestinyText` has no case for `destinytier5`, though `SaveDestinyLite` (:622) writes it; so
+    the choice is dropped on opening, and the next save leaves the line out. Seen in a real build: the
+    same build re-saved by VB 4.15 has lost its `DestinyTier5: Machrotechnic`. *Fix:*
+    `Case "destinytier5": build.DestinyTier5 = mstrValue`.
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`
@@ -154,6 +160,21 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
 22a. **Destiny Trees list puts the tier in the wrong column.** `Forms/Build/frmDestiny2.frm:887`
     `ShowDestinies` writes `GetMaxTier(i)` (always 5) to column 1, headed "Destiny", and nothing to
     the Tier column. *Fix:* `SetText i, 3, ...`.
+
+22b. **Choosing a replacement feat in Messages doesn't update an open Feats window.**
+    `Forms/Build/frmDeprecate.frm:811` `UpdateBuild` calls `CascadeChanges cceFeat`, which skips the
+    Feats window (it assumes the change came from there), so the slot still looks empty until something
+    else refreshes the window. *Fix:* call `frmFeats.Cascade` when it's open.
+
+22c. **Tools › Messages outlives the build.** `gtypDeprecate` is only reset when a `.build` is opened
+    (`basDocuments.bas:543`), so after File › New or Close, Tools › Messages still shows and reopens
+    the old build's messages; a feat chosen there goes into the new build's slot of the same number.
+    *Fix:* `DeprecateInit` in `BuildNew` and `BuildClose`, then `frmMain.UpdateToolsMenu`.
+
+22d. **The Messages window reloads itself, hidden, after the last message.** `frmDeprecate.frm:782`
+    `chkIgnore_Click` (and `UpdateBuild`) call `ShowMessages` after `ResolveMessage` has unloaded the
+    form, which loads it again without showing it. *Fix:* `If CountMessages() = 0 Then Exit Sub`
+    after `ResolveMessage`.
 
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.

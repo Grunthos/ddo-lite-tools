@@ -60,7 +60,7 @@ fun featsScreenshots(prototype: PrototypeState, kensei: ByteArray, repoRoot: Pat
         shot(scene, outDir.resolve("25-feats-channels.png"))
         feats.changeChannels(false)
     }
-    val eresh = repoRoot.resolve("Save").resolve("Eresh WFWizRog.build")
+    val eresh = repoRoot.resolve("Save").resolve("Eresh WFWizRog-v4.15.build")
     if (Files.exists(eresh)) {
         prototype.openBuild(readBuildFile(Files.readAllBytes(eresh), prototype.data, BuildPoints.ADVENTURER))
         feats.opened()

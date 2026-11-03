@@ -23,7 +23,7 @@ look for anything different.
 - [ ] Open each `.build` in `Save/` in Kotlin: no errors, the main window's summary matches what VB shows.
 - [ ] Save from Kotlin, open the saved file in VB: same build.
 - [ ] Save a build in a current VB, then open and save it in Kotlin: the file should be byte for byte the
-      same (it is for `Eresh WFWizRog.build`). More such files (casters, epic, Drow, multiclass, Iconic races)
+      same (it is for `Eresh WFWizRog-v4.15.build`). More such files (casters, epic, Drow, multiclass, Iconic races)
       make good automatic tests: drop them in `Save/` (or `kotlin/test-builds/` to commit them) and the
       round-trip tests use them.
 - [ ] File › New, Close, Save As, and quitting with unsaved changes (Yes / No / Cancel) behave as in VB.
@@ -131,6 +131,20 @@ look for anything different.
 - [ ] Add (double-click / drag, at most 3), swap, double-click to remove, the menu.
 - [ ] Destinies tab: slots, ranks, red slots, abilities offered, selectors, details (no level
       requirements, as VB), adding by double-click and drag, clearing, the tier 5 question.
+
+## 7b. Messages (builds with feats or enhancements the data no longer has)
+
+- [ ] Open `Save/Eresh WFWizRog-old-feats-and-ehhancements.build` in both: the Messages window opens
+      by itself with the same label ("2 Issues and 6 Messages"), the same list, and the same details.
+- [ ] Best Guess: the same feats in the same order; unticked, every selectable feat (none highlighted
+      until a message is clicked again); a feat with selectors lists them on the right.
+- [ ] Choose (with and without a selector chosen: "Choose a selector."), Ignore, and OK on a notice;
+      the label counts down; after the last one the window closes and Tools › Messages goes.
+- [ ] Tools › Messages reopens it while there are messages left.
+- [ ] **VB bug to confirm:** with the Feats window open, Choose a feat in Messages: the Feats window
+      still shows the slot empty (VB-BUGS 22b).
+- [ ] **VB bug to confirm:** after File › New, Tools › Messages is still there (22c).
+- [ ] **VB bug to confirm:** set a tier 5 destiny, save, reopen: it's gone (18f).
 
 ## 8. Display
 

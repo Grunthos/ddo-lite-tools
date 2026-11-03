@@ -650,6 +650,12 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         lists, details, drag, tier 5 question). `EnhancementRules` gained the destiny AP pool, epic and
         legendary levels, destiny tier 5 and the destiny details differences. VB bugs kept: 18d (no
         destiny AP at exactly level 30), 18e, 22a in `VB-BUGS.md`.
+      - [x] Messages (frmDeprecate, Tools › Messages): opens after a build file with feats, renames,
+        enhancements or a guide step the data no longer has; Best Guess (VB's Levenshtein distance and
+        its unstable QuickSort2, so ties come in VB's order) or every selectable feat, selectors,
+        Choose / Ignore / OK. Rules in `DeprecationMessages`, with tests. The binary-build groups (War
+        Soul, reset trees) aren't copied: the prototype doesn't read .bld files. VB bugs kept: 18f
+        (DestinyTier5 never read), 22b-d in `VB-BUGS.md`.
       - [ ] Destinies still open: Help, the mouse wheel, the ability list's scroll position. (VB's
         older frmDestiny, with twists and fate points, isn't used by the Edit menu.)
       - [ ] Enhancements still open: the Leveling Guide tab (about half of frmEnhancements, with
@@ -665,7 +671,7 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         feats; the Arcane Trickster exception in `CheckFeatSlot`; with no alignment the selector alignment
         check passes; a description with no wiki page links to the wiki's base address; after a change
         while on the Granted tab, the details box stays wide without its "<<" link.
-      - `Save/Eresh WFWizRog.build` (saved by a current VB) reads and writes back byte for byte: the first exact
+      - `Save/Eresh WFWizRog-v4.15.build` (saved by a current VB) reads and writes back byte for byte: the first exact
         golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`, plus
         `kotlin/test-builds/` (TEST.build, level 36, kept there after master removed it from `Save/`).
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
