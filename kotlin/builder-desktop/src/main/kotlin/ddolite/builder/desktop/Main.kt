@@ -597,7 +597,12 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {
         // The form's client area is 815 x 555 at 100%.
         ScreenWindow(windows, state, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
-            EnhancementsWindowContent(state, onExportGuide = { exports.exportGuide(windows.awtWindows[BuildScreen.ENHANCEMENTS] ?: mainWindow[0]!!, state, "csv") }) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
+            EnhancementsWindowContent(state, onExportGuide = {
+                val parent = windows.awtWindows[BuildScreen.ENHANCEMENTS] ?: mainWindow[0]
+                if (parent != null) {
+                    exports.exportGuide(parent, state, "csv")
+                }
+            }) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
         }
     }
     if (state.export.isOpen) {

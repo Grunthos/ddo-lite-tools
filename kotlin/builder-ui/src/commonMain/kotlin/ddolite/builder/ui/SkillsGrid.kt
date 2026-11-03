@@ -1,5 +1,6 @@
 package ddolite.builder.ui
 
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -197,8 +198,8 @@ fun SkillsGrid(
     val activeRow = state.activeRow
     val activeCol = state.activeCol
 
-    val widthDp = with(density) { (layout.width + 2).toDp() }
-    val heightDp = with(density) { (layout.height + 2).toDp() }
+    val widthDp = ((layout.width + 2) / density.density).dp
+    val heightDp = ((layout.height + 2) / density.density).dp
 
     Canvas(
         modifier = modifier

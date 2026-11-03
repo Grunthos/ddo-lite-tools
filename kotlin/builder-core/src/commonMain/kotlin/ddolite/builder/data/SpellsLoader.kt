@@ -41,7 +41,7 @@ fun loadSpells(source: DataSource, log: LoadLog): List<Spell> {
         }
         spells.add(spell)
     }
-    spells.sortWith(compareBy { it.name })
+    spells.sortWith { a, b -> a.name.compareTo(b.name) }
     return spells
 }
 

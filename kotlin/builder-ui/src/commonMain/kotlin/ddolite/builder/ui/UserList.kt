@@ -288,7 +288,14 @@ private fun <T> SlotBox(
         var text = content.caption
         var textWidth = width - 8
         if (arrows) {
-            text = text + " " + "III".substring(0, minOf(content.ranks, 3).coerceAtLeast(0))
+            var shown = content.ranks
+            if (shown > 3) {
+                shown = 3
+            }
+            if (shown < 0) {
+                shown = 0
+            }
+            text = text + " " + "III".substring(0, shown)
             textWidth -= arrowWidth
         }
         BasicText(

@@ -83,7 +83,10 @@ class BuilderSettings {
             val parts = text.split("Section: ")
             for (i in 1 until parts.size) {
                 val part = parts[i]
-                val end = part.indexOf("\r\n").let { if (it < 0) part.indexOf('\n') else it }
+                var end = part.indexOf("\r\n")
+                if (end < 0) {
+                    end = part.indexOf('\n')
+                }
                 if (end < 0) {
                     continue
                 }
@@ -240,8 +243,14 @@ class BuilderSettings {
     fun write(): String {
         val out = StringBuilder()
         out.append(section("Character Builder Lite", charBuildLines()))
-        otherSections["Compendium"]?.let { out.append("Section: Compendium").append(it) }
-        otherSections["Paths"]?.let { out.append("Section: Paths").append(it) }
+        val compendium = otherSections["Compendium"]
+        if (compendium != null) {
+            out.append("Section: Compendium").append(compendium)
+        }
+        val paths = otherSections["Paths"]
+        if (paths != null) {
+            out.append("Section: Paths").append(paths)
+        }
         out.append("Section: Output\r\n\r\n").append(section(null, outputLines()))
         out.append(section("Shared", sharedLines()))
         val colors = colorsText

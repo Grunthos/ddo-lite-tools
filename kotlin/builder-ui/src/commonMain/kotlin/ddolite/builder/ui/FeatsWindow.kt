@@ -195,7 +195,10 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
         }
         ListBox(
             theme, selectorNames, { i -> i == screen.selectorIndex }, 648, 64, 145, 282, screen,
-            dragItem = { _ -> screen.feats.getOrNull(screen.featIndex)?.let { FeatDrag.FromList(it) } },
+            dragItem = { _ ->
+                val feat = screen.feats.getOrNull(screen.featIndex)
+                if (feat == null) null else FeatDrag.FromList(feat)
+            },
             onPress = { i, _ -> screen.clickSelector(i) },
             onDoubleClick = { screen.doubleClickList() },
         )

@@ -1101,7 +1101,8 @@ class FeatRules(val rules: BuildRules) {
             val check = list[i].feat ?: continue
             for (req in check.requirements.all) {
                 val pointer = featPointer(req)
-                if (pointer.first == null || pointer.first!!.name != feat.name) {
+                val pointed = pointer.first
+                if (pointed == null || pointed.name != feat.name) {
                     continue
                 }
                 var locked: Boolean

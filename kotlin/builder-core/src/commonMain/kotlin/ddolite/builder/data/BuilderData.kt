@@ -133,10 +133,12 @@ class BuilderData(
     }
 
     /** VB's `db.FeatLookup`: the feats sorted by name (case-sensitive), equal names in file order. */
-    private val featLookup: List<Feat> by lazy {
-        val sorted = ArrayList(feats)
+    private val featLookup: List<Feat> = sortedByName(feats)
+
+    private fun sortedByName(list: List<Feat>): List<Feat> {
+        val sorted = ArrayList(list)
         sorted.sortWith { a, b -> a.name.compareTo(b.name) } // stable, like IndexFeatLookup's insertion sort
-        sorted
+        return sorted
     }
 
     /**

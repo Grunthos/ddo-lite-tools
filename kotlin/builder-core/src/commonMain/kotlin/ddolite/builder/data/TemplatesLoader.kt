@@ -103,7 +103,8 @@ private fun loadTemplate(record: RawRecord, log: LoadLog): StatTemplate {
             }
             "warning" -> warning = value
             "str", "dex", "con", "int", "wis", "cha" -> {
-                val stat = Stat.find(parsed.field)!!
+                // The field is one of the six stat names, so this always finds it.
+                val stat = Stat.find(parsed.field) ?: throw IllegalStateException("not a stat: " + parsed.field)
                 // Fixed-width columns: VB's Val(Mid$(strItem, (i * 3) + 1, 2)) for i = 0 to 4.
                 for (column in 0 until StatTemplate.COLUMNS) {
                     val text = vbMid(value, column * 3 + 1, 2)

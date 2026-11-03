@@ -90,7 +90,11 @@ private fun writeContainer(out: StringBuilder, placed: PlacedControl) {
     out.append("| Row | Col | Control | Type | Caption | Left, Top | Size | Notes |\n")
     out.append("|---|---|---|---|---|---|---|---|\n")
     val sorted = ArrayList(placed.children)
-    sorted.sortWith(compareBy<PlacedControl>({ it.row }, { it.col }))
+    // By row, then column.
+    sorted.sortWith { a, b ->
+        val byRow = a.row.compareTo(b.row)
+        if (byRow != 0) byRow else a.col.compareTo(b.col)
+    }
     for (child in sorted) {
         val cb = child.bounds
         out.append("| r").append(child.row)

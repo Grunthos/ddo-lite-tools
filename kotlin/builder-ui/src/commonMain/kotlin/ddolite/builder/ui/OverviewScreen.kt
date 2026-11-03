@@ -110,7 +110,13 @@ fun classResourceId(c: CharacterClass?): String {
 }
 
 /** Drawn grey, as VB's GrayScale (basBitmap.bas:46) does to disabled icons. */
-private val GREY = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+private val GREY = ColorFilter.colorMatrix(greyMatrix())
+
+private fun greyMatrix(): ColorMatrix {
+    val matrix = ColorMatrix()
+    matrix.setToSaturation(0f)
+    return matrix
+}
 
 /**
  * The Overview window: header (Overview;Notes | Help), the build's name, race, alignment and max
@@ -411,8 +417,8 @@ private fun RaceList(overview: OverviewScreenState, theme: Theme, left: Int, top
     val headerBack = theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
     val density = androidx.compose.ui.platform.LocalDensity.current
-    val widthDp = with(density) { totalWidth.toDp() }
-    val heightDp = with(density) { totalHeight.toDp() }
+    val widthDp = (totalWidth / density.density).dp
+    val heightDp = (totalHeight / density.density).dp
     Canvas(
         modifier = Modifier.offset(left.dp, top.dp).size(widthDp, heightDp)
             .pointerInput(rows) {
@@ -739,8 +745,8 @@ private fun LevelGrid(
             val icon = classIcons[classResourceId(c)]
             val enabled = rules.isSlotEnabled(slot)
             var modifier = Modifier
-                .offset(with(density) { iconLeft.toDp() }, with(density) { iconTop.toDp() })
-                .size(with(density) { iconWidth.toDp() })
+                .offset((iconLeft / density.density).dp, (iconTop / density.density).dp)
+                .size((iconWidth / density.density).dp)
                 .dropTarget(overview.drag, BuildSlotKey(slot))
             if (c != null) {
                 modifier = modifier.dragSource(overview.drag, OverviewDrag.BuildSlot(slot)) { item, target -> overview.dropped(item, target) }

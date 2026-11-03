@@ -27,9 +27,14 @@ private val TOME_MAX_NAMES = setOf(
  * missing file (the defaults stay). Quirks kept: a maximum of 0 (or text) leaves the default;
  * `Val` ignores spaces inside the number, so "FateTomeMax: 3 3" would mean 33 – reported as a warning.
  */
+/** One of VB's built-in tome schedules, which always parse. */
+private fun builtInSchedule(text: String): TomeSchedule {
+    return parseSchedule(text) ?: throw IllegalStateException("bad built-in tome schedule: $text")
+}
+
 fun loadTomes(source: DataSource, log: LoadLog): Tomes {
-    var stat = parseSchedule("8, 1, 1, 3, 7, 11, 15, 19, 22")!!
-    var skill = parseSchedule("5, 1, 1, 3, 7, 11")!!
+    var stat = builtInSchedule("8, 1, 1, 3, 7, 11, 15, 19, 22")
+    var skill = builtInSchedule("5, 1, 1, 3, 7, 11")
     var racialApMax = 2
     var universalApMax = 1
     var powerMax = 4
@@ -166,6 +171,10 @@ fun loadNameChanges(source: DataSource, log: LoadLog): List<NameChange> {
             changes.add(NameChange(type, oldName, newName, assignSelector))
         }
     }
-    changes.sortWith(compareBy<NameChange>({ it.type }, { it.oldName }))
+    // By type, then old name.
+    changes.sortWith { a, b ->
+        val byType = a.type.compareTo(b.type)
+        if (byType != 0) byType else a.oldName.compareTo(b.oldName)
+    }
     return changes
 }

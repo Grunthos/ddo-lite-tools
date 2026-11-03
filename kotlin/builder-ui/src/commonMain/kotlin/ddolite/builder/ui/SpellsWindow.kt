@@ -66,9 +66,10 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                 }
             },
     ) {
-        if (state.rules != null && screen.spellClass != null) {
+        val buildRules = state.rules
+        if (buildRules != null && screen.spellClass != null) {
             val rows = screen.rows()
-            val rules = ddolite.builder.build.SpellRules(state.rules!!)
+            val rules = ddolite.builder.build.SpellRules(buildRules)
             UserList(
                 theme,
                 listOf(
@@ -76,7 +77,10 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                     ListColumn("Spells", "", TextAlign.Center, slot = true),
                 ),
                 rows.size,
-                cellText = { row, _ -> rows.getOrNull(row - 1)?.let { rules.levelText(it) } ?: "" },
+                cellText = { row, _ ->
+                    val slot = rows.getOrNull(row - 1)
+                    if (slot == null) "" else rules.levelText(slot)
+                },
                 slot = { row -> SlotContent(rows.getOrNull(row - 1)?.spell ?: "", false) },
                 dropState = { row -> screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
                 hoverRow = screen.hoverRow,

@@ -130,10 +130,11 @@ class FeatsScreenState(private val session: BuilderSession) {
     /** The slot list's rows on the current tab (usrList's ItemData), index row - 1. */
     fun rows(): List<FeatListEntry> {
         val r = session.rules ?: return emptyList()
+        val fr = FeatRules(r)
         val result = arrayOfNulls<FeatListEntry>(r.featTabCounts[tab.ordinal])
         for (entry in r.featList) {
             val row = entry.tabRows[tab.ordinal]
-            if (row > 0 && featRules!!.isOnTab(entry, tab)) {
+            if (row > 0 && fr.isOnTab(entry, tab)) {
                 result[row - 1] = entry
             }
         }
@@ -661,11 +662,12 @@ class FeatsScreenState(private val session: BuilderSession) {
             val e = entry(item.row) ?: return false
             chooseSlot(item.row)
             sourceRow = item.row
-            if (e.feat == null) {
+            val feat = e.feat
+            if (feat == null) {
                 // VB allows the drag but ShowDropSlots shows no targets.
                 return true
             }
-            showDropSlots(e.feat!!, e.selector)
+            showDropSlots(feat, e.selector)
             return true
         }
         val choice = userChoice() ?: return false

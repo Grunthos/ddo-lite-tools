@@ -47,7 +47,7 @@ private fun loadTreeFile(source: DataSource, file: BuilderRecordFile, fileName: 
         }
     }
     // SortTrees: insertion sort on TreeName (ordinal, stable), then TreeID = position.
-    trees.sortWith(compareBy { it.name })
+    trees.sortWith { a, b -> a.name.compareTo(b.name) }
     return trees
 }
 

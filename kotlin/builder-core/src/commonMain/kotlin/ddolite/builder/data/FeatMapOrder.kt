@@ -36,9 +36,7 @@ class FeatMapOrder(entries: List<FeatMapEntry>) {
         if (key == FeatMapKey.UNKNOWN) {
             return
         }
-        val a = ArrayList<FeatMapEntry?>()
-        a.add(null)
-        a.addAll(map)
+        // VB's array is 1-based: its position p is map[p - 1] here.
         val min = 1
         val max = map.size
         var gap = min
@@ -48,21 +46,18 @@ class FeatMapOrder(entries: List<FeatMapEntry>) {
         do {
             gap /= 3
             for (i in gap + min..max) {
-                val swap = a[i]!!
+                val swap = map[i - 1]
                 var hold = i
-                while (name(a[hold - gap]!!) > name(swap)) {
-                    a[hold] = a[hold - gap]
+                while (name(map[hold - gap - 1]) > name(swap)) {
+                    map[hold - 1] = map[hold - gap - 1]
                     hold -= gap
                     if (hold < min + gap) {
                         break
                     }
                 }
-                a[hold] = swap
+                map[hold - 1] = swap
             }
         } while (gap != 1)
-        for (i in 1..max) {
-            map[i - 1] = a[i]!!
-        }
     }
 
     /** SeekFeatMap: a binary search by the current key's names; null if not found (VB's 0). */
