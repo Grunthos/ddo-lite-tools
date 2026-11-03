@@ -63,13 +63,13 @@ class BuildBackup(root: Path, private val data: BuilderData) {
             delete()
             return false
         }
-        val bytes: ByteArray
         try {
-            bytes = file.readBytes()
+            state.restoreBackup(readBuildFile(file.readBytes(), data, state.settings.buildPoints))
         } catch (e: Exception) {
+            // VB's LoadBuild shows the error. The backup is kept, to look at or delete.
+            JOptionPane.showMessageDialog(parent, "Can't open the backup " + file.name + ":\n" + e, "Notice", JOptionPane.ERROR_MESSAGE)
             return false
         }
-        state.restoreBackup(readBuildFile(bytes, data, state.settings.buildPoints))
         return true
     }
 }

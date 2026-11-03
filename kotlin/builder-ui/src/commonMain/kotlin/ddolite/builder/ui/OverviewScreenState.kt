@@ -220,7 +220,6 @@ class OverviewScreenState(private val session: BuilderSession) {
                 }
                 return
             }
-            else -> return
         }
         raceListActive = active
     }

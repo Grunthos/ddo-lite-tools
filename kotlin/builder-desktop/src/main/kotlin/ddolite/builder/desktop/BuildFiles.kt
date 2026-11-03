@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ddolite.builder.build.BuildPoints
+import ddolite.builder.build.BuildLoadResult
 import ddolite.builder.build.readBuildFile
 import ddolite.builder.build.writeBuildFile
 import ddolite.builder.data.BuilderData
@@ -105,7 +106,15 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             JOptionPane.showMessageDialog(parent, "Can't read " + chosen.name + ":\n" + e.message, "Open", JOptionPane.ERROR_MESSAGE)
             return
         }
-        val result = readBuildFile(bytes, data, state.settings.buildPoints)
+        val result: BuildLoadResult
+        try {
+            result = readBuildFile(bytes, data, state.settings.buildPoints)
+        } catch (e: Exception) {
+            // VB's LoadBuild error handler shows the error; the reader reports VB's own errors as problems,
+            // so this is only for the unexpected.
+            JOptionPane.showMessageDialog(parent, "Can't open " + chosen.name + ":\n" + e, "Open", JOptionPane.ERROR_MESSAGE)
+            return
+        }
         file = chosen
         state.settings.addRecent(chosen.path)
         state.openBuild(result)
@@ -157,7 +166,14 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             return
         }
         val preferred = state.settings.buildPoints
-        val result = if (builder) PlannerImport.builder(text, data, preferred) else PlannerImport.ron(text, chosen.path, data, preferred)
+        val result: BuildLoadResult
+        try {
+            result = if (builder) PlannerImport.builder(text, data, preferred) else PlannerImport.ron(text, chosen.path, data, preferred)
+        } catch (e: Exception) {
+            // VB has no error handler here and stops; this reports it instead (crashes aren't copied).
+            JOptionPane.showMessageDialog(parent, "Can't import " + chosen.name + ":\n" + e, "Import", JOptionPane.ERROR_MESSAGE)
+            return
+        }
         file = null
         state.importBuild(result)
     }

@@ -5,6 +5,7 @@ import ddolite.dataformat.Windows1252
 import ddolite.dataformat.decodeText
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.swing.JOptionPane
 
 /**
  * Where the settings live. VB keeps them in Settings.txt next to the program (clsConfig.SettingsFile,
@@ -41,7 +42,7 @@ class SettingsStore(private val root: Path) {
         try {
             Files.write(kotlinFile, Windows1252.encode(settings.write()))
         } catch (e: Exception) {
-            println("Can't save " + kotlinFile + ": " + e.message)
+            JOptionPane.showMessageDialog(null, "Can't save the settings to " + kotlinFile + ":\n" + e.message, "Settings", JOptionPane.ERROR_MESSAGE)
         }
     }
 }
