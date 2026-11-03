@@ -1,6 +1,6 @@
 package ddolite.builder.ui
 
-import ddolite.builder.build.AbilityRef
+import ddolite.builder.model.AbilityRef
 import ddolite.builder.build.AbilityChoice
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf

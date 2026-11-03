@@ -740,10 +740,10 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
      * For frmImport.AddGuess: ValidSkills(…, True) and ValidFeats(True), which ignore the section
      * shown: how complete the skills and the feats are.
      */
-    fun importValidity(): Pair<Valid, Valid> {
+    fun importValidity(): SkillsAndFeats {
         view = OutputView.ALL
-        val skills = validSkills(SkillOutput()).first
-        return Pair(skills, validFeats())
+        val skills = validSkills(SkillOutput()).valid
+        return SkillsAndFeats(skills, validFeats())
     }
 
     /** OutputSkills (:674): the skill points grid for the skills with ranks. */
@@ -753,12 +753,12 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
         }
         val grid = SkillOutput()
         val result = validSkills(grid)
-        val valid = result.first
+        val valid = result.valid
         if (valid == Valid.SKIP || valid == Valid.EMPTY) {
             return
         }
-        val classRow = result.second
-        val rows = result.third
+        val classRow = result.classRow
+        val rows = result.rows
         val levels = rules.heroicLevels()
         val dashLine = "         " + "-".repeat(levels * 3)
         outputTitle("Skills", error = if (valid == Valid.ERRORS) "(Errors)" else "")
@@ -850,13 +850,13 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
      * at any level), incomplete (points left), or complete; the class row when multiclassed; and the
      * skills with ranks, in the output order.
      */
-    private fun validSkills(grid: SkillOutput): Triple<Valid, Boolean, List<Skill>> {
+    private fun validSkills(grid: SkillOutput): SkillsCheck {
         if (display && view != OutputView.ALL && view != OutputView.OVERVIEW && view != OutputView.SKILLS) {
-            return Triple(Valid.SKIP, false, emptyList())
+            return SkillsCheck(Valid.SKIP, false, emptyList())
         }
         val splitSize = classSplit().size
         if (splitSize == 0) {
-            return Triple(Valid.EMPTY, false, emptyList())
+            return SkillsCheck(Valid.EMPTY, false, emptyList())
         }
         val classRow = splitSize == 2 || splitSize == 3
         val rows = ArrayList<Skill>()
@@ -867,7 +867,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             }
         }
         if (rows.isEmpty()) {
-            return Triple(Valid.EMPTY, classRow, rows)
+            return SkillsCheck(Valid.EMPTY, classRow, rows)
         }
         var result = Valid.COMPLETE
         for (col in 1..rules.heroicLevels()) {
@@ -893,7 +893,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
         if (settings.skillOrder == SkillOrderOutput.RANKS_SPENT) {
             sortRows(rows, grid)
         }
-        return Triple(result, classRow, rows)
+        return SkillsCheck(result, classRow, rows)
     }
 
     /**
@@ -1132,7 +1132,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             return
         }
         val result = validSpells()
-        val valid = result.first
+        val valid = result.valid
         if (valid == Valid.SKIP) {
             return
         }
@@ -1140,7 +1140,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             return
         }
         val split = classSplit()
-        val castingClasses = result.second
+        val castingClasses = result.castingClasses
         outputTitle("Spells")
         blankLine()
         if (reddit) {
@@ -1210,13 +1210,13 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
      * ValidSpells (:1246): InitBuildSpells first, then skip, empty, incomplete or complete, and how
      * many classes have reached their first spell level.
      */
-    private fun validSpells(): Pair<Valid, Int> {
+    private fun validSpells(): SpellsCheck {
         rules.initBuildSpells()
         if (build.canCastSpell[1] == 0) {
-            return Pair(Valid.SKIP, 0)
+            return SpellsCheck(Valid.SKIP, 0)
         }
         if (display && view != OutputView.ALL && view != OutputView.SPELLS) {
-            return Pair(Valid.SKIP, 0)
+            return SpellsCheck(Valid.SKIP, 0)
         }
         var complete = true
         var empty = true
@@ -1239,7 +1239,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             }
         }
         val valid = if (empty) Valid.EMPTY else if (complete) Valid.COMPLETE else Valid.INCOMPLETE
-        return Pair(valid, casting)
+        return SpellsCheck(valid, casting)
     }
 
     // ---------------------------------------------------------------- enhancements
@@ -1288,17 +1288,17 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
         }
         val order = treeOrder(build.trees, false)
         for (entry in order) {
-            val buildTree = build.trees[entry.first - 1]
+            val buildTree = build.trees[entry.position - 1]
             if (buildTree.abilities.isEmpty()) {
                 continue
             }
             blankLine()
-            val guideTree = findGuideTree(entry.first)
+            val guideTree = findGuideTree(entry.position)
             if (guideTree != null && guideTree.out.spent > 0) {
                 colorOverride = true
                 colorOpen(guideTree.out.color)
             }
-            outputText(buildTree.treeName + " (" + entry.second + " AP)")
+            outputText(buildTree.treeName + " (" + entry.ap + " AP)")
             val tree = data.findTree(buildTree.treeName)
             outputTreeAbilities(tree, buildTree)
             if (guideTree != null && guideTree.out.spent > 0) {
@@ -1361,12 +1361,12 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
     /** OutputEnhancementTreesReddit (:1427) and OutputDestinyTreesReddit (:2279). */
     private fun outputTreesReddit(trees: List<BuildTree>, destiny: Boolean) {
         for (entry in treeOrder(trees, destiny)) {
-            val buildTree = trees[entry.first - 1]
+            val buildTree = trees[entry.position - 1]
             if (buildTree.abilities.isEmpty()) {
                 continue
             }
             blankLine()
-            outputText(buildTree.treeName + " (" + entry.second + " AP)")
+            outputText(buildTree.treeName + " (" + entry.ap + " AP)")
             blankLine()
             outputText("|||")
             outputText("|:--|:--|:--")
@@ -1427,19 +1427,19 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
 
     /**
      * Build trees (or destinies) by AP spent, most first; equal ones keep their order. TreeOrder
-     * (:1712) and DestinyOrder (:1731). Pairs of 1-based position and AP.
+     * (:1712) and DestinyOrder (:1731).
      */
-    private fun treeOrder(trees: List<BuildTree>, destiny: Boolean): List<Pair<Int, Int>> {
+    private fun treeOrder(trees: List<BuildTree>, destiny: Boolean): List<TreeSpend> {
         val enh = EnhancementRules(rules)
-        val order = ArrayList<Pair<Int, Int>>()
+        val order = ArrayList<TreeSpend>()
         for (i in 1..trees.size) {
-            order.add(Pair(i, if (destiny) enh.quickSpentInDestiny(i) else enh.quickSpentInTree(i)))
+            order.add(TreeSpend(i, if (destiny) enh.quickSpentInDestiny(i) else enh.quickSpentInTree(i)))
         }
         for (i in 1 until order.size) {
             val swap = order[i]
             var j = i
             while (j >= 1) {
-                if (swap.second > order[j - 1].second) {
+                if (swap.ap > order[j - 1].ap) {
                     order[j] = order[j - 1]
                 } else {
                     break
@@ -1564,7 +1564,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
     }
 
     private class GuideOutputLevel {
-        val blocks = ArrayList<Pair<String, OutputColor?>>()
+        val blocks = ArrayList<ColorBlock>()
         val steps = ArrayList<GuideOutputStep>()
         var reset = ""
         val trees = ArrayList<GuideOutputTree>()
@@ -1662,15 +1662,15 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
                     val step = level.steps[i]
                     if (i == 0 || step.color != color) {
                         color = step.color
-                        level.blocks.add(Pair("", color))
+                        level.blocks.add(ColorBlock("", color))
                     }
                     val last = level.blocks.size - 1
-                    level.blocks[last] = Pair(level.blocks[last].first + step.display + "; ", level.blocks[last].second)
+                    level.blocks[last].text = level.blocks[last].text + step.display + "; "
                 }
                 if (level.blocks.isNotEmpty()) {
                     val last = level.blocks.size - 1
-                    val text = level.blocks[last].first
-                    level.blocks[last] = Pair(text.substring(0, text.length - 2), level.blocks[last].second)
+                    val text = level.blocks[last].text
+                    level.blocks[last].text = text.substring(0, text.length - 2)
                 }
             } else {
                 for (t in level.trees) {
@@ -1908,7 +1908,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
                 outputText("(Bank AP)")
             } else {
                 for (i in out.blocks.indices) {
-                    outputText(out.blocks[i].first, newLine = i == out.blocks.size - 1, color = out.blocks[i].second)
+                    outputText(out.blocks[i].text, newLine = i == out.blocks.size - 1, color = out.blocks[i].color)
                 }
             }
         }
@@ -1952,7 +1952,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             } else {
                 val text = StringBuilder()
                 for (b in out.blocks) {
-                    text.append(b.first)
+                    text.append(b.text)
                 }
                 outputText("|$level|$text|")
             }
@@ -2010,12 +2010,12 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             return
         }
         for (entry in treeOrder(build.destinies, true)) {
-            val buildTree = build.destinies[entry.first - 1]
+            val buildTree = build.destinies[entry.position - 1]
             if (buildTree.abilities.isEmpty()) {
                 continue
             }
             blankLine()
-            outputText(buildTree.treeName + " (" + entry.second + " AP)")
+            outputText(buildTree.treeName + " (" + entry.ap + " AP)")
             outputTreeAbilities(data.findDestiny(buildTree.treeName), buildTree)
         }
         blankLine(1)
@@ -2050,6 +2050,21 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
 
     /** ValidEnum (basOutput.bas): how complete a section is. */
     enum class Valid { SKIP, EMPTY, ERRORS, INCOMPLETE, COMPLETE }
+
+    /** How complete the skills and the feats are (for the import's build points guess). */
+    class SkillsAndFeats(val skills: Valid, val feats: Valid)
+
+    /** ValidSkills' answers: how complete, whether there's a class row, and the skills with ranks in order. */
+    private class SkillsCheck(val valid: Valid, val classRow: Boolean, val rows: List<Skill>)
+
+    /** ValidSpells' answers: how complete, and how many classes cast spells. */
+    private class SpellsCheck(val valid: Valid, val castingClasses: Int)
+
+    /** A build tree (or destiny) by its 1-based position, with the AP spent in it. */
+    private class TreeSpend(val position: Int, val ap: Int)
+
+    /** Leveling guide text in one colour. */
+    private class ColorBlock(var text: String, val color: OutputColor?)
 
     /** SpecialCodeEnum (:21): Courier for this text, or from here, or up to here. */
     private enum class Special { NONE, COURIER, COURIER_BEGIN, COURIER_END }

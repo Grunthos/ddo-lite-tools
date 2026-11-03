@@ -1,5 +1,6 @@
 package ddolite.builder.build
 
+import ddolite.builder.model.AbilityRef
 import ddolite.builder.model.Ability
 import ddolite.builder.model.AbilityTarget
 import ddolite.builder.model.CharacterClass
@@ -45,9 +46,6 @@ class AbilityDetails(val caption: String, val lines: List<DetailLine>, val ranks
 
 /** The blank ability VB puts in a tree while an ability is dragged over it (`Ability = 0`). */
 const val BLANK_ABILITY = -1
-
-/** An ability in a tree: its tier and its 0-based position in the tier. */
-data class AbilityRef(val tier: Int, val ability: Int)
 
 /** An ability chosen in the Enhancements or Destinies lists, with its selector (numbered from 1; 0 for none). */
 data class AbilityChoice(val tier: Int, val ability: Int, val selector: Int)
@@ -423,10 +421,10 @@ class EnhancementRules(val rules: BuildRules) {
                 val display = requirementDisplay(req, abbreviate = true, currentTree = null)
                 var has: Boolean
                 val takenFeats = featRules.identifyTakenFeats(build.maxLevels)
-                if (pointer.second == 0) {
-                    has = takenFeats.of(pointer.first).times != 0
+                if (pointer.selector == 0) {
+                    has = takenFeats.of(pointer.feat).times != 0
                 } else {
-                    has = takenFeats.selectorTaken(pointer.first, pointer.second)
+                    has = takenFeats.selectorTaken(pointer.feat, pointer.selector)
                 }
                 if (has) {
                     if (taken.isEmpty()) {
@@ -539,7 +537,7 @@ class EnhancementRules(val rules: BuildRules) {
         if (target is FeatTarget) {
             val featRules = FeatRules(rules)
             val pointer = featRules.featPointer(req)
-            return featRules.featDisplay(pointer.first, pointer.second, abbreviate, featPrefix = true)
+            return featRules.featDisplay(pointer.feat, pointer.selector, abbreviate, featPrefix = true)
         }
         if (target !is AbilityTarget) {
             return ""

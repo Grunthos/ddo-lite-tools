@@ -222,6 +222,12 @@ class DetailsBuilder {
 /** The Feats screen's details box: its caption (VB's lblDetails) and lines. */
 class FeatDetails(val caption: String, val lines: List<DetailLine>)
 
+/** A requirement's feat and selector (numbered from 1; 0 for none): VB's `.Feat` and `.Selector`. [feat] is null if it isn't a feat. */
+class RequiredFeat(val feat: Feat?, val selector: Int)
+
+/** A feat that was found or chosen, with its selector (numbered from 1; 0 for none). */
+class FeatChoice(val feat: Feat, val selector: Int)
+
 /** The wiki page for [name]. Ported from `MakeWiki` (Source/Modules/basWiki.bas:7). */
 fun makeWiki(name: String): String = "https://ddowiki.com/page/" + name.replace(" ", "_")
 
@@ -971,8 +977,8 @@ class FeatRules(val rules: BuildRules) {
         var missing = ""
         for (req in reqs) {
             val pointer = featPointer(req)
-            val feat = pointer.first
-            val selector = pointer.second
+            val feat = pointer.feat
+            val selector = pointer.selector
             val abbreviation = feat?.abbreviation ?: ""
             var has: Boolean
             if (selector == 0) {
@@ -1002,13 +1008,13 @@ class FeatRules(val rules: BuildRules) {
     }
 
     /** A requirement's feat and selector number (VB's `.Feat`, `.Selector`); null and 0 if it isn't a feat. */
-    fun featPointer(req: Requirement): Pair<Feat?, Int> {
+    fun featPointer(req: Requirement): RequiredFeat {
         val target = req.target
         if (target !is FeatTarget) {
-            return Pair(null, 0)
+            return RequiredFeat(null, 0)
         }
-        val feat = data.findFeat(target.featName) ?: return Pair(null, 0)
-        return Pair(feat, selectorNumber(feat, target.selectorName))
+        val feat = data.findFeat(target.featName) ?: return RequiredFeat(null, 0)
+        return RequiredFeat(feat, selectorNumber(feat, target.selectorName))
     }
 
     /**
@@ -1101,15 +1107,15 @@ class FeatRules(val rules: BuildRules) {
             val check = list[i].feat ?: continue
             for (req in check.requirements.all) {
                 val pointer = featPointer(req)
-                val pointed = pointer.first
+                val pointed = pointer.feat
                 if (pointed == null || pointed.name != feat.name) {
                     continue
                 }
                 var locked: Boolean
                 if (feat.selectorStyle == SelectorStyle.SHARED) {
-                    locked = pointer.second == selector
+                    locked = pointer.selector == selector
                 } else {
-                    locked = pointer.second == 0 || pointer.second == selector
+                    locked = pointer.selector == 0 || pointer.selector == selector
                 }
                 if (locked) {
                     return slotEntry.display + " is locked by " + list[i].display
@@ -1163,15 +1169,15 @@ class FeatRules(val rules: BuildRules) {
         var found = false
         for (req in reqs) {
             val pointer = featPointer(req)
-            if (pointer.first?.name != feat.name) {
+            if (pointer.feat?.name != feat.name) {
                 continue
             }
             if (oneFeat.selectorStyle == SelectorStyle.SHARED) {
-                if (pointer.second == selector) {
+                if (pointer.selector == selector) {
                     found = true
                     break
                 }
-            } else if (pointer.second == 0 || pointer.second == selector) {
+            } else if (pointer.selector == 0 || pointer.selector == selector) {
                 found = true
                 break
             }
@@ -1186,8 +1192,8 @@ class FeatRules(val rules: BuildRules) {
             }
             for (req in reqs) {
                 val pointer = featPointer(req)
-                if (entry.feat != null && pointer.first?.name == entry.feat?.name) {
-                    if (pointer.second == 0 || pointer.second == entry.selector) {
+                if (entry.feat != null && pointer.feat?.name == entry.feat?.name) {
+                    if (pointer.selector == 0 || pointer.selector == entry.selector) {
                         count++
                     }
                 }
@@ -1235,7 +1241,7 @@ class FeatRules(val rules: BuildRules) {
         val target = req.target
         if (target is FeatTarget) {
             val pointer = featPointer(req)
-            return featDisplay(pointer.first, pointer.second, abbreviate, featPrefix = false)
+            return featDisplay(pointer.feat, pointer.selector, abbreviate, featPrefix = false)
         }
         if (target is AbilityTarget) {
             var treeText = ""

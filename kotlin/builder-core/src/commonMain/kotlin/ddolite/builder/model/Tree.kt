@@ -126,3 +126,6 @@ data class Tree(
     val lockout: String?,
     val wiki: String,
 )
+
+/** An ability in a tree: its tier and its 0-based position in the tier. */
+data class AbilityRef(val tier: Int, val ability: Int)

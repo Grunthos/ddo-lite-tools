@@ -106,6 +106,9 @@ private fun classType(build: Build, c: CharacterClass?): BuildFeatType? {
     return null
 }
 
+/** A feat named in a Ron's Planner file, as our feat name and selector number (0 for none). */
+private class ImportedFeat(val name: String, val selector: Int)
+
 /** The module state of basFormatRon while it imports one file (mstrLine, mlngLines). */
 private class RonReader(private val data: BuilderData, preferred: BuildPoints, private val line: List<String>) {
     val build = Build()
@@ -371,13 +374,13 @@ private class RonReader(private val data: BuilderData, preferred: BuildPoints, p
             }
             val feat = splitFeat(line[i]) ?: continue
             val slot = findSlot(line[i]) ?: continue
-            slot.featName = feat.first
-            slot.selector = feat.second
+            slot.featName = feat.name
+            slot.selector = feat.selector
         }
     }
 
     /** RonSplitFeat (:587): our feat name and selector number for the line's feat, or null. */
-    private fun splitFeat(raw: String): Pair<String, Int>? {
+    private fun splitFeat(raw: String): ImportedFeat? {
         val comma = raw.indexOf(',')
         if (comma < 0) {
             return null
@@ -402,7 +405,7 @@ private class RonReader(private val data: BuilderData, preferred: BuildPoints, p
             }
             selector = s
         }
-        return Pair(name, selector)
+        return ImportedFeat(name, selector)
     }
 
     /** RonFindSlot (:617): the slot for the line's level and Ron's slot kind (RonSlotEnum, :52). */

@@ -324,7 +324,7 @@ class GuideRules(private val rules: BuildRules) {
         for (req in reqs.all) {
             if (req.target is FeatTarget) {
                 need = true
-                val feat = featRules.featPointer(req).first
+                val feat = featRules.featPointer(req).feat
                 for (entry in rules.featList) {
                     if (entry.actualType != BuildFeatType.ALTERNATE && feat != null && entry.feat == feat) {
                         found = true
@@ -670,7 +670,7 @@ class GuideRules(private val rules: BuildRules) {
             if (target is FeatTarget) {
                 val pointer = featRules.featPointer(req)
                 val display = enhancements.requirementDisplay(req, abbreviate = true, currentTree = null)
-                if (guideErrorFeat(pointer.first, pointer.second, level)) {
+                if (guideErrorFeat(pointer.feat, pointer.selector, level)) {
                     if (taken.isEmpty()) {
                         taken = display
                     }
@@ -985,7 +985,7 @@ class GuideRules(private val rules: BuildRules) {
                 if (target is FeatTarget) {
                     val pointer = featRules.featPointer(req)
                     val taken = featRules.identifyTakenFeats(build.maxLevels)
-                    val has = if (pointer.second == 0) taken.of(pointer.first).times != 0 else taken.selectorTaken(pointer.first, pointer.second)
+                    val has = if (pointer.selector == 0) taken.of(pointer.feat).times != 0 else taken.selectorTaken(pointer.feat, pointer.selector)
                     if (has) {
                         matches++
                     }

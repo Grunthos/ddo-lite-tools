@@ -136,8 +136,8 @@ class CrossReferencesTest {
 
     @Test
     fun rankSuffix() {
-        assertEquals(Pair("Energy of the Wild", 3), splitRank("Energy of the Wild Rank 3"))
-        assertEquals(Pair("Focus", 0), splitRank("Focus"))
-        assertEquals(Pair("Rank 2", 0), splitRank("Rank 2")) // too short
+        assertEquals(NameAndRank("Energy of the Wild", 3), splitRank("Energy of the Wild Rank 3"))
+        assertEquals(NameAndRank("Focus", 0), splitRank("Focus"))
+        assertEquals(NameAndRank("Rank 2", 0), splitRank("Rank 2")) // too short
     }
 }

@@ -1,5 +1,7 @@
 package ddolite.builder.imports
 
+import ddolite.builder.data.NameAndRank
+import ddolite.builder.build.FeatChoice
 import ddolite.builder.build.Build
 import ddolite.builder.build.BuildAbility
 import ddolite.builder.build.BuildFeat
@@ -552,16 +554,16 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
             }
         }
         val order = listOf(
-            Pair(BuildOutput.Valid.COMPLETE, BuildOutput.Valid.INCOMPLETE),
-            Pair(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.COMPLETE),
-            Pair(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.INCOMPLETE),
-            Pair(BuildOutput.Valid.COMPLETE, BuildOutput.Valid.ERRORS),
-            Pair(BuildOutput.Valid.ERRORS, BuildOutput.Valid.COMPLETE),
-            Pair(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.ERRORS),
-            Pair(BuildOutput.Valid.ERRORS, BuildOutput.Valid.INCOMPLETE),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.COMPLETE, BuildOutput.Valid.INCOMPLETE),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.COMPLETE),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.INCOMPLETE),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.COMPLETE, BuildOutput.Valid.ERRORS),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.ERRORS, BuildOutput.Valid.COMPLETE),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.INCOMPLETE, BuildOutput.Valid.ERRORS),
+            BuildOutput.SkillsAndFeats(BuildOutput.Valid.ERRORS, BuildOutput.Valid.INCOMPLETE),
         )
         for (o in order) {
-            if (bestGuess(o.first, o.second)) {
+            if (bestGuess(o.skills, o.feats)) {
                 return
             }
         }
@@ -579,8 +581,8 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
         guesses.add(guess)
         build.buildPoints = points
         val valid = BuildOutput(rules, OutputFormat.DEFAULT, settings).importValidity()
-        guess.skills = if (valid.first == BuildOutput.Valid.EMPTY) BuildOutput.Valid.COMPLETE else valid.first
-        guess.feats = if (valid.second == BuildOutput.Valid.EMPTY) BuildOutput.Valid.COMPLETE else valid.second
+        guess.skills = if (valid.skills == BuildOutput.Valid.EMPTY) BuildOutput.Valid.COMPLETE else valid.skills
+        guess.feats = if (valid.feats == BuildOutput.Valid.EMPTY) BuildOutput.Valid.COMPLETE else valid.feats
         return guess.skills == BuildOutput.Valid.COMPLETE && guess.feats == BuildOutput.Valid.COMPLETE
     }
 
@@ -702,7 +704,7 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
                     for (i in 1 until parts.size) {
                         var alternate = parseFeat(parts[i])
                         if (alternate == null) {
-                            alternate = parseFeat(first.first.name + ": " + parts[i])
+                            alternate = parseFeat(first.feat.name + ": " + parts[i])
                         }
                         if (alternate != null) {
                             addAlternateFeat(index, alternate)
@@ -722,7 +724,7 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
      * ParseFeat (:831): a feat by name, "Feat: Selector", or a selector-only feat's selector; with
      * its selector number (0 if none or not found). Null if no feat.
      */
-    private fun parseFeat(display: String): Pair<Feat, Int>? {
+    private fun parseFeat(display: String): FeatChoice? {
         var selector = 0
         var selectorName = ""
         var feat = rules.findFeatOrNull(display)
@@ -760,29 +762,29 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
                 }
             }
         }
-        return Pair(feat, selector)
+        return FeatChoice(feat, selector)
     }
 
     /**
      * ApplyFeat (:882): the feat in the listed slot, then the feat list again. A feat that wasn't
      * found empties the slot (VB's db.Feat(0) has no name).
      */
-    private fun applyFeat(index: Int, found: Pair<Feat, Int>?) {
+    private fun applyFeat(index: Int, found: FeatChoice?) {
         val entry = rules.featList[index]
-        entry.slot.featName = found?.first?.name ?: ""
-        entry.slot.selector = found?.second ?: 0
+        entry.slot.featName = found?.feat?.name ?: ""
+        entry.slot.selector = found?.selector ?: 0
         rules.initBuildFeats()
     }
 
     /** AddAlternateFeat (:898): an alternate slot copied from the listed one. */
-    private fun addAlternateFeat(index: Int, found: Pair<Feat, Int>) {
+    private fun addAlternateFeat(index: Int, found: FeatChoice) {
         val entry = rules.featList[index]
         val slot = entry.slot.copy()
         slot.type = BuildFeatType.ALTERNATE
         slot.childType = entry.actualType
         slot.child = entry.index
-        slot.featName = found.first.name
-        slot.selector = found.second
+        slot.featName = found.feat.name
+        slot.selector = found.selector
         build.feats(BuildFeatType.ALTERNATE).add(slot)
     }
 
@@ -799,12 +801,12 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
         val oldFeat = parseFeat(parts[1]) ?: return
         val list = rules.featList
         for (entry in list) {
-            if (entry.feat == oldFeat.first && entry.selector == oldFeat.second) {
+            if (entry.feat == oldFeat.feat && entry.selector == oldFeat.selector) {
                 val slot = BuildFeat(BuildFeatType.EXCHANGE)
                 slot.childType = entry.actualType
                 slot.child = entry.index
-                slot.featName = newFeat.first.name
-                slot.selector = newFeat.second
+                slot.featName = newFeat.feat.name
+                slot.selector = newFeat.selector
                 slot.level = level
                 build.feats(BuildFeatType.EXCHANGE).add(slot)
                 return
@@ -968,8 +970,8 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
         }
         val rank = getRanks(name)
         if (rank != null) {
-            name = rank.first
-            ranks = rank.second
+            name = rank.name
+            ranks = rank.rank
             found = findAbility(abilities, name, selector)
             if (found != null) {
                 addAbility(target, found, ranks)
@@ -987,8 +989,11 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
         }
     }
 
+    /** An ability found in a tier: its number and its selector's, both from 1 (selector 0 for none). */
+    private class AbilityMatch(val number: Int, val selector: Int)
+
     /** FindAbility (:1107): (ability, selector), both 1-based, by abbreviation, or by a selector's name. */
-    private fun findAbility(abilities: List<Ability>, name: String, selectorName: String): Pair<Int, Int>? {
+    private fun findAbility(abilities: List<Ability>, name: String, selectorName: String): AbilityMatch? {
         for (i in abilities.indices) {
             if (abilities[i].abbreviation == name) {
                 var selector = 0
@@ -1000,13 +1005,13 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
                         }
                     }
                 }
-                return Pair(i + 1, selector)
+                return AbilityMatch(i + 1, selector)
             }
         }
         for (i in abilities.indices) {
             for (s in abilities[i].selectors.indices) {
                 if (abilities[i].selectors[s].name == name) {
-                    return Pair(i + 1, s + 1)
+                    return AbilityMatch(i + 1, s + 1)
                 }
             }
         }
@@ -1018,20 +1023,20 @@ class ForumImport(private val data: BuilderData, preferred: BuildPoints, private
      * VB bug, kept (VB-BUGS 18m): destinies' abilities get this tier too, which ParseSection sets
      * to 1 at the Destiny heading.
      */
-    private fun addAbility(target: BuildTree, found: Pair<Int, Int>, ranks: Int) {
-        target.abilities.add(BuildAbility(tier, found.first - 1, ranks, found.second))
+    private fun addAbility(target: BuildTree, found: AbilityMatch, ranks: Int) {
+        target.abilities.add(BuildAbility(tier, found.number - 1, ranks, found.selector))
     }
 
     /** GetRanks (:1156): the name without " I", " II" or " III", and the ranks; null if none. */
-    private fun getRanks(name: String): Pair<String, Int>? {
+    private fun getRanks(name: String): NameAndRank? {
         if (name.endsWith(" I")) {
-            return Pair(name.substring(0, name.length - 2), 1)
+            return NameAndRank(name.substring(0, name.length - 2), 1)
         }
         if (name.endsWith(" II")) {
-            return Pair(name.substring(0, name.length - 3), 2)
+            return NameAndRank(name.substring(0, name.length - 3), 2)
         }
         if (name.endsWith(" III")) {
-            return Pair(name.substring(0, name.length - 4), 3)
+            return NameAndRank(name.substring(0, name.length - 4), 3)
         }
         return null
     }

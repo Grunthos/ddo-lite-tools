@@ -274,8 +274,8 @@ fun loadBuilderData(source: DataSource, log: LoadLog, userTemplates: String? = n
     val sharedDestinies = crossReferences.processAbilitySelectors(destinies, true)
     val resolved = crossReferences.processPointers(feats, sharedTrees, sharedDestinies)
     val data = BuilderData(
-        races, classes, spells, templates, resolved.first, featMap, autoGrantedFeats,
-        resolved.second, resolved.third, tomes, nameChanges,
+        races, classes, spells, templates, resolved.feats, featMap, autoGrantedFeats,
+        resolved.trees, resolved.destinies, tomes, nameChanges,
     )
     checkClassSpells(data, log)
     checkTemplates(templates, log)

@@ -1,5 +1,6 @@
 package ddolite.builder.ui
 
+import ddolite.builder.build.FeatChoice
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -596,14 +597,14 @@ class FeatsScreenState(private val session: BuilderSession) {
     }
 
     /** GetUserChoices (:579): the feat and selector chosen in the lists, or null if a selector is still needed. */
-    private fun userChoice(): Pair<Feat, Int>? {
+    private fun userChoice(): FeatChoice? {
         val feat = feats.getOrNull(featIndex) ?: return null
         var selector = 0
         if (selectorIndex >= 0 && selectorIndex < selectors.size) {
             selector = selectors[selectorIndex].number
         }
         if (selector != 0 || selectors.isEmpty()) {
-            return Pair(feat, selector)
+            return FeatChoice(feat, selector)
         }
         return null
     }
@@ -625,8 +626,8 @@ class FeatsScreenState(private val session: BuilderSession) {
                     continue
                 }
                 val check = e.slot.copy()
-                check.selector = choice.second
-                val state = fr.checkFeatSlot(choice.first, check).state
+                check.selector = choice.selector
+                val state = fr.checkFeatSlot(choice.feat, check).state
                 if (state == DropState.CAN_DROP || state == DropState.CAN_DROP_ERROR) {
                     row = i + 1
                     break
@@ -637,7 +638,7 @@ class FeatsScreenState(private val session: BuilderSession) {
             }
         }
         val e = rows[row - 1]
-        fr.setSlot(e, choice.first, choice.second)
+        fr.setSlot(e, choice.feat, choice.selector)
         fr.checkSlotErrors()
         resetDropStates()
         active = 0
@@ -672,7 +673,7 @@ class FeatsScreenState(private val session: BuilderSession) {
         }
         val choice = userChoice() ?: return false
         slotFilter = selectedRow()
-        showDropSlots(choice.first, choice.second)
+        showDropSlots(choice.feat, choice.selector)
         return true
     }
 
@@ -733,13 +734,13 @@ class FeatsScreenState(private val session: BuilderSession) {
         val choice = userChoice() ?: return
         val e = entry(row) ?: return
         val keepSelectors = selectors.size > 1
-        fr.setSlot(e, choice.first, choice.second)
+        fr.setSlot(e, choice.feat, choice.selector)
         fr.checkSlotErrors()
         active = 0
         showAvailable()
         if (keepSelectors) {
             // VB reselects the feat, which shows its remaining selectors.
-            val index = feats.indexOf(choice.first)
+            val index = feats.indexOf(choice.feat)
             if (index >= 0) {
                 clickFeat(index)
             }

@@ -298,8 +298,8 @@ private class FeatReader(
                     feat.raceMode = RaceRequirementMode.ANY
                     return false
                 }
-                feat.raceMode = mode.first
-                return mode.second
+                feat.raceMode = mode.mode
+                return mode.allKnown
             }
             "cancastspell" -> {
                 if (value < 0 || value > 9) {
@@ -489,8 +489,8 @@ private class FeatReader(
                     selector.raceMode = RaceRequirementMode.ANY
                     return false
                 }
-                selector.raceMode = mode.first
-                return mode.second
+                selector.raceMode = mode.mode
+                return mode.allKnown
             }
             "classbonus" -> {
                 selector.classBonus = ArrayList() // VB: ReDim .ClassBonus
@@ -604,12 +604,15 @@ private class FeatReader(
         return ok
     }
 
+    /** A Race line read: its mode, and whether every race named was known. */
+    private class RaceModeRead(val mode: RaceRequirementMode, val allKnown: Boolean)
+
     /**
      * `Race: Required, Human, Elf`: the first entry is the mode, the rest are races, added to [into].
      * Returns null if the mode is unknown (VB then ignores the races), else the mode and whether
      * every race was known.
      */
-    private fun readRaceRequirement(entries: List<String>, into: MutableList<String>): Pair<RaceRequirementMode, Boolean>? {
+    private fun readRaceRequirement(entries: List<String>, into: MutableList<String>): RaceModeRead? {
         if (entries.isEmpty()) {
             return null
         }
@@ -626,7 +629,7 @@ private class FeatReader(
                 into.add(race.name)
             }
         }
-        return Pair(mode, ok)
+        return RaceModeRead(mode, ok)
     }
 }
 

@@ -1,5 +1,6 @@
 package ddolite.builder.data
 
+import ddolite.builder.model.AbilityRef
 import ddolite.builder.model.Ability
 import ddolite.builder.model.AbilityTarget
 import ddolite.builder.model.Feat
@@ -156,7 +157,7 @@ internal class CrossReferences(
                     log.error(fileOf(isDestiny), null, prefix + where, "Invalid parent selector: ${parent.raw}")
                     continue
                 }
-                val parentAbility = tiers[found.first][found.second]
+                val parentAbility = tiers[found.tier][found.ability]
                 var selectors = ArrayList(ability.selectors)
                 if (parentAbility.selectors.isNotEmpty() && selectors.isEmpty()) {
                     for (s in parentAbility.selectors) {
@@ -177,7 +178,7 @@ internal class CrossReferences(
                     }
                     selectors[j] = own.copy(name = from.name, description = description, requirements = from.requirements, cost = ability.cost)
                 }
-                val target = AbilityTarget(style, tree.name, found.first, found.second, parentAbility.name, null, 0)
+                val target = AbilityTarget(style, tree.name, found.tier, found.ability, parentAbility.name, null, 0)
                 tiers[tierIndex][i] = ability.copy(selectors = selectors, parent = parent.copy(style = style, target = target))
             }
         }
@@ -186,9 +187,9 @@ internal class CrossReferences(
 
     /**
      * "Tier n: Ability" in the same tree. Ported from `basProcess.ProcessTreeSelectorParent` (:353).
-     * Returns (tier, ability index) or null.
+     * Returns the ability, or null.
      */
-    private fun findParentInTree(tree: Tree, tiers: List<List<Ability>>, raw: String): Pair<Int, Int>? {
+    private fun findParentInTree(tree: Tree, tiers: List<List<Ability>>, raw: String): AbilityRef? {
         if (!raw.startsWith("Tier ")) {
             return null
         }
@@ -205,7 +206,7 @@ internal class CrossReferences(
         val name = vbMidFrom(rest, colon + 3) // VB: Mid$(strRaw, lngPos + 2), skipping ": "
         for (i in tiers[tier].indices) {
             if (tiers[tier][i].name == name) {
-                return Pair(tier, i)
+                return AbilityRef(tier, i)
             }
         }
         return null
@@ -217,7 +218,7 @@ internal class CrossReferences(
      * Resolves granted feats, feat requirements and every tree's requirements. Ported from
      * `basProcess.ProcessPointers` (:387). Returns the feats, trees and destinies with targets filled in.
      */
-    fun processPointers(feats: List<Feat>, trees: List<Tree>, destinies: List<Tree>): Triple<List<Feat>, List<Tree>, List<Tree>> {
+    fun processPointers(feats: List<Feat>, trees: List<Tree>, destinies: List<Tree>): ResolvedPointers {
         checkGrantedFeats()
         val newFeats = ArrayList<Feat>()
         for (feat in feats) {
@@ -231,7 +232,7 @@ internal class CrossReferences(
         for (tree in destinies) {
             newDestinies.add(processTree(tree, destinies, true))
         }
-        return Triple(newFeats, newTrees, newDestinies)
+        return ResolvedPointers(newFeats, newTrees, newDestinies)
     }
 
     /** Race and class `GrantedFeats<level>` must name feats (and selectors). VB stores them as "Feat: X". */
@@ -405,7 +406,7 @@ internal class CrossReferences(
                 return req // not reached by the shipped data; VB would look in the wrong list here
             }
             val tier = Vb.cLng(Vb.valOf(field.substring(5)))
-            return findAbility(req.copy(style = style), tree, style, tier, split.first, split.second, fail)
+            return findAbility(req.copy(style = style), tree, style, tier, split.name, split.rank, fail)
         }
         log.vbDifference(fileOf(style == PointerStyle.DESTINY), null, "Requirement not resolved: ${req.raw} (VB6 ignores it)")
         return req
@@ -474,6 +475,9 @@ internal class CrossReferences(
         return req.copy(target = AbilityTarget(style, tree.name, tier, index, abilityName, selectorName, rank))
     }
 
+    /** One requirement as [parseReqLine] resolves it, and whether VB leaves it "untouched" for ProcessPointer. */
+    private class ParsedReq(val requirement: Requirement, val untouched: Boolean)
+
     /** Requirements resolved by [parseReqLine], and those VB would leave untouched for ProcessPointer. */
     private class ParsedReqs(val requirements: Requirements, val untouched: Set<Requirement>)
 
@@ -484,9 +488,9 @@ internal class CrossReferences(
             val result = ArrayList<Requirement>()
             for (req in list) {
                 val outcome = parseReqLine(req, tree, isDestiny, allOfKind, where)
-                result.add(outcome.first)
-                if (outcome.second) {
-                    untouched.add(outcome.first)
+                result.add(outcome.requirement)
+                if (outcome.untouched) {
+                    untouched.add(outcome.requirement)
                 }
             }
             groups.add(result)
@@ -507,27 +511,27 @@ internal class CrossReferences(
      *
      * VB reports nothing here; things it can't find become warnings marked as VB differences.
      */
-    private fun parseReqLine(req: Requirement, tree: Tree, isDestiny: Boolean, allOfKind: List<Tree>, where: String): Pair<Requirement, Boolean> {
+    private fun parseReqLine(req: Requirement, tree: Tree, isDestiny: Boolean, allOfKind: List<Tree>, where: String): ParsedReq {
         val raw = req.raw
         if (!raw.contains(':')) {
-            return Pair(req, true)
+            return ParsedReq(req, true)
         }
         val parts = Vb.split(raw, ":")
         if (raw.lowercase().contains("feat:")) {
             val featName = Vb.trim(parts[1])
             val feat = featsByName[featName]
             if (feat == null) {
-                return Pair(req.copy(style = PointerStyle.FEAT), true) // Feat = 0: ProcessPointer reports it
+                return ParsedReq(req.copy(style = PointerStyle.FEAT), true) // Feat = 0: ProcessPointer reports it
             }
             if (parts.size == 3) {
                 val selectorName = Vb.trim(parts[2])
                 if (feat.findSelector(selectorName) == null) {
                     warnNotFound(isDestiny, where, raw, "selector")
-                    return Pair(req.copy(style = PointerStyle.FEAT), false)
+                    return ParsedReq(req.copy(style = PointerStyle.FEAT), false)
                 }
-                return Pair(req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, selectorName)), false)
+                return ParsedReq(req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, selectorName)), false)
             }
-            return Pair(req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, null)), false)
+            return ParsedReq(req.copy(style = PointerStyle.FEAT, target = FeatTarget(feat.name, null)), false)
         }
 
         val style = if (isDestiny) PointerStyle.DESTINY else PointerStyle.ENHANCEMENT
@@ -540,14 +544,14 @@ internal class CrossReferences(
             val tierAt = p0.indexOf("Tier")
             if (tierAt < 0) {
                 log.vbDifference(fileOf(isDestiny), null, "$where: requirement has no tier: $raw (VB6 stops with an error)")
-                return Pair(req, false)
+                return ParsedReq(req, false)
             }
             if (!isDestiny) {
                 val treeName = Vb.trim(p0.substring(0, tierAt))
                 target = findExact(allOfKind, treeName)
                 if (target == null) {
                     log.vbDifference(fileOf(isDestiny), null, "$where: requirement names an unknown tree: $raw (VB6 stops with an error)")
-                    return Pair(req, false)
+                    return ParsedReq(req, false)
                 }
             }
             tierText = p0.substring(tierAt)
@@ -556,11 +560,11 @@ internal class CrossReferences(
         val tier = if (words.size > 1) Vb.cLng(Vb.valOf(words[1])) else -1
         if (target == null || tier < 0 || tier >= target.tiers.size) {
             log.vbDifference(fileOf(isDestiny), null, "$where: requirement tier out of range: $raw (VB6 stops with an error)")
-            return Pair(req, false)
+            return ParsedReq(req, false)
         }
         var split = splitRank(parts[1])
-        var rank = split.second
-        val abilityName = Vb.trim(split.first)
+        var rank = split.rank
+        val abilityName = Vb.trim(split.name)
         var index = -1
         val abilities = target.tiers[tier]
         for (i in abilities.indices) {
@@ -572,23 +576,23 @@ internal class CrossReferences(
         var selectorName: String? = null
         if (parts.size > 2) {
             split = splitRank(parts[2])
-            rank = split.second
-            selectorName = Vb.trim(split.first)
+            rank = split.rank
+            selectorName = Vb.trim(split.name)
             if (index < 0) {
                 log.vbDifference(fileOf(isDestiny), null, "$where: requirement not found: $raw (VB6 stops with an error)")
-                return Pair(req.copy(style = style), false)
+                return ParsedReq(req.copy(style = style), false)
             }
             if (abilities[index].findSelector(selectorName) == null) {
                 warnNotFound(isDestiny, where, raw, "selector")
-                return Pair(req.copy(style = style), false)
+                return ParsedReq(req.copy(style = style), false)
             }
         }
         if (index < 0) {
             warnNotFound(isDestiny, where, raw, "ability")
-            return Pair(req.copy(style = style), false)
+            return ParsedReq(req.copy(style = style), false)
         }
         // A reference to another enhancement tree is still an enhancement (style from this tree).
-        return Pair(req.copy(style = style, target = AbilityTarget(style, target.name, tier, index, abilityName, selectorName, rank)), false)
+        return ParsedReq(req.copy(style = style, target = AbilityTarget(style, target.name, tier, index, abilityName, selectorName, rank)), false)
     }
 
     private fun warnNotFound(isDestiny: Boolean, where: String, raw: String, what: String) {
@@ -605,20 +609,26 @@ internal class CrossReferences(
     }
 }
 
+/** The feats, trees and destinies with their requirements resolved ([CrossReferences.processPointers]). */
+class ResolvedPointers(val feats: List<Feat>, val trees: List<Tree>, val destinies: List<Tree>)
+
+/** A name and the rank written after it ("Name Rank 2", "Name II"); 0 or 1 when none is written. */
+data class NameAndRank(val name: String, val rank: Int)
+
 /**
  * A " Rank n" ending: returns the text without it and the rank (0 if none). Ported from
  * `basProcess.ProcessRank` / `GetAbilityReqRank` (:489, :497): the text must be at least 8
  * characters, with " Rank " just before the last character, which is the rank.
  */
-internal fun splitRank(text: String): Pair<String, Int> {
+internal fun splitRank(text: String): NameAndRank {
     if (text.length < 8) {
-        return Pair(text, 0)
+        return NameAndRank(text, 0)
     }
     if (text.substring(text.length - 7, text.length - 1) != " Rank ") {
-        return Pair(text, 0)
+        return NameAndRank(text, 0)
     }
     val rank = Vb.cLng(Vb.valOf(text.substring(text.length - 1)))
-    return Pair(text.substring(0, text.length - 7), rank)
+    return NameAndRank(text.substring(0, text.length - 7), rank)
 }
 
 /**
