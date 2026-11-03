@@ -103,6 +103,24 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     `Modules/Build/basFormatLite.bas:1263` `LoadLevelingGuideText`. *Fix:* skip just that step, and add its tree
     only when it resolves.
 
+18a. **A rare scroll dragged into a spell slot is saved as "  Name*".** `Forms/Build/frmSpells.frm:565`
+    `usrList_OLEDragDrop` stores `Me.lstSpell.Text`, the list's display text (rare Wizard and
+    Artificer scrolls are indented and starred by `MakeSpellName`). `ChooseSpell` (:627, double-click)
+    cleans it with `CleanSpellName`. The slot then holds an unknown spell, and the build file gets
+    "  Name*". `ShowDropSlots` (:375) also tests `CheckFree` on the display text. *Fix:* use
+    `CleanSpellName(Me.lstSpell.Text)` in both places.
+
+18b. **Only every other empty free spell slot is removed.** `Modules/Build/basBuild.bas:2158`
+    `RemoveEmptyFreeSlots` moves on to the next slot after removing one, without checking the slot
+    that moved into its place. Two empty free slots in a row leave one behind. *Fix:* don't advance
+    after a removal.
+
+18c. **A new free spell slot shows a class level, not a character level.** `Modules/Build/basBuild.bas:2154`
+    `AddFreeSpellSlot` sets `.Level = GetSpellSlotClassLevel(...)` (a class level), where
+    `InitBuildSpellsSlotLevels` converts it with `GetCharacterLevel`. A multiclass build shows a
+    different "Level" for the new slot until the slots are set up again. *Fix:* convert as
+    `InitBuildSpellsSlotLevels` does.
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`

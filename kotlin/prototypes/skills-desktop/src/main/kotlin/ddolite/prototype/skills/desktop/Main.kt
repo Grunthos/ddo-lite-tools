@@ -41,6 +41,7 @@ import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
 import ddolite.prototype.skills.FeatsWindowContent
 import ddolite.prototype.skills.SkillsWindowContent
+import ddolite.prototype.skills.SpellsWindowContent
 import ddolite.prototype.skills.StatsWindowContent
 import ddolite.prototype.skills.TreeSlotsState
 import ddolite.prototype.skills.EnhancementsWindowContent
@@ -90,7 +91,7 @@ private enum class EditScreen(val screen: BuildScreen, val title: String, val mn
     STATS(BuildScreen.STATS, "Stats...", 'A', Key.T, true),
     SKILLS(BuildScreen.SKILLS, "Skills...", 'K', Key.K, true),
     FEATS(BuildScreen.FEATS, "Feats...", 'F', Key.F, true),
-    SPELLS(BuildScreen.SPELLS, "Spells...", 'P', Key.P, false),
+    SPELLS(BuildScreen.SPELLS, "Spells...", 'P', Key.P, true),
     ENHANCEMENTS(BuildScreen.ENHANCEMENTS, "Enhancements...", 'E', Key.E, true),
     DESTINY(BuildScreen.DESTINY, "Destiny...", 'D', Key.D, false),
 }
@@ -147,6 +148,9 @@ private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenW
     }
     if (screen == EditScreen.ENHANCEMENTS && !windows.isOpen(BuildScreen.ENHANCEMENTS)) {
         state.enhancements.opened() // frmEnhancements.Form_Load
+    }
+    if (screen == EditScreen.SPELLS && !windows.isOpen(BuildScreen.SPELLS)) {
+        state.spells.opened() // frmSpells.Form_Load
     }
     windows.show(screen.screen)
     return true
@@ -337,6 +341,12 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         // The form's client area is 815 x 593 at 100%.
         ScreenWindow(windows, BuildScreen.FEATS, "Feats", 540, 60, 831, 636) {
             FeatsWindowContent(state) { link -> footerLink(link, BuildScreen.FEATS, state, windows) }
+        }
+    }
+    if (windows.isOpen(BuildScreen.SPELLS)) {
+        // The form's client area is 815 x 518 at 100%.
+        ScreenWindow(windows, BuildScreen.SPELLS, "Spells", 560, 80, 831, 561) {
+            SpellsWindowContent(state) { link -> footerLink(link, BuildScreen.SPELLS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {

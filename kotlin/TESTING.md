@@ -90,6 +90,19 @@ look for anything different.
       name doesn't count; change a skill point): the Feats window should come back on Selected with the
       details box still wide and no "<<" link.
 
+## 6a. Spells
+
+- [ ] Each caster build: the same classes, levels, slots and "Level N" / "Pact @ N" as VB, and the
+      same spells offered (rare Wizard/Artificer scrolls indented with "*").
+- [ ] Double-click or Enter on a spell fills the first empty slot; a class's free spell gets a new
+      free slot at the top.
+- [ ] Drag a spell onto a slot; drag a slot onto another (swap); drag a slot onto the list (clear);
+      double-click a slot (clear); the slot menu (this spell / this class / all).
+- [ ] Opening a saved warlock build: VB's main window (before opening Spells) should show the pact
+      spells missing (VB-BUGS #8); after opening the Spells window they're back.
+- [ ] **VB bug to confirm:** drag a rare scroll (e.g. Wizard level 6 Acid Fog) into a slot and save:
+      VB should write "  Acid Fog*" (VB-BUGS 18a).
+
 ## 7. Enhancements (Trees and Enhancements tabs)
 
 - [ ] Each sample build: the same trees, Class/Tier/AP columns, available trees and the

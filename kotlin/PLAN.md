@@ -640,6 +640,11 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         Show All, details, add by double-click or drag onto the blank slot, drag a slot to the list
         to clear it, the slot menu, the tier 5 question. The old Trees stand-in stays only for the
         Android demo.
+      - [x] Spells: core `SpellRules` (casting classes, spells offered with rare scrolls, free slots,
+        clearing, details) with tests; the window as frmSpells: slots by class and spell level (pact
+        and cure slots fixed), double-click / Enter / drag from the list, swap slots, drag to the list
+        to clear, the slot menu. Opening it runs InitBuildSpells, so pact slots are filled (as VB's
+        Form_Load). VB bugs kept, listed in `VB-BUGS.md` (18a-c).
       - [ ] Enhancements still open: the Leveling Guide tab (about half of frmEnhancements, with
         `InitGuideEnhancements` and the guide's errors in basBuild.bas), Export, Help, the mouse wheel,
         keeping the ability list's scroll position, "Destiny >" and "< Spells" (need those windows).

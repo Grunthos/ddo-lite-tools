@@ -104,7 +104,7 @@ fun EnhancementsWindowContent(state: PrototypeState, onNavigate: (String) -> Uni
                 listOf(screen.footerLeft()),
                 null,
                 right,
-                isEnabled = { link -> link != "< Spells" && link != "Destiny >" },
+                isEnabled = { link -> link != "Destiny >" },
                 onClick = { link -> onNavigate(link) },
             )
         }

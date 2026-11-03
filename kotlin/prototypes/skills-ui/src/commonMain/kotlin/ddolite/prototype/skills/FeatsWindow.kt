@@ -139,7 +139,7 @@ fun FeatsWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
                 listOf("< Skills"),
                 null,
                 listOf(next),
-                isEnabled = { link -> link != "Spells >" },
+                isEnabled = { true },
                 onClick = { link -> onNavigate(link) },
             )
         }

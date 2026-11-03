@@ -74,6 +74,8 @@ class PrototypeState(
 
     val enhancements = EnhancementsScreenState(this)
 
+    val spells = SpellsScreenState(this)
+
     init {
         skills.onChanged = { skillsChanged() }
         trees.onChanged = { storeTrees() }
@@ -116,6 +118,7 @@ class PrototypeState(
         refreshScreens()
         feats.cascade()
         enhancements.cascade()
+        spells.cascade()
         revision++
         onCascade(CascadeChange.ALL)
     }
@@ -135,6 +138,8 @@ class PrototypeState(
         if (change != CascadeChange.FEAT) {
             feats.cascade()
         }
+        // VB cascades to the Spells window after every change (basMain.bas:309).
+        spells.cascade()
         // And to the Enhancements window for these (basMain.bas:311).
         if (change == CascadeChange.ALL || change == CascadeChange.RACE || change == CascadeChange.CLASS ||
             change == CascadeChange.MAX_LEVEL || change == CascadeChange.FEAT || change == CascadeChange.ENHANCEMENTS
@@ -185,6 +190,12 @@ class PrototypeState(
     private fun storeTrees() {
         val result = opened ?: return
         trees.storeInto(result.rules)
+        dirty = true
+        revision++
+    }
+
+    /** A window changed the build without a cascade (VB's SetDirty alone). */
+    fun markDirty() {
         dirty = true
         revision++
     }
