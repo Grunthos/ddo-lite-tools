@@ -223,6 +223,8 @@ private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenW
  * going back ("< Overview") closes this window either way.
  */
 private fun footerLink(link: String, from: BuildScreen, state: PrototypeState, windows: OpenWindows) {
+    // UnloadForm (basMain.bas:228): the closing window's place is saved first, so the next one opens there.
+    saveDialogPosition(state.settings, windows.awtWindows[from])
     var target: EditScreen? = null
     for (screen in EditScreen.entries) {
         if (link == "< " + screen.screen.title || link == screen.screen.title + " >") {
@@ -374,7 +376,8 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             }
         },
         title = appCaption(files, state),
-        state = mainWindowState(state.settings),
+        // Remembered: made afresh on every recomposition, it would put the window back (maximized) each time.
+        state = remember { mainWindowState(state.settings) },
         onKeyEvent = { event -> mainWindowKey(event, windows, state) },
     ) {
         mainWindow[0] = window
@@ -698,6 +701,8 @@ private fun ScreenWindow(
             }
         },
         title = title,
+        // The Edit windows are Fixed Dialogs in VB (BorderStyle 3): no resizing or maximizing.
+        resizable = false,
         state = rememberWindowState(position = dialogPosition(state.settings, x, y), width = width.dp, height = height.dp),
     ) {
         windows.awtWindows[screen] = window

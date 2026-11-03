@@ -1,5 +1,7 @@
 package ddolite.prototype.skills
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
@@ -75,10 +77,12 @@ fun OutputPane(state: PrototypeState) {
     val rules = state.rules
     val vertical = rememberScrollState()
     val horizontal = rememberScrollState()
-    var modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.OUTPUT, ColorValue.BACKGROUND))
+    var modifier: Modifier = Modifier
     // CanDrag (basOutput.bas:2696): with a scroll bar showing, the output can be dragged with the mouse,
     // under a hand cursor (picBuild_MouseDown/Move/Up, frmMain.frm:862).
-    if (vertical.maxValue > 0 || horizontal.maxValue > 0) {
+    val showVertical = vertical.maxValue in 1 until Int.MAX_VALUE
+    val showHorizontal = horizontal.maxValue in 1 until Int.MAX_VALUE
+    if (showVertical || showHorizontal) {
         modifier = modifier.pointerHoverIcon(PointerIcon.Hand).pointerInput(Unit) {
             detectDragGestures { change, drag ->
                 change.consume()
@@ -87,11 +91,20 @@ fun OutputPane(state: PrototypeState) {
             }
         }
     }
-    Box(modifier = modifier.verticalScroll(vertical).horizontalScroll(horizontal)) {
-        if (rules != null) {
-            val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
-            OutputLines(lines, theme, state.settings.outputMargin)
+    // scrollVertical and scrollHorizontal (frmMain), shown when the output doesn't fit.
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.OUTPUT, ColorValue.BACKGROUND))) {
+        val width = maxWidth.value.toInt()
+        val height = maxHeight.value.toInt()
+        val contentWidth = if (showVertical) width - SCROLL_BAR else width
+        val contentHeight = if (showHorizontal) height - SCROLL_BAR else height
+        Box(modifier = modifier.size(contentWidth.dp, contentHeight.dp).verticalScroll(vertical).horizontalScroll(horizontal)) {
+            if (rules != null) {
+                val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
+                OutputLines(lines, theme, state.settings.outputMargin)
+            }
         }
+        ScrollBar(theme, vertical, width - SCROLL_BAR, 0, contentHeight)
+        ScrollBar(theme, horizontal, 0, height - SCROLL_BAR, contentWidth, vertical = false)
     }
 }
 

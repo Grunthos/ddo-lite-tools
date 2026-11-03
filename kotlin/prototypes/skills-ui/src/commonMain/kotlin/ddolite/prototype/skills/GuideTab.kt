@@ -1,5 +1,6 @@
 package ddolite.prototype.skills
 
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -160,7 +161,9 @@ private class GuideColumn(val header: String, val left: Int, val width: Int, val
 private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit) {
     val measurer = rememberTextMeasurer()
     val textStyle = TextStyle(fontSize = FONT_SIZE)
-    fun measure(text: String): Int = measurer.measure(text, textStyle).size.width
+    // The measurer works in pixels; the grid is laid out in dp.
+    val scale = LocalDensity.current.density
+    fun measure(text: String): Int = (measurer.measure(text, textStyle).size.width / scale).toInt()
     val space = measure(" ")
     val gridWidth = GRID_WIDTH - SCROLL_WIDTH
 

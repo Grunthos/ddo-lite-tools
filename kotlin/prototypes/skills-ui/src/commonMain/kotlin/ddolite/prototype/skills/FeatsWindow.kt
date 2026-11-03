@@ -236,12 +236,13 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
 private fun DetailsBox(screen: FeatsScreenState, theme: Theme, left: Int, top: Int, width: Int, height: Int) {
     val uriHandler = LocalUriHandler.current
     val text = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
+    val scroll = rememberScrollState()
     Box(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).offset(5.dp, 2.dp).width((width - 12).dp)) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(scroll).offset(5.dp, 2.dp).width((if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 12 - SCROLL_BAR else width - 12).dp)) {
             for (line in screen.details.lines) {
                 var color = text
                 if (line.error) {
@@ -272,6 +273,7 @@ private fun DetailsBox(screen: FeatsScreenState, theme: Theme, left: Int, top: I
                 }
             }
         }
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
     }
 }
 
@@ -286,12 +288,14 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     val textMeasurer = rememberTextMeasurer()
     val normal = TextStyle(fontSize = FONT_SIZE)
     val bold = TextStyle(fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
+    // The measurer works in pixels; the layout below is in dp.
+    val scale = LocalDensity.current.density
     // userList.UserControl_Initialize: slot height 4/3 of the text, a quarter of that between slots,
     // two spaces between columns.
-    val textHeight = textMeasurer.measure("X", normal).size.height
+    val textHeight = (textMeasurer.measure("X", normal).size.height / scale).toInt()
     val slotHeight = textHeight * 4 / 3
     val marginY = slotHeight / 4
-    val marginX = textMeasurer.measure("  ", normal).size.width
+    val marginX = (textMeasurer.measure("  ", normal).size.width / scale).toInt()
     var clientWidth = LIST_WIDTH - 2
     if (rows.size > MAX_ROWS) {
         clientWidth -= 17
@@ -317,13 +321,13 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     var x = marginX
     for (i in 0 until slotColumn) {
         lefts[i] = x
-        widths[i] = textMeasurer.measure(sizeTexts[i], bold).size.width
+        widths[i] = (textMeasurer.measure(sizeTexts[i], bold).size.width / scale).toInt()
         x = lefts[i] + widths[i] + marginX
     }
     lefts[slotColumn] = x
     var right = clientWidth - marginX
     for (i in headers.size - 1 downTo slotColumn + 1) {
-        widths[i] = textMeasurer.measure(sizeTexts[i], bold).size.width
+        widths[i] = (textMeasurer.measure(sizeTexts[i], bold).size.width / scale).toInt()
         lefts[i] = right - widths[i]
         right = lefts[i] - marginX
     }
@@ -332,7 +336,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     val textStyle = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     // DrawColumnHeaders: a header may be wider than its column; right-aligned ones then reach left.
     for (i in headers.indices) {
-        val headerWidth = textMeasurer.measure(headers[i], normal).size.width
+        val headerWidth = (textMeasurer.measure(headers[i], normal).size.width / scale).toInt()
         var x = lefts[i]
         if (aligns[i] == TextAlign.Center) {
             x = lefts[i] + (widths[i] - headerWidth) / 2
@@ -346,6 +350,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
             modifier = Modifier.offset((LIST_LEFT + 1 + x).dp, (LIST_TOP + LIST_HEADER - textHeight - 2).dp),
         )
     }
+    val scroll = rememberScrollState()
     Box(
         modifier = Modifier.offset(LIST_LEFT.dp, (LIST_TOP + LIST_HEADER).dp).size(LIST_WIDTH.dp, (LIST_HEIGHT - LIST_HEADER).dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
@@ -353,7 +358,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     ) {
         Box(
             modifier = Modifier.offset(1.dp, 1.dp).size((LIST_WIDTH - 2).dp, (LIST_HEIGHT - LIST_HEADER - 2).dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scroll),
         ) {
             val contentHeight = (slotHeight + marginY) * rows.size + marginY * 2
             Box(modifier = Modifier.size(clientWidth.dp, contentHeight.dp)) {
@@ -383,6 +388,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
                 }
             }
         }
+        ScrollBar(theme, scroll, LIST_WIDTH - 1 - SCROLL_BAR, 1, LIST_HEIGHT - LIST_HEADER - 2)
     }
 }
 
@@ -513,12 +519,14 @@ private fun ListBox(
         modifier = modifier.dropTarget(screen.drag, dropKey)
     }
     val clicks = remember { ClickTimer() }
+    val scroll = rememberScrollState()
+    val inner = if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 2 - SCROLL_BAR else width - 2
     Box(
         modifier = modifier
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Column(modifier = Modifier.offset(1.dp, 1.dp).size((width - 2).dp, (height - 2).dp).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.offset(1.dp, 1.dp).size(inner.dp, (height - 2).dp).verticalScroll(scroll)) {
             for (i in items.indices) {
                 var back = Color.Transparent
                 var color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
@@ -526,7 +534,7 @@ private fun ListBox(
                     back = HIGHLIGHT
                     color = HIGHLIGHT_TEXT
                 }
-                var itemModifier = Modifier.size((width - 2).dp, ITEM_HEIGHT.dp).background(back)
+                var itemModifier = Modifier.size(inner.dp, ITEM_HEIGHT.dp).background(back)
                     .pointerInput(i, items.size) {
                         awaitPointerEventScope {
                             while (true) {
@@ -560,6 +568,7 @@ private fun ListBox(
                 }
             }
         }
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
     }
 }
 

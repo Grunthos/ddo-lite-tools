@@ -48,6 +48,20 @@ file dialogs remember their folders only while the program runs.
 
 Still open from B8: the child-windows option, Convert Builds (.bld), the Colors editor.
 
+**Comparison findings** (Philip, 2026-11-04):
+- [x] No scroll bars on lists (e.g. the Messages window's feat guesses) or the main window: added, drawn by
+      `ScrollBar` (shown only when needed, as a VB ListBox's).
+- [x] The main window maximized again whenever another window opened: its window state was made afresh on
+      each redraw; now remembered.
+- [x] "Next >" / "< Back" opened the next window elsewhere: the closing window's place is now saved first
+      (UnloadForm), so the next opens in the same place. Sizes still differ per window, as in VB.
+- [x] Edit windows could be resized to no effect: now fixed size, as VB's (Fixed Dialog).
+- [x] Feats, Trees and Destiny slot lists had extra padding and overflowed (7 trees didn't fit): text was
+      measured in pixels but laid out in dp, so at Windows scaling above 100% everything grew. Fixed in
+      `UserList`, `FeatsWindow` and `GuideTab`.
+- [ ] "Errors" in the output's Feats heading: VB offers Tools › Messages while messages are unresolved (kept);
+      a link from the heading to the Feats window would be new. Decide.
+
 ---
 
 ## 1. Goals and non-goals

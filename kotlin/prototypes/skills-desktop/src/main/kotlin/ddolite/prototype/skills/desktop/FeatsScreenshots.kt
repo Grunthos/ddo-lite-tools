@@ -24,6 +24,11 @@ fun featsScreenshots(prototype: PrototypeState, kensei: ByteArray, repoRoot: Pat
     prototype.openBuild(readBuildFile(kensei, prototype.data, BuildPoints.ADVENTURER))
     val feats = prototype.feats
     feats.opened()
+    // At 150% display scaling (as Windows at 150%): the lists must fit as at 100%.
+    ImageComposeScene(width = 1223, height = 890, density = Density(1.5f)) { FeatsWindowContent(prototype) {} }.use { scene ->
+        shot(scene, outDir.resolve("20b-feats-150.png"))
+        shot(scene, outDir.resolve("20b-feats-150.png")) // again: the scroll bars need the first layout
+    }
     ImageComposeScene(width = 815, height = 593, density = Density(1f)) { FeatsWindowContent(prototype) {} }.use { scene ->
         shot(scene, outDir.resolve("20-feats-kensei.png"))
         // Choose the level 21 epic slot (an empty Destiny one is at 22): row of "Epic 21".

@@ -1,5 +1,6 @@
 package ddolite.prototype.skills
 
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -101,10 +102,12 @@ fun <T> UserList(
     val textMeasurer = rememberTextMeasurer()
     val normal = TextStyle(fontSize = FONT_SIZE)
     val bold = TextStyle(fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
-    val textHeight = textMeasurer.measure("X", normal).size.height
+    // The measurer works in pixels; the layout below is in dp.
+    val scale = LocalDensity.current.density
+    val textHeight = (textMeasurer.measure("X", normal).size.height / scale).toInt()
     val slotHeight = textHeight * 4 / 3
     val marginY = slotHeight / 4
-    val marginX = textMeasurer.measure("  ", normal).size.width
+    val marginX = (textMeasurer.measure("  ", normal).size.width / scale).toInt()
     val headerSpace = 30
     var clientWidth = width - 2
     if (rowCount > maxRows) {
@@ -121,13 +124,13 @@ fun <T> UserList(
     var x = marginX
     for (i in 0 until slotColumn) {
         lefts[i] = x
-        widths[i] = textMeasurer.measure(columns[i].sizeText, bold).size.width
+        widths[i] = (textMeasurer.measure(columns[i].sizeText, bold).size.width / scale).toInt()
         x = lefts[i] + widths[i] + marginX
     }
     lefts[slotColumn] = x
     var right = clientWidth - marginX
     for (i in columns.size - 1 downTo slotColumn + 1) {
-        widths[i] = textMeasurer.measure(columns[i].sizeText, bold).size.width
+        widths[i] = (textMeasurer.measure(columns[i].sizeText, bold).size.width / scale).toInt()
         lefts[i] = right - widths[i]
         right = lefts[i] - marginX
     }
@@ -136,7 +139,7 @@ fun <T> UserList(
     // DrawColumnHeaders: headers may be wider than their columns.
     val headerStyle = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     for (i in columns.indices) {
-        val headerWidth = textMeasurer.measure(columns[i].header, normal).size.width
+        val headerWidth = (textMeasurer.measure(columns[i].header, normal).size.width / scale).toInt()
         var hx = lefts[i]
         if (columns[i].align == TextAlign.Center) {
             hx = lefts[i] + (widths[i] - headerWidth) / 2
@@ -145,12 +148,13 @@ fun <T> UserList(
         }
         BasicText(columns[i].header, style = headerStyle, softWrap = false, modifier = Modifier.offset((left + 1 + hx).dp, (top + headerSpace - textHeight - 2).dp))
     }
+    val scroll = rememberScrollState()
     Box(
         modifier = Modifier.offset(left.dp, (top + headerSpace).dp).size(width.dp, (height - headerSpace).dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.WORKSPACE, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Box(modifier = Modifier.offset(1.dp, 1.dp).size((width - 2).dp, (height - headerSpace - 2).dp).verticalScroll(rememberScrollState())) {
+        Box(modifier = Modifier.offset(1.dp, 1.dp).size((width - 2).dp, (height - headerSpace - 2).dp).verticalScroll(scroll)) {
             Box(modifier = Modifier.size(clientWidth.dp, ((slotHeight + marginY) * rowCount + marginY * 2).dp)) {
                 for (r in 0 until rowCount) {
                     val row = r + 1
@@ -181,6 +185,7 @@ fun <T> UserList(
                 }
             }
         }
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - headerSpace - 2)
     }
 }
 
@@ -335,12 +340,14 @@ fun <T> ListBox(
     }
     val clicks = remember { DoubleClickTimer() }
     val buttons = remember { arrayOf(PointerButton.PRIMARY) }
+    val scroll = rememberScrollState()
+    val inner = if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 2 - SCROLL_BAR else width - 2
     Box(
         modifier = modifier
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Column(modifier = Modifier.offset(1.dp, 1.dp).size((width - 2).dp, (height - 2).dp).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.offset(1.dp, 1.dp).size(inner.dp, (height - 2).dp).verticalScroll(scroll)) {
             for (i in items.indices) {
                 var back = Color.Transparent
                 var color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
@@ -351,7 +358,7 @@ fun <T> ListBox(
                     back = HIGHLIGHT
                     color = HIGHLIGHT_TEXT
                 }
-                var itemModifier = Modifier.size((width - 2).dp, 15.dp).background(back)
+                var itemModifier = Modifier.size(inner.dp, 15.dp).background(back)
                     .pointerInput(i, items.size, enabled) {
                         awaitPointerEventScope {
                             while (true) {
@@ -386,6 +393,7 @@ fun <T> ListBox(
                 }
             }
         }
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
     }
 }
 
@@ -394,12 +402,13 @@ fun <T> ListBox(
 fun DetailsBox(theme: Theme, lines: List<DetailLine>, left: Int, top: Int, width: Int, height: Int) {
     val uriHandler = LocalUriHandler.current
     val text = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
+    val scroll = rememberScrollState()
     Box(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).offset(5.dp, 2.dp).width((width - 12).dp)) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(scroll).offset(5.dp, 2.dp).width((if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 12 - SCROLL_BAR else width - 12).dp)) {
             for (line in lines) {
                 var color = text
                 if (line.error) {
@@ -424,5 +433,6 @@ fun DetailsBox(theme: Theme, lines: List<DetailLine>, left: Int, top: Int, width
                 }
             }
         }
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
     }
 }

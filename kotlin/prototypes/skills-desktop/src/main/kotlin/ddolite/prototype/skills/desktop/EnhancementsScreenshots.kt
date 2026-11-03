@@ -24,6 +24,9 @@ fun enhancementsScreenshots(prototype: PrototypeState, repoRoot: Path, outDir: P
     prototype.openBuild(readBuildFile(Files.readAllBytes(file), prototype.data, BuildPoints.ADVENTURER))
     val screen = prototype.enhancements
     screen.opened()
+    ImageComposeScene(width = 1223, height = 833, density = Density(1.5f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
+        shot(scene, outDir.resolve("30b-enh-trees-150.png"))
+    }
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
         shot(scene, outDir.resolve("30-enh-trees.png"))
         screen.chooseTab(1)
