@@ -1,10 +1,52 @@
 # DDO Lite Tools – Kotlin Conversion Plan
 
-Status: **Draft v2** (adds mobile constraints) · Last updated: 2026-11-02 · Owner: Philip Warner
+Status: **Draft v2** (adds mobile constraints) · Last updated: 2026-11-04 · Owner: Philip Warner
 
 This is the working plan for converting the VB6 DDO Lite Tools (Character Builder,
 Cannith Crafting, Compendium) to Kotlin. It is meant to be kept up to date as work
 progresses: tick off tasks, record decisions in §3, and add risks to §12.
+
+---
+
+## 0. Current status (2026-11-04)
+
+The desktop Character Builder has every window of VB's Edit, File, Tools, Window and Help menus except
+Convert Builds and Colors, and is ready for a side-by-side comparison with VB (checklist in
+[TESTING.md](TESTING.md), VB bugs found in [VB-BUGS.md](VB-BUGS.md)). Everything is committed on the
+`kotlin` branch; nothing is pushed.
+
+**Built** (rules in `builder-core`, screens in `prototypes/skills-ui`, the app in `prototypes/skills-desktop`):
+- All data files and the `ProcessData` checks; `.build` reading and writing (byte for byte on current files);
+  renamed/removed items and the Messages window.
+- Windows: Overview, Stats (with Customize and user templates), Skills, Feats, Spells, Enhancements (with the
+  Leveling Guide tab), Destinies, Messages, Export, Import (from Forums, Ron's Planner, DDO Builder), Output
+  Format editor, Options, Help, About.
+- Main window: the build output (every section, as basOutput), drag to scroll, File menu with recent files,
+  Window menu with Cascade Windows, Tools › Error Log, Help menu.
+- Exports: forum text in every format, Ron's Planner, DDO Builder, leveling guide csv/txt.
+- Settings, autosave backup, the command line, the error log.
+
+**Files this version writes** (VB's own are never changed): `Settings-Kotlin.txt` (read from VB's
+Settings.txt the first time), `Error-Kotlin.log`, `Backup-Kotlin.build`. All are in `.gitignore`.
+
+**Differences from VB on purpose:** crashes are not copied (each is in VB-BUGS under Crashes); binary `.bld`
+builds can't be opened (Convert Builds isn't ported); Reload Templates logs only the templates' errors;
+the command line takes arguments without quotes; the Settings file's Paths section isn't used yet, so the
+file dialogs remember their folders only while the program runs.
+
+**Steps, in order** (agreed 2026-11-03):
+1. [x] Leveling Guide.
+2. [x] Output, then Export.
+3. [x] Settings and Options.
+4. [x] Import and the format editor.
+5. [x] Help, Tools and loose ends (B8 below), except the child-windows option.
+6. [ ] **Compare with VB** (Philip, using TESTING.md); fix what's found.
+7. [ ] Logic/screen tidy-up: move the rules still in the `*ScreenState` classes into `builder-core`; make
+       the windows dialogs owned by the main window (the child-windows option); rename the prototype modules.
+8. [ ] Packaging (portable zip with Data/ and Settings/, file association for .build).
+9. [ ] Android; then Cannith Crafting and the Compendium.
+
+Still open from B8: the child-windows option, Convert Builds (.bld), the Colors editor.
 
 ---
 
@@ -281,8 +323,9 @@ Each step lists its deliverables and the test that marks it done.
 - [x] Export to Ron's Planner and DDO Builder: `PlannerExport` (basFormat's alignment, stat raises, past lives,
       feat transposing with VB's feat-map shellsort; ExportFileRon, ExportFileBuilder). VB bug 6a (Ron's export always
       fails) isn't copied.
-- [ ] Import from Forums, Ron's Planner and DDO Builder (frmImport, the import halves of basFormatRon and basFormatBuilder).
-- [ ] Port `basFormatRon`, `basFormatBuilder` (import + export), leveling guide csv/txt.
+- [x] Import from Forums, Ron's Planner and DDO Builder (frmImport, the import halves of basFormatRon and
+      basFormatBuilder): `imports/PlannerImport`, `imports/ForumImport`. VB bugs: 6b, 18j-18r.
+- [x] Port `basFormatRon`, `basFormatBuilder` (import + export), leveling guide csv/txt.
 - **Done when:** golden output tests pass for all builds, formats and exports. From here on, porting more rules means making more golden diffs pass.
 
 ### B7 – Settings
@@ -653,17 +696,16 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         a level that class, drag in the class column to swap two levels), the Sub-Race notice and the
         "erase the Leveling Guide?" question. Rules in core `OverviewRules` with tests; the build part
         of `CascadeChanges` in `BuildRules.cascadeChanges`.
-      - [ ] Overview still open: the combo-box layout used when icons are off in Options (needs the
-        settings), the Help link, saved window positions, and a
-        by-eye comparison with the VB form (fonts: Verdana isn't bundled yet).
+      - [ ] Overview still open: the combo-box layout used when icons are off in Options, and a by-eye
+        comparison with the VB form (fonts: Verdana isn't bundled yet). (Help and saved window positions done.)
       - Not ported in the cascade yet: `InitBuildSkills` (the Skills screen builds its own grid) and
         `CheckSlotErrors` (comes with the Feats screen).
       - [x] Stats: the four point-buy columns (userStats: costs, the preferred column carrying changes to
         the others, Include boxes, Drow without Champion), preferred build points, level-ups ("All Levels"),
         tomes (Supreme, locked to max level), class templates (with warnings for 5 s), Clear Stats, and the
         Schedule tab. Rules in core `StatRules` with tests. Footer links move between Overview, Stats and Skills.
-      - [ ] Stats still open: the Customize link (editing template files), the Help link, the preferred
-        point-buy setting (`cfg.BuildPoints`; Adventurer for now). **Check in VB:** the Schedule tab with a
+      - [x] Stats: the Customize link and user templates, the Help link, the preferred point-buy setting.
+        **Check in VB:** the Schedule tab with a
         level-up stat chosen: `DrawLevelupRow` runs to level 36 but `CellLeft` stops at 30, which looks like
         a "Subscript out of range" crash; Kotlin stops at 30.
       - VB quirk kept: `CalculateLevelup` counts level-ups only to level 32 ("NEED MAX LEVEL HERE"), so the
@@ -674,8 +716,8 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         the levels for a multiclass build (`cfg.IconSkills`, VB's default; initials on Android), the
         right-click menu on skill names, the Contrast menu (default Medium), the Skill Tomes tab,
         Clear Skills / Clear Tomes, and the footer links.
-      - [ ] Skills still open: the Help link, `cfg.SkillOrderScreen` "native skills first" row order,
-        VB's unique class initials (`GetClassSplit`) when icons are off, saving the Contrast setting.
+      - [ ] Skills still open: VB's unique class initials (`GetClassSplit`) when icons are off. (Help, the
+        "Native First" row order and saving the Contrast setting done.)
       - Manual checks for Philip are listed in `TESTING.md`.
       - [x] Feats: core `FeatRules` (basBuild.bas's feat list, `CheckFeatSlot`, `CheckSlotErrors`,
         `IdentifyTakenFeats`, `SlotLocked`, `AddSpecialFeat`/`DeleteFeatSlot`, and frmFeats' feat and
@@ -685,9 +727,9 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         the details box (widen/restore, wiki link), drag from the lists to a slot, slot to slot (swap) and
         slot to the list (clear), double-clicks, and the slot menu (clear, clear all, alternate, exchange
         with VB's level dialog, delete).
-      - [ ] Feats still open: tab error marks with channels on (`ShowChannelErrors`), the Help link,
-        keeping the feat list's scroll position (`SaveScrollPosition`), the mouse wheel, the "group
-        related feats" order (`cfg.FeatOrder`), and "Spells >" (needs Spells).
+      - [ ] Feats still open: tab error marks with channels on (`ShowChannelErrors`), keeping the feat list's
+        scroll position (`SaveScrollPosition`), and the mouse wheel. (Help, "Spells >" and the "Group
+        Related" order done.)
       - [x] Enhancements, Trees and Enhancements tabs: core `EnhancementRules` (basBuild.bas's AP
         spent and available with racial/universal pools, spent in tree, level and AP requirements,
         `CheckAbilityErrors` with requirements and ranks, selectors, insertion order, tier 5, details
@@ -713,15 +755,14 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         Choose / Ignore / OK. Rules in `DeprecationMessages`, with tests. The binary-build groups (War
         Soul, reset trees) aren't copied: the prototype doesn't read .bld files. VB bugs kept: 18f
         (DestinyTier5 never read), 22b-d in `VB-BUGS.md`.
-      - [ ] Destinies still open: Help, the mouse wheel, the ability list's scroll position. (VB's
+      - [ ] Destinies still open: the mouse wheel, the ability list's scroll position. (Help done.) (VB's
         older frmDestiny, with twists and fate points, isn't used by the Edit menu.)
       - [x] Leveling Guide tab: `GuideRules` (InitGuideEnhancements, GuideAbilityML, CalculateGuideLevels,
         CheckGuideErrors and the tab's lists, selectors, adding, row moves and deletes, details) with
         tests; the tab as frmEnhancements' picTab(2) with the 20-row grid, row selection (click, Ctrl,
         Shift, drag), the row menu and the scroll bar. VB bugs kept: 18g (default filter shows all), 18h,
         22f; 22e (level requirements written to the other tab's box) shows the same, without the stray lines.
-      - [ ] Enhancements still open: Export (the guide as csv, with the build output), Help, the mouse
-        wheel on the other tabs, keeping the ability list's scroll position, auto-scroll while
+      - [ ] Enhancements still open: the mouse wheel on the other tabs, keeping the ability list's scroll position, auto-scroll while
         drag-selecting guide rows (tmrScroll).
       - VB quirks kept: emptying any tree clears the tier 5 tree even if it's another tree; deleting or
         resetting a tree from the menu leaves the tier 5 tree set; "Delete All Trees" loses the race
@@ -739,7 +780,8 @@ desktop first; Android only has to keep compiling (CI) until phase G.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.
 10. [ ] 1A: assemble the build set (§6.2) now; capture the first snapshot when 4.15.0 is released.
 11. [ ] Confirm D-6, D-8, D-9, D-11, D-12.
-12. [ ] Tell the data maintainers: `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice); `Spells.txt` lists Prismatic Strike twice (lines 1371 and 1892). Requirements that
+12. [ ] Tell the data maintainers: (the full list is in VB-BUGS.md, "Data file errors"; since added:
+    `Help.txt:379-380` broken Spinners link, `FeatMap.txt:208` Dilettante Wizard/Warlock) `Classes.txt:481` repeats Warlock's Fey `PactSpells` line (VB6 loads it twice); `Spells.txt` lists Prismatic Strike twice (lines 1371 and 1892). Requirements that
     never match (VB6 is silent): `Enhancements.txt:8058` Halfling tier 3 Halfling Guile requires "Tier 2: Halfling
     Guile" (there is none); `Enhancements.txt:14560` Vile Chemist Simple Thrown Mastery requires "Feat: Simple
     Thrown Weapon Expertise" (the feat is "Simple Thrown Expertise").

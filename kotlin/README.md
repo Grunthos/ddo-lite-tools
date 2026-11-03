@@ -1,7 +1,11 @@
 # DDO Lite Tools – Kotlin conversion
 
 Work in progress: converting the VB6 Character Builder, Cannith Crafting and Compendium
-to Kotlin. See [PLAN.md](PLAN.md) for the plan and its current status.
+to Kotlin. See [PLAN.md](PLAN.md) for the plan and its current status (§0), [TESTING.md](TESTING.md)
+for the checks against VB, and [VB-BUGS.md](VB-BUGS.md) for the VB bugs found while porting.
+
+The Character Builder runs on Windows (desktop) with every window except Convert Builds and Colors;
+Cannith Crafting and the Compendium haven't been started.
 
 The VB6 apps are unaffected: this folder isn't part of their release zip, and both
 versions read the same `../Data` folder.
@@ -22,8 +26,8 @@ Needs JDK 21. The Android target also needs the Android SDK: set `ANDROID_HOME`,
 | Module | What it is |
 |---|---|
 | `data-format` | Reading data files: Windows-1252/BOM decoding, VB6 string functions (`Vb`), basUtils helpers, record splitting, `DataSource` |
-| `common` | Shared by all three apps: colour themes (.screen files) so far |
-| `builder-core` | Character Builder logic: `ParseLine`, Races/Classes loaders, skills grid rules |
+| `common` | Shared by all three apps: colour themes (.screen files), the RES file reader (class icons), Help.txt |
+| `builder-core` | Character Builder logic, no UI: data loaders (`data`), the build and its rules (`build`), output and exports (`output`), imports (`imports`), settings (`settings`) |
 | `tools/validate` | Command-line data validator, run by CI |
 | `tools/form-layout` | Reads VB6 `.frm` files: layout report (rows/columns from absolute positions) and wireframe PNGs, for the F0 inventory |
 
@@ -44,9 +48,15 @@ later be used by a mobile app. Code in them must not use JVM-only APIs (`java.io
   `Vb.cLng` rather than the Kotlin equivalents wherever the difference could change a result.
   Improve on VB only once tests prove the behaviour is unchanged.
 
-## Prototypes (plan step F1)
+## The Character Builder app (still in the `prototypes` modules)
 
-Throwaway code to test Compose before building the real screens; see PLAN.md §8.2.
+Started as the Compose test drive (PLAN.md §8.2) and grew into the Builder; the modules are to be renamed
+in the tidy-up step.
+
+It reads `Data/` and `Settings/` from the repository (or next to the .exe), and writes only its own files
+there: `Settings-Kotlin.txt` (started from VB's Settings.txt the first time), `Error-Kotlin.log` and
+`Backup-Kotlin.build` (the autosave). VB's files are never changed. A `.build` file on the command line is
+opened at start.
 
 ```
 ./gradlew :prototypes:skills-desktop:run           # open the prototype window
@@ -57,6 +67,6 @@ Throwaway code to test Compose before building the real screens; see PLAN.md §8
 
 | Module | What it is |
 |---|---|
-| `prototypes/skills-ui` | Shared screens (desktop + Android): themed spinner, skills grid, tree slots with drag-and-drop |
-| `prototypes/skills-desktop` | Desktop window and the off-screen screenshot tool |
+| `prototypes/skills-ui` | The screens and their state (desktop + Android): every Builder window |
+| `prototypes/skills-desktop` | The desktop app (windows, menus, file dialogs, settings file) and the off-screen screenshot tool |
 | `prototypes/skills-android` | Android app wrapping the same screens |

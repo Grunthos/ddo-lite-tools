@@ -189,6 +189,49 @@ look for anything different.
 - [ ] File menu recent files: open one; one that's gone asks to be removed from the list.
 - [ ] Tools › Options: each setting as VB; Show All Feats only shows in the output after the next change (as VB).
 
+- [ ] Tools › Options › Skill Order "Native First": the Skills grid lists the main class's native skills, then
+      the other classes' native skills, then the rest. Feat Order "Group Related": the Feats list sorts by
+      SortName and indents related feats two spaces.
+- [ ] Options › BBCodes, the Export window's "Format:" and the help links open the format editor ("Output
+      Format"): Load, Save As (a .bbcodes file in Settings), Apply Changes (lit only after a change),
+      "Apply changes?" on closing; Reddit and BBCodes enable the tags as VB.
+
+## 7g. Import
+
+- [ ] File › Import › from Ron's Planner and from DDO Builder: files exported by either version come back
+      the same (past lives aren't imported, as VB); the build is unsaved, with no file name.
+- [ ] **VB bug to confirm:** a DDO Builder file starting with `<?xml …?>` imports nothing:
+      VB's tag reader stops at the declaration (18r).
+- [ ] **VB bug to confirm:** a Drow Champion exported to DDO Builder comes back as Adventurer (18q).
+- [ ] File › Import › from Forums: paste a build copied from a forum post, Translate Build.
+- [ ] **VB bugs to confirm** (18j-p): only levels 1-5 of the Level Order come back; any build with a
+      Destinies section fails ("Invalid or Incomplete build text…"); spells come back as "Name (3)";
+      "Half-Elf" reads as Elf; the 32 and 36 level-ups are ignored.
+
+## 7h. Help, About, Error Log
+
+- [ ] Every window's Help link opens the same topic as VB; links inside topics (other topics, web pages,
+      files, windows) and "< Back"; Escape closes the Help window.
+- [ ] **VB bug to confirm:** the Destinies window's Help says "Help Code 'Destinies' not found." (22h).
+- [ ] Help menu: What's New?, FAQ, Save File Specifications, DDO Forums, ddowiki Dashboard, About.
+- [ ] With a data error (e.g. a misspelt class in a copy of Templates.txt): Error-Kotlin.log is written,
+      opened at start-up when "Show Error Log on startup" is on, and Tools › Error Log appears.
+
+## 7i. Start-up, autosave and templates
+
+- [ ] Autosave: change a build, switch a Feats/Enhancements/Destinies tab or close a build window, then
+      end the program without saving (Task Manager). At the next start: "A backup build was autosaved.
+      Open it now?"; Yes opens it unsaved with no file name; No deletes it. (Kotlin's file is
+      Backup-Kotlin.build; VB's Backup.bld is left alone.)
+- [ ] Command line: `CharacterBuilderPrototype.exe "Kensei Warpriest.build"` opens it (a bare name is
+      looked for in the program's folder, then Save).
+- [ ] Stats › Customize: Edit Custom Templates (copies the shipped file to Save\Templates.txt and opens
+      it), Reload Templates, Delete Custom Templates (only with a custom file), Edit System Templates.
+      A custom file older than the shipped one is ignored, and "Stat Template Change" help shows at start.
+- [ ] Main window: drag the output with the mouse when it has scroll bars (hand cursor).
+- [ ] Window menu: Cascade Windows (from the screen's top-left, as VB), the open windows in VB's order
+      with the active one ticked. **VB bug to confirm:** the Destinies window is never listed (22i).
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.

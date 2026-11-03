@@ -210,6 +210,11 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     writes Champion/Hero/Legend as 28/30/32 for a Drow; import (`FilterPoints`, :446) reads 28 as
     Adventurer and 30 as Champion. *Fix:* read 28-36 by race, as `GetBuildPoints` does.
 
+18r. **Confirm: DDO Builder files with an XML declaration import nothing.** `Modules/Build/basFormatBuilder.bas:313`
+    `ParseTags` takes `<?xml version="1.0"?>` as a tag, finds no `</?xml …>` to close it, and stops
+    reading. Only matters if DDO Builder writes a declaration (VB's own export doesn't). *Fix:* skip
+    tags starting with "?" or "!".
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`

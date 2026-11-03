@@ -504,7 +504,7 @@ private class BuilderReader(private val data: BuilderData, preferred: BuildPoint
      * tags inside is read into, else its text is the value. AutomaticFeats, EnhancementSpendInTree,
      * EpicDestinySpendInTree, TwistOfFate and TrainedSpell are skipped.
      *
-     * VB quirk, kept: a tag with attributes, a comment or an `<?xml ?>` declaration has no matching
+     * VB quirk, kept (VB-BUGS 18r): a tag with attributes, a comment or an `<?xml ?>` declaration has no matching
      * close tag, which ends the reading of that level: a file that starts with a declaration
      * imports nothing.
      */
