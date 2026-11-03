@@ -283,19 +283,19 @@ class SpellsScreenState(private val session: PrototypeState) {
             }
         } else if (caption == "Clear all spells") {
             if (classes.size > 1) {
-                if (!session.prompts.confirm("Clear all spells for all classes and levels?")) {
+                if (!session.ask("Clear all spells for all classes and levels?")) {
                     return
                 }
                 r.clearAllSpells()
             } else {
-                if (!session.prompts.confirm("Clear all spells for all levels?")) {
+                if (!session.ask("Clear all spells for all levels?")) {
                     return
                 }
                 r.clearClassSpells(c)
             }
             afterClearClass()
         } else {
-            if (!session.prompts.confirm("Clear all " + c.name + " spells for all levels?")) {
+            if (!session.ask("Clear all " + c.name + " spells for all levels?")) {
                 return
             }
             r.clearClassSpells(c)

@@ -86,6 +86,9 @@ class PrototypeState(
     /** The Export window (frmExport). */
     val export = ExportScreenState(this)
 
+    /** The Help window (frmHelp). */
+    val help = HelpScreenState(this)
+
     /** Called after a change, with what changed, so the app can close windows that no longer make sense. */
     var onCascade: (CascadeChange) -> Unit = {}
 
@@ -227,6 +230,17 @@ class PrototypeState(
         dirty = true
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
+    }
+
+    /**
+     * VB's `Ask` (basUtils.bas:60): the question only with Confirmation Prompts on (Options), else
+     * yes. Questions VB always asks (`AskAlways`) call [prompts] directly.
+     */
+    fun ask(message: String): Boolean {
+        if (!settings.confirm) {
+            return true
+        }
+        return prompts.confirm(message)
     }
 
     /** Bumped when the settings change, so menus that show them (recent files) redraw. */

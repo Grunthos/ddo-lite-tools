@@ -541,7 +541,7 @@ class GuideScreenState(private val session: PrototypeState) {
             g.deleteToEnd(row)
             refreshGuide(0, 0)
         } else if (caption == "Delete All") {
-            if (session.prompts.confirm("Clear Leveling Guide?")) {
+            if (session.ask("Clear Leveling Guide?")) {
                 g.clear()
                 refreshGuide(0, 0)
             }

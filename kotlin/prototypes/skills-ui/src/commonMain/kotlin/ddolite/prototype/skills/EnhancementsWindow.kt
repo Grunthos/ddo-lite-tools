@@ -79,9 +79,10 @@ fun EnhancementsWindowContent(state: PrototypeState, onExportGuide: () -> Unit =
                 listOf("Trees", "Enhancements", "Leveling Guide"),
                 screen.tab,
                 right,
-                isEnabled = { link -> link != "Help" && link != "Export" },
+                isEnabled = { true },
                 onClick = { link ->
                     when (link) {
+                        "Help" -> state.help.show(if (screen.tab == 2) "Leveling_Guide" else "Enhancements")
                         "Trees" -> screen.chooseTab(0)
                         "Enhancements" -> screen.chooseTab(1)
                         "Leveling Guide" -> screen.chooseTab(2)

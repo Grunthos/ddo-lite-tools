@@ -138,8 +138,14 @@ fun OverviewWindowContent(state: PrototypeState, classIcons: Map<String, ImageBi
                 listOf("Overview", "Notes"),
                 if (overview.notesTab) 1 else 0,
                 listOf("Help"),
-                isEnabled = { link -> link != "Help" },
-                onClick = { link -> overview.showTab(link == "Notes") },
+                isEnabled = { true },
+                onClick = { link ->
+                    if (link == "Help") {
+                        state.help.show("Overview")
+                    } else {
+                        overview.showTab(link == "Notes")
+                    }
+                },
             )
         }
         Box(modifier = Modifier.offset(8.dp, 584.dp).size(858.dp, 26.dp)) {

@@ -117,7 +117,7 @@ class StatsScreenState(private val session: PrototypeState) {
         if (r.hasTomes()) {
             val answer = session.prompts.yesNoCancel("Keep tomes?", "Clear Stats") ?: return
             keepTomes = answer
-        } else if (!session.prompts.confirm("Clear stats and levelups?")) {
+        } else if (!session.ask("Clear stats and levelups?")) {
             return
         }
         // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.

@@ -133,7 +133,7 @@ fun OptionsWindowContent(state: PrototypeState) {
         OptionsButton(theme, "BBCodes", false, 352, 384)
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { false }, onClick = {})
+            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Options") })
         }
 
         // The open combo's list, over everything.

@@ -87,7 +87,7 @@ fun MessagesWindowContent(state: PrototypeState) {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             // usrHeader_Click (:229): Help only.
-            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { false }, onClick = {})
+            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Messages") })
         }
     }
 }

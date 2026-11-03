@@ -77,9 +77,11 @@ fun DestinyWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
                 listOf("Destiny Trees", "Destinies"),
                 screen.tab,
                 listOf("Help"),
-                isEnabled = { link -> link != "Help" },
+                isEnabled = { true },
                 onClick = { link ->
-                    if (link == "Destiny Trees") {
+                    if (link == "Help") {
+                        state.help.show("Destinies") // VB asks for a topic Help.txt doesn't have (VB-BUGS 22h)
+                    } else if (link == "Destiny Trees") {
                         screen.chooseTab(0)
                     } else if (link == "Destinies") {
                         screen.chooseTab(1)

@@ -146,7 +146,7 @@ fun SpellsWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
             }
         }
         Column(modifier = Modifier.fillMaxWidth()) {
-            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { false }, onClick = {})
+            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Spells") })
         }
         Box(modifier = Modifier.offset(0.dp, SPELLS_FOOTER_TOP.dp).size(SPELLS_WIDTH.dp, 26.dp)) {
             // usrFooter_Click (:240).

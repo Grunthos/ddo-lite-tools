@@ -116,9 +116,11 @@ fun SkillsWindowContent(state: PrototypeState, classIcons: Map<String, ImageBitm
                 listOf("Skill Ranks", "Skill Tomes"),
                 tab,
                 listOf("Contrast", "Help"),
-                isEnabled = { link -> link != "Help" },
+                isEnabled = { true },
                 onClick = { link ->
-                    if (link == "Skill Ranks") {
+                    if (link == "Help") {
+                        state.help.show("Skills")
+                    } else if (link == "Skill Ranks") {
                         skills.tomesTab = false
                     } else if (link == "Skill Tomes") {
                         skills.tomesTab = true
@@ -142,11 +144,11 @@ fun SkillsWindowContent(state: PrototypeState, classIcons: Map<String, ImageBitm
                 isEnabled = { true },
                 onClick = { link ->
                     if (link == "Clear Skills") {
-                        if (state.prompts.confirm("Clear all skills?")) {
+                        if (state.ask("Clear all skills?")) {
                             skills.clearSkills()
                         }
                     } else if (link == "Clear Tomes") {
-                        if (state.prompts.confirm("Clear all skill tomes?")) {
+                        if (state.ask("Clear all skill tomes?")) {
                             skills.clearTomes()
                         }
                     } else {

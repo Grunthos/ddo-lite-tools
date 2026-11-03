@@ -214,6 +214,10 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     `oeDestiny` (`ValidDestinies`, :2354) or the other windows' values, so only the name, classes and
     race show. *Fix:* `ActivateForm oeDestiny` (or accept oeDestiny2 in `ValidDestinies`).
 
+22h. **The Destinies window's Help link says "Help Code 'Destinies' not found."**
+    `Forms/Build/frmDestiny2.frm:655` asks for `ShowHelp "Destinies"`, but Help.txt's topic is
+    "Destiny" (:758). *Fix:* `ShowHelp "Destiny"`.
+
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
 
@@ -261,3 +265,5 @@ spell; `Tomes.txt` values go through `Val`, so "3 3" means 33.
 - `Enhancements.txt:8058` Halfling tier 3 Halfling Guile requires "Tier 2: Halfling Guile" (there is none).
 - `Enhancements.txt:14560` Vile Chemist Simple Thrown Mastery requires "Feat: Simple Thrown Weapon
   Expertise" (the feat is "Simple Thrown Expertise").
+- `Help.txt:379-380` (Options topic) breaks the Spinners link over two lines, so the window shows
+  "=Spinners}Spinners" as plain text. Join the lines and restore `{hlp=Spinners}`.

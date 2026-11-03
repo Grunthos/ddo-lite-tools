@@ -138,6 +138,18 @@ fun main(args: Array<String>) {
     ImageComposeScene(width = 474, height = 428, density = Density(1f)) { ddolite.prototype.skills.OptionsWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("7e-options.png"))
     }
+    // The Help window (Help on the Leveling Guide tab, then a help link) and About.
+    prototype.help.help = ddolite.common.help.HelpText.parse(decodeText(Files.readAllBytes(repoRoot.resolve("Data").resolve("Builder").resolve("Help.txt"))).text)
+    prototype.help.show("Leveling_Guide")
+    ImageComposeScene(width = 501, height = 491, density = Density(1f)) { ddolite.prototype.skills.HelpWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("7f-help.png"))
+        prototype.help.clickLink("hlp=Options")
+        save(scene, outDir.resolve("7g-help-link.png"))
+    }
+    prototype.help.close()
+    ImageComposeScene(width = 262, height = 139, density = Density(1f)) { ddolite.prototype.skills.AboutWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("7h-about.png"))
+    }
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))
     }

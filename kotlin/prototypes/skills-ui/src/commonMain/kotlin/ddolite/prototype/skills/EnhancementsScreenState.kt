@@ -384,7 +384,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                 populateCombo()
             }
             1 -> {
-                if (!session.prompts.confirm("Delete all trees?")) {
+                if (!session.ask("Delete all trees?")) {
                     return
                 }
                 build.trees.clear()
@@ -401,7 +401,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
                 build.trees[row - 1].abilities.clear()
             }
             4 -> {
-                if (!session.prompts.confirm("Reset all trees?")) {
+                if (!session.ask("Reset all trees?")) {
                     return
                 }
                 for (bt in build.trees) {
@@ -845,7 +845,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
             return
         }
         val bt = currentBuildTree() ?: return
-        if (!session.prompts.confirm("Reset $comboTree?")) {
+        if (!session.ask("Reset $comboTree?")) {
             return
         }
         bt.abilities.clear()
@@ -961,7 +961,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
         val bt = currentBuildTree() ?: return true
         val tier5 = r.build.tier5
         if (choice.first == 5 && tier5.isNotEmpty() && tier5 != bt.treeName) {
-            if (session.prompts.confirm("Make " + bt.treeName + " your Tier 5 tree?\n\n(This will clear Tier 5 enhancements from the " + tier5 + " tree.)")) {
+            if (session.ask("Make " + bt.treeName + " your Tier 5 tree?\n\n(This will clear Tier 5 enhancements from the " + tier5 + " tree.)")) {
                 EnhancementRules(r).setTier5(bt.treeName)
             } else {
                 return false

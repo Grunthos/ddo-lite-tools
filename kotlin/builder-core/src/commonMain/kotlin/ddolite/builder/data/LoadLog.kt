@@ -66,4 +66,49 @@ class LoadLog {
     fun vbDifference(file: String, line: Int?, message: String) {
         issues.add(LoadIssue(file, line, "$file: $message", null, vbDifference = true))
     }
+
+    /** The problems VB reports (not the ones only this version finds). */
+    fun vbErrors(): List<LoadIssue> {
+        val result = ArrayList<LoadIssue>()
+        for (issue in issues) {
+            if (!issue.vbDifference) {
+                result.add(issue)
+            }
+        }
+        return result
+    }
+
+    /**
+     * The error log's text: "N Errors:", a blank line, then each error's lines, CRLF line ends.
+     * Ported from `CreateErrorLog` / `ErrorLogText` (basErrorLog.bas:260, :274). Problems VB doesn't
+     * report follow under their own heading. Empty when VB would write no log.
+     */
+    fun errorLogText(): String {
+        val errors = vbErrors()
+        if (errors.isEmpty()) {
+            return ""
+        }
+        val lines = ArrayList<String>()
+        lines.add(errors.size.toString() + " Errors:")
+        lines.add("")
+        for (issue in errors) {
+            lines.add(issue.message)
+            val detail = issue.detail
+            if (detail != null) {
+                lines.add(detail)
+            }
+        }
+        var first = true
+        for (issue in issues) {
+            if (issue.vbDifference) {
+                if (first) {
+                    lines.add("")
+                    lines.add("Also found by the Kotlin version (VB doesn't report these):")
+                    first = false
+                }
+                lines.add(issue.file + ": " + issue.message)
+            }
+        }
+        return lines.joinToString("\r\n")
+    }
 }

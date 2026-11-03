@@ -119,8 +119,11 @@ fun FeatsWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
                 captions,
                 current,
                 listOf("Help"),
-                isEnabled = { link -> link != "Help" },
+                isEnabled = { true },
                 onClick = { link ->
+                    if (link == "Help") {
+                        state.help.show("Feats")
+                    }
                     val tab = FeatTab.find(link)
                     if (tab != null) {
                         screen.chooseTab(tab)

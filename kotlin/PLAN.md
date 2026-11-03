@@ -294,6 +294,37 @@ Each step lists its deliverables and the test that marks it done.
       icons take effect. Not yet: BBCodes (format editor), Colors (VB's Colors program), Help; stored but unused so
       far: the screens' skill and feat orders, error log on startup, child windows, confirmation prompts.
 
+### B8 – Missed features (audit 2026-11-03)
+
+Every routine in the Builder's forms and modules was looked for in the Kotlin sources (which cite
+the VB routine they port). Unmatched ones that are mouse/drag plumbing, developer tools or binary
+.bld code are left out; the rest:
+
+- [x] **Error Log**: VB writes Error.log from the data load (CreateErrorLog, basErrorLog.bas:260), opens it at
+      start-up when "Show Error Log on startup" is on, and Tools › Error Log shows only when there were errors.
+      Done: Error-Kotlin.log (VB's Error.log is left alone, as Settings.txt is).
+- [x] **Help**: frmHelp with Data/Builder/Help.txt (basHelp: InitHelp, ShowHelp), every window's Help link,
+      the Help menu (What's New?, FAQ, Save File Specifications, DDO Forums, ddowiki Dashboard) and About (frmAbout).
+      Not yet: the Help window's arrow-key and page scrolling; links to frmConvert and frmFormat.
+- [ ] **Autosave**: SaveBackup (basDocuments.bas:302) saves the build when a window closes or a tab changes;
+      LoadBackup offers it at the next start; DeleteBackup on a clean exit. (VB's backup is a binary .bld.)
+- [ ] **Command line**: a .build given on the command line opens at start (CheckCommandLine, :327).
+- [ ] **User templates**: VB reads Save\Templates.txt instead of the shipped one unless it's older
+      (DataFile, basDataLoad.bas:28); Stats › Customize (Edit Custom / Delete Custom / Edit System / Reload
+      Templates); the "Stat Template Change" help notice at start-up (UserTemplateOlder).
+- [ ] **Main window**: drag the output with the mouse (picBuild_MouseDown/Move/Up, CanDrag); Window ›
+      Cascade Windows (cfg.CascadeWindows) and the tick on the active window.
+- [ ] **Options not yet acted on**: child windows (owned by the main window), the
+      Skills screen's "Native First" order, the Feats screen's "Group Related" order (IndexFeatDisplay, OrderChanged).
+- [ ] **Import** (frmImport, Ron's Planner, DDO Builder) and the **format editor** (frmFormat).
+- [ ] **Convert Builds** (frmConvert, the binary .bld formats) and its start-up prompt when Save has .bld files.
+- [ ] **Colors** editor (VB's separate Colors program).
+- Dropped (VB never shows them, or developer-only): Tools › Exceptions (always hidden), Refresh Data (debug
+  mode only), DeleteOldFiles (clean-up of old versions' files), basMain's CleanTrees/PrintEnhancements.
+- Checked, nothing missing: frmDestiny2 uses CheckDestinyAbilityErrors, the same as CheckAbilityErrors less
+  the rank class check, which never applies to trees; frmFeats.NoValidSelectors is in FeatRules.availableFeats.
+- Done in this pass: the "Confirmation Prompts" option (VB's Ask skips the question when it's off).
+
 ### B6 – Rules (taken out of `basBuild`, `basProcess` and the forms, using the F0 inventory)
 Order: BAB/stats → skills → granted/deity/selected feats and exchanges → spells → enhancement trees → destinies and twists → leveling guide.
 - [ ] Commands on `BuildState` (e.g. `setRace`, `setClassAtLevel`, `setStatPoints`, `setSkillRanks`, `selectFeat`, `exchangeFeat`, `placeAbility`, `swapTrees`, `moveGuideRows`).

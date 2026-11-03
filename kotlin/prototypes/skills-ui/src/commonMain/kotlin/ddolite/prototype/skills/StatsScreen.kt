@@ -70,8 +70,14 @@ fun StatsWindowContent(state: PrototypeState, onNavigate: (String) -> Unit) {
                 listOf("Stats", "Schedule"),
                 if (screen.scheduleTab) 1 else 0,
                 listOf("Help"),
-                isEnabled = { link -> link != "Help" },
-                onClick = { link -> screen.showTab(link == "Schedule") },
+                isEnabled = { true },
+                onClick = { link ->
+                    if (link == "Help") {
+                        state.help.show("Stats")
+                    } else {
+                        screen.showTab(link == "Schedule")
+                    }
+                },
             )
         }
         Box(modifier = Modifier.offset(0.dp, 520.dp).size(815.dp, 26.dp)) {

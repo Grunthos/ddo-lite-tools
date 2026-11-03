@@ -52,6 +52,10 @@ import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.MessagesWindowContent
 import ddolite.prototype.skills.ExportWindowContent
 import ddolite.prototype.skills.OptionsWindowContent
+import ddolite.prototype.skills.HelpWindowContent
+import ddolite.prototype.skills.AboutWindowContent
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -112,10 +116,14 @@ fun main(args: Array<String>) {
     state.settings = settings
     state.outputFormat = settings.output
     state.formatName = settings.bbCodes
+    val helpFiles = HelpFiles(repoRoot)
+    state.help.help = helpFiles.loadHelp()
+    // tmrData_Timer (frmMain.frm:646): the error log, shown if the settings say so.
+    val errorLog = helpFiles.createErrorLog(log, settings.showErrors)
     val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files, exports, store, icons)
+        BuilderWindows(state, files, exports, store, icons, helpFiles, errorLog)
     }
 }
 
@@ -282,13 +290,27 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>, helpFiles: HelpFiles, errorLog: Boolean) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val optionsWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     var optionsOpen by remember { mutableStateOf(false) }
+    var aboutOpen by remember { mutableStateOf(false) }
+    state.help.onUrl = { helpFiles.openUrl(it) }
+    state.help.onRun = { helpFiles.run(state, it) }
+    // OpenForm (basMain.bas:130) for the windows the help links name; frmConvert and frmFormat aren't built yet.
+    state.help.onForm = { name ->
+        when (name) {
+            "frmOptions" -> {
+                optionsOpen = true
+                optionsWindow[0]?.toFront()
+            }
+            "frmExport" -> state.export.open()
+            "frmFeats" -> openScreen(EditScreen.FEATS, state, windows)
+        }
+    }
     @Suppress("UNUSED_VARIABLE")
     val settingsRevision = state.settingsRevision // read so the menus and icons follow the Options window
     SideEffect {
@@ -383,6 +405,11 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                     Item("Messages...", mnemonic = 'M', onClick = { state.messages.showDeprecated() })
                     Separator()
                 }
+                // Error Log shows only when there were errors at start-up (tmrData_Timer, frmMain.frm:649).
+                if (errorLog) {
+                    Item("Error Log", mnemonic = 'E', onClick = { helpFiles.viewErrorLog(state, true) })
+                    Separator()
+                }
                 Menu("Colors", mnemonic = 'C') {
                     val skills = state.skills
                     for (i in skills.themes.indices) {
@@ -401,43 +428,20 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                         Item(screen.title.removeSuffix("..."), onClick = { windows.show(screen.screen) })
                     }
                 }
-                if (state.export.isOpen) {
-        // frmExport: the client area is 815 x 518 at 100%.
-        Window(
-            onCloseRequest = {
-                saveDialogPosition(state.settings, exportWindow[0])
-                state.export.close()
-            },
-            title = "Export",
-            resizable = false,
-            state = rememberWindowState(position = dialogPosition(state.settings, 520, 100), width = 831.dp, height = 561.dp),
-        ) {
-            exportWindow[0] = window
-            ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
-        }
-    }
-    if (optionsOpen) {
-        // frmOptions: the client area is 474 x 428 at 100%; closing saves the settings (Form_Unload).
-        Window(
-            onCloseRequest = {
-                val w = optionsWindow[0]
-                if (w != null) {
-                    state.settings.optionsCoords = Coords(w.x * TWIPS, w.y * TWIPS)
-                }
-                store.save(state.settings)
-                optionsOpen = false
-            },
-            title = "Options",
-            resizable = false,
-            state = rememberWindowState(position = optionsPosition(state.settings), width = 490.dp, height = 471.dp),
-        ) {
-            optionsWindow[0] = window
-            OptionsWindowContent(state)
-        }
-    }
-    if (state.messages.isOpen) {
+                if (state.messages.isOpen) {
                     Item("Messages", onClick = { messagesWindow[0]?.toFront() })
                 }
+            }
+            // frmMain's Help menu (frmMain.frm:496, mnuHelp_Click :778).
+            Menu("Help", mnemonic = 'H') {
+                Item("What's New?", onClick = { state.help.show("What's New?") })
+                Item("Frequently Asked Questions", mnemonic = 'Q', onClick = { state.help.show("Frequently Asked Questions") })
+                Item("Save File Specifications", onClick = { state.help.show("Save_File_Specifications") })
+                Separator()
+                Item("DDO Forums", mnemonic = 'D', onClick = { helpFiles.openUrl("https://www.ddo.com/forums/forum.php") })
+                Item("ddowiki Dashboard", mnemonic = 'd', onClick = { helpFiles.openUrl("https://ddowiki.com/page/User:EllisDee37/Dashboard") })
+                Separator()
+                Item("About...", mnemonic = 'A', onClick = { aboutOpen = true })
             }
         }
         MainWindowContent(state)
@@ -483,6 +487,70 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         // The form's client area is 815 x 555 at 100%.
         ScreenWindow(windows, state, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
             EnhancementsWindowContent(state, onExportGuide = { exports.exportGuide(windows.awtWindows[BuildScreen.ENHANCEMENTS] ?: mainWindow[0]!!, state, "csv") }) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
+        }
+    }
+    if (state.export.isOpen) {
+        // frmExport: the client area is 815 x 518 at 100%.
+        Window(
+            onCloseRequest = {
+                saveDialogPosition(state.settings, exportWindow[0])
+                state.export.close()
+            },
+            title = "Export",
+            resizable = false,
+            state = rememberWindowState(position = dialogPosition(state.settings, 520, 100), width = 831.dp, height = 561.dp),
+        ) {
+            exportWindow[0] = window
+            ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
+        }
+    }
+    if (optionsOpen) {
+        // frmOptions: the client area is 474 x 428 at 100%; closing saves the settings (Form_Unload).
+        Window(
+            onCloseRequest = {
+                val w = optionsWindow[0]
+                if (w != null) {
+                    state.settings.optionsCoords = Coords(w.x * TWIPS, w.y * TWIPS)
+                }
+                store.save(state.settings)
+                optionsOpen = false
+            },
+            title = "Options",
+            resizable = false,
+            state = rememberWindowState(position = optionsPosition(state.settings), width = 490.dp, height = 471.dp),
+        ) {
+            optionsWindow[0] = window
+            OptionsWindowContent(state)
+        }
+    }
+    if (state.help.isOpen) {
+        // frmHelp: the client area is 501 x 491 at 100%; the title is the topic's (DrawText); Escape closes it.
+        Window(
+            onCloseRequest = { state.help.close() },
+            title = state.help.topic?.caption() ?: "Help",
+            state = rememberWindowState(width = 517.dp, height = 530.dp),
+            onKeyEvent = { event ->
+                if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
+                    state.help.close()
+                    true
+                } else {
+                    false
+                }
+            },
+        ) {
+            LaunchedEffect(state.help.topic) { window.toFront() }
+            HelpWindowContent(state)
+        }
+    }
+    if (aboutOpen) {
+        // frmAbout: a fixed dialog, 262 x 139 at 100%.
+        Window(
+            onCloseRequest = { aboutOpen = false },
+            title = "About",
+            resizable = false,
+            state = rememberWindowState(position = WindowPosition(Alignment.Center), width = 278.dp, height = 178.dp),
+        ) {
+            AboutWindowContent(state)
         }
     }
     if (state.messages.isOpen) {

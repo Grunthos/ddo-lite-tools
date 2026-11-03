@@ -410,7 +410,7 @@ class FeatsScreenState(private val session: PrototypeState) {
     /** ClearAllSlots (:837), after asking. */
     private fun clearAllSlots() {
         val fr = featRules ?: return
-        if (!session.prompts.confirm("Clear all feats?")) {
+        if (!session.ask("Clear all feats?")) {
             return
         }
         fr.clearAllFeats()

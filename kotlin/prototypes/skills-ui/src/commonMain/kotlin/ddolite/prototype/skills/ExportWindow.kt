@@ -94,7 +94,7 @@ fun ExportWindowContent(state: PrototypeState, onCopy: (String) -> Unit, onSave:
             }
         }
         ComboBox(theme, control, sectionName, 576, 2, 129, 21) { sectionOpen = !sectionOpen }
-        BasicText("Help", style = nav.copy(color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_DIM)), modifier = Modifier.offset(768.dp, 6.dp))
+        BasicText("Help", style = link, modifier = Modifier.offset(768.dp, 6.dp).clickable { state.help.show("Export") })
 
         // txtOutput: Courier New 9pt, both scroll bars, editable.
         Box(
