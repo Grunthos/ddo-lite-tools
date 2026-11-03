@@ -52,6 +52,8 @@ import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.MessagesWindowContent
 import ddolite.prototype.skills.ExportWindowContent
 import ddolite.prototype.skills.ImportWindowContent
+import ddolite.prototype.skills.FormatWindowContent
+import java.awt.FileDialog
 import ddolite.prototype.skills.OptionsWindowContent
 import ddolite.prototype.skills.HelpWindowContent
 import ddolite.prototype.skills.AboutWindowContent
@@ -124,7 +126,7 @@ fun main(args: Array<String>) {
     val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files, exports, store, icons, helpFiles, errorLog)
+        BuilderWindows(state, files, exports, store, icons, helpFiles, errorLog, repoRoot)
     }
 }
 
@@ -291,12 +293,19 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>, helpFiles: HelpFiles, errorLog: Boolean) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>, helpFiles: HelpFiles, errorLog: Boolean, appRoot: Path) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val importWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val formatWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val settingsFolder = appRoot.resolve("Settings").toFile()
+    state.format.onShow = { formatWindow[0]?.toFront() }
+    state.format.onLoad = { chooseFormatFile(mainWindow[0], settingsFolder, FileDialog.LOAD)?.nameWithoutExtension }
+    state.format.onSaveDialog = { chooseFormatFile(mainWindow[0], settingsFolder, FileDialog.SAVE)?.path }
+    state.format.onWrite = { path, text -> writeFormatFile(File(path), text) }
+    state.format.onFormatsChanged = { state.formats = loadFormats(settingsFolder.toPath()) }
     state.imports.checkDirty = {
         val parent = mainWindow[0]
         parent != null && files.checkDirty(parent, state)
@@ -314,7 +323,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     var aboutOpen by remember { mutableStateOf(false) }
     state.help.onUrl = { helpFiles.openUrl(it) }
     state.help.onRun = { helpFiles.run(state, it) }
-    // OpenForm (basMain.bas:130) for the windows the help links name; frmConvert and frmFormat aren't built yet.
+    // OpenForm (basMain.bas:130) for the windows the help links name; frmConvert isn't built yet.
     state.help.onForm = { name ->
         when (name) {
             "frmOptions" -> {
@@ -323,6 +332,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             }
             "frmExport" -> state.export.open()
             "frmFeats" -> openScreen(EditScreen.FEATS, state, windows)
+            "frmFormat" -> state.format.open()
         }
     }
     @Suppress("UNUSED_VARIABLE")
@@ -542,6 +552,18 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         ) {
             importWindow[0] = window
             ImportWindowContent(state, onPaste = { exports.paste() })
+        }
+    }
+    if (state.format.isOpen) {
+        // frmFormat ("Output Format"): the client area is 368 x 436 at 100%; closing asks "Apply changes?".
+        Window(
+            onCloseRequest = { state.format.close() },
+            title = "Output Format",
+            resizable = false,
+            state = rememberWindowState(position = dialogPosition(state.settings, 600, 120), width = 384.dp, height = 479.dp),
+        ) {
+            formatWindow[0] = window
+            FormatWindowContent(state)
         }
     }
     if (optionsOpen) {

@@ -45,8 +45,6 @@ private val EXPORT_SECTIONS = listOf(
  * The Export window (Source/Forms/Build/frmExport.frm): links along the top (Copy to Clipboard,
  * Save to File, Format: with its combo, the Section combo, Help) and the text below in Courier,
  * editable. [onCopy] puts text on the clipboard and [onSave] saves it (the platform's part).
- *
- * Not yet: "Format:" opens the format editor (frmFormat) in VB; Help.
  */
 @Composable
 fun ExportWindowContent(state: PrototypeState, onCopy: (String) -> Unit, onSave: (String) -> Unit) {
@@ -84,7 +82,8 @@ fun ExportWindowContent(state: PrototypeState, onCopy: (String) -> Unit, onSave:
                 onSave(screen.text)
             }
         })
-        BasicText("Format:", style = nav, modifier = Modifier.offset(285.dp, 6.dp))
+        // "Format:" opens the format editor (lnkNav_MouseDown, :339).
+        BasicText("Format:", style = nav, modifier = Modifier.offset(285.dp, 6.dp).clickable { state.format.open() })
         ComboBox(theme, control, screen.currentFormatName(), 344, 2, 141, 21) { formatOpen = !formatOpen }
         BasicText("Section:", style = nav, modifier = Modifier.offset(522.dp, 6.dp))
         var sectionName = ""

@@ -2,6 +2,7 @@ package ddolite.prototype.skills
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +33,8 @@ import ddolite.common.theme.Theme
  * redrawn where VB calls GenerateOutput or ResizeOutput. Laid out from the form's positions; the
  * client area is 474 x 428 at 100%.
  *
- * Not yet: the BBCodes button (the format editor, frmFormat), the Colors button (VB's Colors
- * program) and Help. Stored but not used yet: the skill order and feat order of the screens, the
- * error log on startup, child windows and confirmation prompts.
+ * Not yet: the Colors button (VB's Colors program). Stored but not used yet: the skill order and
+ * feat order of the screens, and child windows.
  */
 @Composable
 fun OptionsWindowContent(state: PrototypeState) {
@@ -130,7 +130,8 @@ fun OptionsWindowContent(state: PrototypeState) {
             s.featShowAll = !s.featShowAll
             changed()
         }
-        OptionsButton(theme, "BBCodes", false, 352, 384)
+        // chkFormat_Click (:626): OpenForm "frmFormat".
+        OptionsButton(theme, "BBCodes", true, 352, 384) { state.format.open() }
 
         Column(modifier = Modifier.fillMaxWidth()) {
             HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Options") })
@@ -176,13 +177,15 @@ fun OptionsWindowContent(state: PrototypeState) {
 
 /** A graphical CheckBox used as a button (chkColors, chkFormat), 93 x 25; grey when not available. */
 @Composable
-private fun OptionsButton(theme: Theme, caption: String, enabled: Boolean, left: Int, top: Int) {
+private fun OptionsButton(theme: Theme, caption: String, enabled: Boolean, left: Int, top: Int, onClick: () -> Unit = {}) {
     val color = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
-    Box(
-        modifier = Modifier.offset(left.dp, top.dp).size(93.dp, 25.dp)
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
-    ) {
+    var modifier = Modifier.offset(left.dp, top.dp).size(93.dp, 25.dp)
+        .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
+        .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
+    if (enabled) {
+        modifier = modifier.clickable(onClick = onClick)
+    }
+    Box(modifier = modifier) {
         BasicText(caption, style = TextStyle(fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp))
     }
 }

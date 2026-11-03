@@ -157,6 +157,12 @@ fun main(args: Array<String>) {
         save(scene, outDir.resolve("7i-import.png"))
     }
     prototype.imports.close()
+    // The format editor (Options > BBCodes, or Format: in the Export window).
+    prototype.format.open()
+    ImageComposeScene(width = 368, height = 436, density = Density(1f)) { ddolite.prototype.skills.FormatWindowContent(prototype) }.use { scene ->
+        save(scene, outDir.resolve("7j-format.png"))
+    }
+    prototype.format.close()
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))
     }

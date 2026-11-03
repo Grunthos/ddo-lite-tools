@@ -304,28 +304,7 @@ class BuilderSettings {
     )
 
     /** MakeOutputSettings (:1323). */
-    private fun outputLines(): List<String> {
-        val lines = arrayListOf(
-            "Codes=" + vbBool(output.codes),
-            "Dots=" + vbBool(output.dots),
-            "TextColors=" + vbBool(output.textColors),
-            "Bold=" + tags(output.bold),
-            "Underline=" + tags(output.underline),
-            "Fixed=" + tags(output.fixed),
-            "Lists=" + listTags(output.lists),
-            "Color=" + tags(output.color),
-            "Wrapper=" + tags(output.wrapper),
-        )
-        if (output.reddit) {
-            lines.add("Reddit=True")
-        }
-        return lines
-    }
-
-    private fun tags(t: Tags): String = vbBool(t.enabled) + "\t" + t.open + "\t" + t.close
-
-    private fun listTags(t: ListTags): String =
-        vbBool(t.enabled) + "\t" + t.bulletOpen + "\t" + t.bulletClose + "\t" + t.numberedOpen + "\t" + t.numberedClose
+    private fun outputLines(): List<String> = output.toLines()
 
     /** MakeSharedSettings (:1311). */
     private fun sharedLines(): List<String> = listOf(

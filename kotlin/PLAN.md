@@ -291,8 +291,8 @@ Each step lists its deliverables and the test that marks it done.
       there's none yet, and only writes Settings-Kotlin.txt (on exit). Used: theme and saved colours, output format
       and options, default build points, skills contrast, recent files, main window and dialog positions.
 - [x] The Options window (frmOptions): every setting, saved when it closes; the output options, indent and class
-      icons take effect. Not yet: BBCodes (format editor), Colors (VB's Colors program), Help; stored but unused so
-      far: the screens' skill and feat orders, error log on startup, child windows, confirmation prompts.
+      icons take effect. Not yet: Colors (VB's Colors program); stored but unused so far: the screens' skill and
+      feat orders, child windows.
 
 ### B8 – Missed features (audit 2026-11-03)
 
@@ -318,7 +318,8 @@ the VB routine they port). Unmatched ones that are mouse/drag plumbing, develope
       Skills screen's "Native First" order, the Feats screen's "Group Related" order (IndexFeatDisplay, OrderChanged).
 - [x] **Import** (frmImport, Ron's Planner, DDO Builder): builder-core `imports/`; VB's Import from Forums is
       broken against its own current output (VB-BUGS 18j-18p) and is copied as it is.
-- [ ] The **format editor** (frmFormat).
+- [x] The **format editor** (frmFormat, "Output Format"), from Options › BBCodes, the Export window's "Format:"
+      and help links.
 - [ ] **Convert Builds** (frmConvert, the binary .bld formats) and its start-up prompt when Save has .bld files.
 - [ ] **Colors** editor (VB's separate Colors program).
 - Dropped (VB never shows them, or developer-only): Tools › Exceptions (always hidden), Refresh Data (debug

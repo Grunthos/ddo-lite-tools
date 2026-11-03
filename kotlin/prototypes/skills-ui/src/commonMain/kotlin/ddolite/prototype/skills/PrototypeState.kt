@@ -89,6 +89,9 @@ class PrototypeState(
     /** The Help window (frmHelp). */
     val help = HelpScreenState(this)
 
+    /** The format editor (frmFormat). */
+    val format = FormatScreenState(this)
+
     /** File › Import › from Forums (frmImport). */
     val imports = ImportScreenState(this)
 

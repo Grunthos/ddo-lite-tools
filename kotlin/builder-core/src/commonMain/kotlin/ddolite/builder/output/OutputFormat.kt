@@ -38,6 +38,35 @@ data class OutputFormat(
     val color: Tags,
     val wrapper: Tags,
 ) {
+    /**
+     * The settings as lines: MakeOutputSettings (clsConfig.cls:1323), used for the Output section of
+     * the settings file and for a .bbcodes file.
+     */
+    fun toLines(): List<String> {
+        val lines = arrayListOf(
+            "Codes=" + vbBool(codes),
+            "Dots=" + vbBool(dots),
+            "TextColors=" + vbBool(textColors),
+            "Bold=" + tagsText(bold),
+            "Underline=" + tagsText(underline),
+            "Fixed=" + tagsText(fixed),
+            "Lists=" + vbBool(lists.enabled) + "\t" + lists.bulletOpen + "\t" + lists.bulletClose + "\t" + lists.numberedOpen + "\t" + lists.numberedClose,
+            "Color=" + tagsText(color),
+            "Wrapper=" + tagsText(wrapper),
+        )
+        if (reddit) {
+            lines.add("Reddit=True")
+        }
+        return lines
+    }
+
+    /** A .bbcodes file's text: SaveFormat (clsConfig.cls:2678), the lines with GetString(1)'s three line breaks after. */
+    fun fileText(): String = toLines().joinToString("\r\n") + "\r\n\r\n\r\n"
+
+    private fun vbBool(b: Boolean): String = if (b) "True" else "False"
+
+    private fun tagsText(t: Tags): String = vbBool(t.enabled) + "\t" + t.open + "\t" + t.close
+
     companion object {
         /** The formats every install has, in VB's order (`GetFormatNames`, clsConfig.cls:2583). */
         val BUILT_IN = listOf("DDO Forums", "Code Tags", "Plain Text")
