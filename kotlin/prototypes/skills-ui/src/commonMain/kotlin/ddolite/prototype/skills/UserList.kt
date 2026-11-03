@@ -1,5 +1,6 @@
 package ddolite.prototype.skills
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -352,7 +353,7 @@ fun <T> ListBox(
     val clicks = remember { DoubleClickTimer() }
     val buttons = remember { arrayOf(PointerButton.PRIMARY) }
     val scroll = rememberScrollState()
-    val inner = if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 2 - SCROLL_BAR else width - 2
+    val inner = width - 2 - SCROLL_BAR // beside the scroll bar, always there (greyed when not needed)
     Box(
         modifier = modifier
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
@@ -404,7 +405,7 @@ fun <T> ListBox(
                 }
             }
         }
-        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2, always = true)
     }
 }
 
@@ -419,7 +420,11 @@ fun DetailsBox(theme: Theme, lines: List<DetailLine>, left: Int, top: Int, width
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(scroll).offset(5.dp, 2.dp).width((if (scroll.maxValue in 1 until Int.MAX_VALUE) width - 12 - SCROLL_BAR else width - 12).dp)) {
+        // The text wraps beside the scroll bar, which is always there (greyed when not needed).
+        Column(
+            modifier = Modifier.offset(1.dp, 1.dp).size((width - 2 - SCROLL_BAR).dp, (height - 2).dp)
+                .verticalScroll(scroll).padding(start = 4.dp, top = 1.dp, end = 4.dp, bottom = 2.dp),
+        ) {
             for (line in lines) {
                 var color = text
                 if (line.error) {
@@ -444,6 +449,6 @@ fun DetailsBox(theme: Theme, lines: List<DetailLine>, left: Int, top: Int, width
                 }
             }
         }
-        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2)
+        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2, always = true)
     }
 }

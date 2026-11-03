@@ -34,6 +34,8 @@ builds can't be opened (Convert Builds isn't ported); Reload Templates logs only
 the command line takes arguments without quotes; the Settings file's Paths section isn't used yet, so the
 file dialogs remember their folders only while the program runs.
 
+UI ideas for after parity (one window with navigation, editor and output; problems panel; undo): [UI-IDEAS.md](UI-IDEAS.md).
+
 **Steps, in order** (agreed 2026-11-03):
 1. [x] Leveling Guide.
 2. [x] Output, then Export.
@@ -63,6 +65,9 @@ Still open from B8: the child-windows option, Convert Builds (.bld), the Colors 
       is taller than VB's Verdana.
 - [x] Rank arrows didn't work on an ability added since the list was drawn (the slot's mouse handler kept the
       empty slot's "no arrows"); the handler is now rebuilt when the rank or caption changes.
+- [x] Details boxes: the text ran under the right border and ignored the scroll bar when wrapping (the text
+      column was forced to the box's full width). Details boxes and lists now always show a scroll bar, greyed
+      when not needed (Philip's suggestion), and the text wraps beside it.
 - [x] "Errors" in an output heading is now a link (new; Philip's choice): Skills, Feats, Enhancements,
       Leveling Guide and Destinies open their window. Tools › Messages still shows while messages are unresolved.
 

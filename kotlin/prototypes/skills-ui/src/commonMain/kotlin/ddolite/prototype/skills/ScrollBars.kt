@@ -27,12 +27,16 @@ private const val ARROW_STEP = 15
 
 /**
  * A scroll bar for [state], VB-style: arrows at the ends (a line), the track either side of the thumb
- * (a page), and the thumb dragged. Placed at [left], [top] with [length] along it; nothing is drawn
- * while everything fits (VB's ListBox shows its bar only then). New code: VB's controls had them built in.
+ * (a page), and the thumb dragged. Placed at [left], [top] with [length] along it. While everything fits
+ * it isn't drawn, or with [always] it's drawn greyed with no thumb, so the space beside it doesn't change.
+ * New code: VB's controls had them built in.
  */
 @Composable
-fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int, vertical: Boolean = true) {
-    if (state.maxValue <= 0 || state.maxValue == Int.MAX_VALUE) {
+fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int, vertical: Boolean = true, always: Boolean = false) {
+    if (!canScroll(state)) {
+        if (always) {
+            DisabledScrollBar(theme, left, top, length, vertical)
+        }
         return
     }
     val density = LocalDensity.current.density
@@ -88,5 +92,22 @@ fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int
                     }
                 },
         )
+    }
+}
+
+/** True when [state] has more than fits (its size is known after the first layout). */
+fun canScroll(state: ScrollState): Boolean = state.maxValue in 1 until Int.MAX_VALUE
+
+/** A scroll bar with nothing to scroll: the track and greyed arrows. */
+@Composable
+private fun DisabledScrollBar(theme: Theme, left: Int, top: Int, length: Int, vertical: Boolean) {
+    val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
+    val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
+    val dim = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM))
+    val size = if (vertical) Modifier.size(SCROLL_BAR.dp, length.dp) else Modifier.size(length.dp, SCROLL_BAR.dp)
+    Box(modifier = Modifier.offset(left.dp, top.dp).then(size).background(back).border(1.dp, border)) {
+        BasicText(if (vertical) "▴" else "◂", style = dim, modifier = Modifier.offset(5.dp, 0.dp))
+        val end = (length - SCROLL_BAR).dp
+        BasicText(if (vertical) "▾" else "▸", style = dim, modifier = if (vertical) Modifier.offset(5.dp, end) else Modifier.offset(end + 5.dp, 0.dp))
     }
 }
