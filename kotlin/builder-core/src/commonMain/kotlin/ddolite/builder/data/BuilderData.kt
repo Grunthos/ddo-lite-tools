@@ -67,6 +67,18 @@ class BuilderData(
      */
     fun findFeat(name: String): Feat? = featsByName[name]
 
+    /**
+     * VB's `db.FeatDisplay`: the order the Feats screen lists feats in. Ported from
+     * `IndexFeatDisplay` (Build/basDataLoad.bas:1142) with `cfg.FeatOrder` at its default,
+     * alphabetical: sorted by abbreviation (case-sensitive), equal ones in file order. The other
+     * order (by `SortName`, grouping related feats) comes with the settings.
+     */
+    val featsInDisplayOrder: List<Feat> by lazy {
+        val sorted = ArrayList(feats)
+        sorted.sortWith { a, b -> a.abbreviation.compareTo(b.abbreviation) } // stable, like its insertion sort
+        sorted
+    }
+
     /** VB's `db.FeatLookup`: the feats sorted by name (case-sensitive), equal names in file order. */
     private val featLookup: List<Feat> by lazy {
         val sorted = ArrayList(feats)

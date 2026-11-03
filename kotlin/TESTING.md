@@ -69,11 +69,32 @@ look for anything different.
 - [ ] Skill Tomes tab: the spinners' maximum, and the values saved in the file.
 - [ ] Clear Skills; "< Stats" and the Stats window's "Skills >".
 
-## 6. Enhancements (Trees tab only so far)
+## 6. Feats
+
+- [ ] Each sample build: the same slots, sources, levels, BAB and red (error) slots as VB, on Selected
+      and Granted; with "Channels" ticked, the same tabs.
+- [ ] Click a slot: the list title ("Level 3", "Fighter 2", …) and the feats offered match VB; "Show All"
+      and the filter groups (click, Ctrl-click) change the list the same way.
+- [ ] A feat with selectors: the selectors offered (and their order) match VB.
+- [ ] The details box for a few feats and selectors, including "Fred says:" for a slot in error, and
+      the >> / << links.
+- [ ] Drag a feat onto a slot (yellow = fits, pink = fits with an error); slot onto slot swaps; slot
+      onto the feat list clears it; double-click a slot clears it; double-click a feat fills the chosen
+      (or first fitting) slot.
+- [ ] Right-click a slot: the menu items match VB; Add Alternate; Exchange Feat (the level dialog, and
+      "Fred says:" when the slot is locked); Delete This Slot; Clear All Feats.
+- [ ] Changing race, class, stats or skills elsewhere updates the slot errors here.
+- [ ] **VB quirk to confirm:** add three alternates for levels 9, 3 and 1 (in that order) and save: VB's
+      file should list them 9, 3, 1 (out of order), as Kotlin does.
+- [ ] **VB quirk to confirm:** on the Granted tab, change something in another window (e.g. the build
+      name doesn't count; change a skill point): the Feats window should come back on Selected with the
+      details box still wide and no "<<" link.
+
+## 7. Enhancements (Trees tab only so far)
 
 - [ ] Tree list and the slots for an opened build; dragging trees into and out of slots.
 
-## 7. Display
+## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.
 - [ ] Each theme in `Settings/` looks like VB's (Kotlin: Tools › Colors lists them).

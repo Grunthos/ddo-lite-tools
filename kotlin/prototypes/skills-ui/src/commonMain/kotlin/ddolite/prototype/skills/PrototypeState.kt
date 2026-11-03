@@ -28,6 +28,12 @@ interface BuilderPrompts {
 
     /** Yes, No or Cancel (the default), titled [title]: true, false, or null for Cancel. */
     fun yesNoCancel(message: String, title: String): Boolean?
+
+    /**
+     * frmLevel ("Exchange Feat"): a level from [min] to [max], starting at [min]; null for Cancel.
+     * VB's dialog returns the shown level if closed with the window's X (only Cancel gives 0).
+     */
+    fun chooseLevel(min: Int, max: Int): Int?
 }
 
 /**
@@ -64,8 +70,10 @@ class PrototypeState(
 
     val stats = StatsScreenState(this)
 
+    val feats = FeatsScreenState(this)
+
     init {
-        skills.onChanged = { storeScreens() }
+        skills.onChanged = { skillsChanged() }
         trees.onChanged = { storeScreens() }
     }
 
@@ -104,6 +112,7 @@ class PrototypeState(
         overview.opened()
         stats.refresh()
         refreshScreens()
+        feats.cascade()
         revision++
         onCascade(CascadeChange.ALL)
     }
@@ -119,6 +128,10 @@ class PrototypeState(
             stats.refresh()
         }
         refreshScreens()
+        // VB cascades to the Feats window after every change but its own.
+        if (change != CascadeChange.FEAT) {
+            feats.cascade()
+        }
         dirty = true
         revision++
         if (change != null) {
@@ -140,6 +153,17 @@ class PrototypeState(
         skills.openBuild(result.build, result.rules.heroicLevels(), intModifiers)
         trees.openBuild(result.build)
         overview.refreshChoices()
+    }
+
+    /**
+     * The Skills screen changed: SkillsChanged (frmSkills.frm:1177), CascadeChanges cceSkill, which
+     * rechecks the feat slots and refreshes the Feats window.
+     */
+    private fun skillsChanged() {
+        storeScreens()
+        val r = rules ?: return
+        r.cascadeChanges(CascadeChange.SKILL)
+        feats.cascade()
     }
 
     /** The Skills and Enhancements screens changed: copy their state into the build. */

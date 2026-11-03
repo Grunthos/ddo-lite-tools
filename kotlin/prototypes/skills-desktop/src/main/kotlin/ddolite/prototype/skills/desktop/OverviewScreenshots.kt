@@ -35,6 +35,11 @@ object ScriptPrompts : BuilderPrompts {
         println("Asked: $message -> Yes")
         return true
     }
+
+    override fun chooseLevel(min: Int, max: Int): Int? {
+        println("Asked for a level from $min to $max -> $min")
+        return min
+    }
 }
 
 /**

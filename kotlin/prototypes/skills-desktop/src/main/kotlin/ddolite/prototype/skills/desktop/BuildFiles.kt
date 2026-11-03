@@ -13,7 +13,11 @@ import java.awt.Component
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
+import javax.swing.JLabel
 import javax.swing.JOptionPane
+import javax.swing.JPanel
+import javax.swing.JSpinner
+import javax.swing.SpinnerNumberModel
 
 /**
  * File > New, Open, Close, Save and Save As for .build files. Ported from basDocuments
@@ -222,6 +226,21 @@ class DesktopPrompts(private val parent: () -> Component?) : BuilderPrompts {
             return false
         }
         return null
+    }
+
+    override fun chooseLevel(min: Int, max: Int): Int? {
+        // frmLevel: "Exchange feat at level:" with a spinner from min to max; Cancel gives none,
+        // closing the window keeps the level shown, as VB.
+        val spinner = JSpinner(SpinnerNumberModel(min, min, max, 1))
+        val panel = JPanel()
+        panel.add(JLabel("Exchange feat at level:"))
+        panel.add(spinner)
+        val options = arrayOf("OK", "Cancel")
+        val answer = JOptionPane.showOptionDialog(parent(), panel, "Exchange Feat", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0])
+        if (answer == 1) {
+            return null
+        }
+        return spinner.value as Int
     }
 }
 

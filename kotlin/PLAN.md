@@ -620,6 +620,22 @@ desktop first; Android only has to keep compiling (CI) until phase G.
       - [ ] Skills still open: the Help link, `cfg.SkillOrderScreen` "native skills first" row order,
         VB's unique class initials (`GetClassSplit`) when icons are off, saving the Contrast setting.
       - Manual checks for Philip are listed in `TESTING.md`.
+      - [x] Feats: core `FeatRules` (basBuild.bas's feat list, `CheckFeatSlot`, `CheckSlotErrors`,
+        `IdentifyTakenFeats`, `SlotLocked`, `AddSpecialFeat`/`DeleteFeatSlot`, and frmFeats' feat and
+        selector filters and details text) with tests; slot errors now run in the cascade. The window:
+        Selected/Granted tabs and the channel tabs ("Channels"), the slot list with drop states, related
+        slots and errors, the feat and selector lists, Show All, the filter groups (Ctrl-click for more),
+        the details box (widen/restore, wiki link), drag from the lists to a slot, slot to slot (swap) and
+        slot to the list (clear), double-clicks, and the slot menu (clear, clear all, alternate, exchange
+        with VB's level dialog, delete).
+      - [ ] Feats still open: tab error marks with channels on (`ShowChannelErrors`), the Help link,
+        keeping the feat list's scroll position (`SaveScrollPosition`), the mouse wheel, the "group
+        related feats" order (`cfg.FeatOrder`), and "Spells >" (needs Spells).
+      - VB quirks kept (documented in the code): `AddSpecialFeat` moves a new alternate/exchange back at
+        most one place; an Arcane Trickster build skips the remaining list filters for spellcasting
+        feats; the Arcane Trickster exception in `CheckFeatSlot`; with no alignment the selector alignment
+        check passes; a description with no wiki page links to the wiki's base address; after a change
+        while on the Granted tab, the details box stays wide without its "<<" link.
       - `Save/Eresh WFWizRog.build` (saved by a current VB) reads and writes back byte for byte: the first exact
         golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.

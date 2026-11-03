@@ -16,13 +16,51 @@ import ddolite.builder.model.TreeStyle
 class ClassSplit(val characterClass: CharacterClass, val levels: Int)
 
 /**
- * A feat slot in the order the Feats screen lists them. The parts of VB's `FeatDetailType`
- * (basBuildDefs.bas:73) that the rules use so far.
+ * A feat slot in the order the Feats screen lists them. Ported from VB's `FeatDetailType`
+ * (basBuildDefs.bas:73), filled in by [FeatRules.initFeatList].
+ *
+ * Differences from VB: the feat and selector are read from [slot] (VB keeps copies, `FeatID` and
+ * `Selector`, which its SetSlot updates with the slot); positions are 0-based, with -1 for none.
  *
  * @property effectiveType for alternates and exchanges, the kind of slot they belong to.
+ * @property index position in the build's list of [actualType].
+ * @property parentIndex for alternates and exchanges, the position of their slot in the list of
+ *   [effectiveType] (`ParentIndex`).
+ * @property characterClass, classLevel the class taken at [level] and its class level by then;
+ *   null and 0 above level 20.
+ * @property display the feat as listed: "Feat: Selector", or the selector alone for
+ *   `SelectorOnly` feats; the saved name for a feat the data doesn't have.
+ * @property displayAlternate for alternates: just the selector when the alternate is the same feat
+ *   as its slot's.
+ * @property sourceForm the Source column ("Heroic", "Ftr", "Alternate", …).
+ * @property sourceOutput the source in the build's text output.
+ * @property sourceFilter the Feats list's title when this slot is chosen ("Level 3", "Ftr 2", …).
+ * @property exchangeIndex for an exchange, its slot's position in the feat list; for a slot, its
+ *   exchange's; -1 if none.
+ * @property tab the Feats screen tab the slot is on (VB's `Channel`).
+ * @property tabRows the slot's row on each tab (1-based; 0 if not on it), VB's `ChannelSlot`.
+ * @property flag set only on the slot just added by [FeatRules.addSpecialFeat].
  */
 class FeatListEntry(val actualType: BuildFeatType, val effectiveType: BuildFeatType, val index: Int, val slot: BuildFeat) {
     val level: Int get() = slot.level
+    var parentIndex = -1
+    var characterClass: CharacterClass? = null
+    var classLevel = 0
+    var feat: Feat? = null
+    var display = ""
+    var displayAlternate = ""
+    var sourceForm = ""
+    var sourceOutput = ""
+    var sourceFilter = ""
+    var exchangeIndex = -1
+    var errorState = false
+    var errorText = ""
+    var tab = FeatTab.GENERAL
+    val tabRows = IntArray(FeatTab.entries.size)
+    var flag = false
+
+    /** The selector in the slot (1-based; 0 for none). */
+    val selector: Int get() = slot.selector
 }
 
 /**
@@ -57,7 +95,11 @@ class GuideTree(val treeName: String, val tree: Tree?, val characterClass: Chara
 class BuildRules(val data: BuilderData, val build: Build) {
     /** VB's `Feat.List`: the feat slots as last listed by [initFeatList]. */
     var featList: List<FeatListEntry> = emptyList()
-        private set
+        internal set
+
+    /** How many feat slots each Feats screen tab lists (VB's `Feat.ChannelCount`), by [FeatTab] ordinal. */
+    var featTabCounts = IntArray(FeatTab.entries.size)
+        internal set
 
     /** VB's `Guide.Tree`. */
     var guideTrees: List<GuideTree> = emptyList()
@@ -159,8 +201,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
      * (basMain.bas:250); refreshing or closing the open windows is the screens' job.
      *
      * Not ported here: `InitBuildSkills` only fills the Skills screen's own grid (the screen
-     * builds its grid from the build), and `CheckSlotErrors` marks feat slots in error for the
-     * Feats screen, which comes with that screen.
+     * builds its grid from the build; [FeatRules] works out skill ranks from the build itself).
      */
     fun cascadeChanges(change: CascadeChange) {
         val hasClass = build.levelClass(1) != null
@@ -190,7 +231,10 @@ class BuildRules(val data: BuilderData, val build: Build) {
                 initLevelingGuide()
             }
             CascadeChange.ALIGNMENT, CascadeChange.STATS, CascadeChange.SKILL -> {
-                // VB: CheckSlotErrors (and InitBuildSkills for stats); see above.
+                // VB also runs InitBuildSkills for stats; see above.
+                if (hasClass) {
+                    FeatRules(this).checkSlotErrors()
+                }
             }
             CascadeChange.FEAT -> {
                 if (hasClass) {
@@ -620,49 +664,12 @@ class BuildRules(val data: BuilderData, val build: Build) {
     }
 
     /**
-     * Lists the feat slots within the build's levels, sorted by level and then kind. Ported from
-     * the parts of `InitFeatList` (basBuild.bas:1002), `AddFeatToList` (:1141) and `SortFeatList`
-     * (:1267) the rules use so far.
+     * Lists the feat slots within the build's levels, sorted by level and then kind, with their
+     * errors and Feats screen tabs; see [FeatRules.initFeatList]. Returns the position of the slot
+     * [newType]/[newIndex] in the list, or -1.
      */
-    fun initFeatList() {
-        val list = ArrayList<FeatListEntry>()
-        if (build.levelClass(1) == null) {
-            featList = list
-            return
-        }
-        for (type in BuildFeatType.entries) {
-            val slots = build.feats(type)
-            for (i in slots.indices) {
-                val slot = slots[i]
-                if (slot.level < 1 || slot.level > build.maxLevels) {
-                    continue
-                }
-                var effective = type
-                if (type == BuildFeatType.ALTERNATE || type == BuildFeatType.EXCHANGE) {
-                    effective = slot.childType ?: type
-                }
-                list.add(FeatListEntry(type, effective, i, slot))
-            }
-        }
-        // Insertion sort, as SortFeatList: by level, then by effective kind; equal entries keep their order.
-        for (i in 1 until list.size) {
-            val swap = list[i]
-            var j = i
-            while (j > 0 && compareSlot(swap, list[j - 1]) < 0) {
-                list[j] = list[j - 1]
-                j--
-            }
-            list[j] = swap
-        }
-        featList = list
-    }
-
-    /** Ported from `CompareSlot` (basBuild.bas:1284). */
-    private fun compareSlot(one: FeatListEntry, two: FeatListEntry): Int {
-        if (one.level != two.level) {
-            return if (one.level < two.level) -1 else 1
-        }
-        return one.effectiveType.ordinal.compareTo(two.effectiveType.ordinal)
+    fun initFeatList(newType: BuildFeatType? = null, newIndex: Int = -1): Int {
+        return FeatRules(this).initFeatList(newType, newIndex)
     }
 
     // ---------------------------------------------------------------- spells

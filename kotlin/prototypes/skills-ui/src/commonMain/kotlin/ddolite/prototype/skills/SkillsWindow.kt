@@ -139,7 +139,7 @@ fun SkillsWindowContent(state: PrototypeState, classIcons: Map<String, ImageBitm
                 listOf("< Stats"),
                 null,
                 listOf("Feats >"),
-                isEnabled = { link -> link != "Feats >" },
+                isEnabled = { true },
                 onClick = { link ->
                     if (link == "Clear Skills") {
                         if (state.prompts.confirm("Clear all skills?")) {
@@ -217,7 +217,7 @@ private val MENU_BORDER = Color(0xFFCCCCCC)
  * that opened the menu can't choose one); a press anywhere else closes it.
  */
 @Composable
-internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: Float, onChoose: (Int) -> Unit, onDismiss: () -> Unit) {
+internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: Float, onChoose: (Int) -> Unit, onDismiss: () -> Unit, clientWidth: Int = CLIENT_WIDTH) {
     val width = 190
     var height = 4
     for (item in items) {
@@ -228,8 +228,8 @@ internal fun PopupMenu(items: List<String>, checked: Int, at: Offset, density: F
         }
     }
     var left = (at.x / density).toInt()
-    if (left + width > CLIENT_WIDTH) {
-        left = CLIENT_WIDTH - width
+    if (left + width > clientWidth) {
+        left = clientWidth - width
     }
     val top = (at.y / density).toInt()
     var hover by remember { mutableIntStateOf(-1) }

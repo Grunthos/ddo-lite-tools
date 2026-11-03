@@ -39,6 +39,7 @@ import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.OverviewWindowContent
 import ddolite.prototype.skills.PrototypeState
 import ddolite.prototype.skills.SkillsScreenState
+import ddolite.prototype.skills.FeatsWindowContent
 import ddolite.prototype.skills.SkillsWindowContent
 import ddolite.prototype.skills.StatsWindowContent
 import ddolite.prototype.skills.TreeSlotsState
@@ -88,7 +89,7 @@ private enum class EditScreen(val screen: BuildScreen, val title: String, val mn
     OVERVIEW(BuildScreen.OVERVIEW, "Overview...", 'O', Key.O, true),
     STATS(BuildScreen.STATS, "Stats...", 'A', Key.T, true),
     SKILLS(BuildScreen.SKILLS, "Skills...", 'K', Key.K, true),
-    FEATS(BuildScreen.FEATS, "Feats...", 'F', Key.F, false),
+    FEATS(BuildScreen.FEATS, "Feats...", 'F', Key.F, true),
     SPELLS(BuildScreen.SPELLS, "Spells...", 'P', Key.P, false),
     ENHANCEMENTS(BuildScreen.ENHANCEMENTS, "Enhancements...", 'E', Key.E, true),
     DESTINY(BuildScreen.DESTINY, "Destiny...", 'D', Key.D, false),
@@ -140,6 +141,9 @@ private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenW
             state.overview.showRaceList()
         }
         return false
+    }
+    if (screen == EditScreen.FEATS && !windows.isOpen(BuildScreen.FEATS)) {
+        state.feats.opened() // frmFeats.Form_Load
     }
     windows.show(screen.screen)
     return true
@@ -324,6 +328,12 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         // The form's client area is 870 x 517 at 100%.
         ScreenWindow(windows, BuildScreen.SKILLS, "Skills", 520, 40, 886, 560) {
             SkillsWindowContent(state, icons) { link -> footerLink(link, BuildScreen.SKILLS, state, windows) }
+        }
+    }
+    if (windows.isOpen(BuildScreen.FEATS)) {
+        // The form's client area is 815 x 593 at 100%.
+        ScreenWindow(windows, BuildScreen.FEATS, "Feats", 540, 60, 831, 636) {
+            FeatsWindowContent(state) { link -> footerLink(link, BuildScreen.FEATS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {

@@ -110,16 +110,22 @@ fun <T> Modifier.dropTarget(state: DragDropState<T>, key: Any): Modifier {
  * With a mouse the drag starts once the pointer moves a little, as VB's
  * `lstTree_MouseMove` waits for actual movement; with touch, likewise after a short slide.
  */
-fun <T> Modifier.dragSource(state: DragDropState<T>, item: T, onDrop: (T, Any?) -> Unit): Modifier = composed {
+fun <T> Modifier.dragSource(state: DragDropState<T>, item: T, onStart: (T) -> Boolean = { true }, onDrop: (T, Any?) -> Unit): Modifier = composed {
     // This element's position, kept across recompositions, to turn drag offsets into window coordinates.
     val placement = remember { PlacementHolder() }
-    // The gesture handler outlives recompositions, so it calls the latest onDrop through this.
+    // The gesture handler outlives recompositions, so it calls the latest callbacks through these.
     val currentOnDrop by rememberUpdatedState(onDrop)
+    val currentOnStart by rememberUpdatedState(onStart)
     Modifier
         .onGloballyPositioned { coordinates -> placement.coordinates = coordinates }
         .pointerInput(item) {
             detectDragGestures(
-                onDragStart = { offset -> state.start(item, placement.toWindow(offset)) },
+                onDragStart = { offset ->
+                    // [onStart] can refuse the drag (VB's RequestDrag with Allow = False).
+                    if (currentOnStart(item)) {
+                        state.start(item, placement.toWindow(offset))
+                    }
+                },
                 onDrag = { change, _ ->
                     change.consume()
                     state.moveTo(placement.toWindow(change.position))

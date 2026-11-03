@@ -51,6 +51,8 @@ object AndroidPrompts : BuilderPrompts {
     }
 
     override fun yesNoCancel(message: String, title: String): Boolean? = true
+
+    override fun chooseLevel(min: Int, max: Int): Int? = min
 }
 
 /**

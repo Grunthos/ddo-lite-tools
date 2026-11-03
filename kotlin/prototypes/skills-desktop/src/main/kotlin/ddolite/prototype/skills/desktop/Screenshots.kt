@@ -133,6 +133,7 @@ fun main(args: Array<String>) {
 
     overviewScreenshots(prototype, bytes, repoRoot, outDir)
     statsScreenshots(prototype, bytes, outDir)
+    featsScreenshots(prototype, bytes, repoRoot, outDir)
     println("Screenshots written to " + outDir.toAbsolutePath())
 }
 
