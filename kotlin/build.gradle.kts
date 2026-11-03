@@ -25,3 +25,27 @@ subprojects {
         inputs.dir(testBuildsDir)
     }
 }
+
+// Test coverage of the shared modules' JVM tests: ./gradlew jvmCoverage writes
+// build/reports/jacoco/jvmCoverage in each module (HTML, XML and CSV).
+subprojects {
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        apply(plugin = "jacoco")
+        afterEvaluate {
+            val jvmTest = tasks.findByName("jvmTest") as? Test
+            if (jvmTest != null) {
+                tasks.register<JacocoReport>("jvmCoverage") {
+                    dependsOn(jvmTest)
+                    executionData(jvmTest)
+                    classDirectories.setFrom(layout.buildDirectory.dir("classes/kotlin/jvm/main"))
+                    sourceDirectories.setFrom("src/commonMain/kotlin", "src/jvmMain/kotlin")
+                    reports {
+                        xml.required.set(true)
+                        csv.required.set(true)
+                        html.required.set(true)
+                    }
+                }
+            }
+        }
+    }
+}
