@@ -51,6 +51,7 @@ import ddolite.dataformat.decodeText
 import ddolite.prototype.skills.MainWindowContent
 import ddolite.prototype.skills.MessagesWindowContent
 import ddolite.prototype.skills.ExportWindowContent
+import ddolite.prototype.skills.ImportWindowContent
 import ddolite.prototype.skills.OptionsWindowContent
 import ddolite.prototype.skills.HelpWindowContent
 import ddolite.prototype.skills.AboutWindowContent
@@ -295,6 +296,19 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val importWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    state.imports.checkDirty = {
+        val parent = mainWindow[0]
+        parent != null && files.checkDirty(parent, state)
+    }
+    state.imports.onImported = { files.forgetFile() }
+    // BuildClose: CloseForm "All", which closes the Import window too.
+    state.imports.onFailed = {
+        windows.closeAll()
+        state.messages.close()
+        state.export.close()
+        state.imports.close()
+    }
     val optionsWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     var optionsOpen by remember { mutableStateOf(false) }
     var aboutOpen by remember { mutableStateOf(false) }
@@ -362,6 +376,15 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Item("Save", mnemonic = 'S', shortcut = KeyShortcut(Key.S, ctrl = true), enabled = state.opened != null, onClick = { files.save(window, state) })
                 Item("Save As...", mnemonic = 'A', enabled = state.opened != null, onClick = { files.saveAs(window, state) })
                 Separator()
+                // The Import submenu (frmMain.frm:202, mnuImport_Click :718); always enabled.
+                Menu("Import", mnemonic = 'I') {
+                    Item("from Forums...", mnemonic = 'F', onClick = {
+                        state.imports.open()
+                        importWindow[0]?.toFront()
+                    })
+                    Item("from Ron's Planner...", mnemonic = 'R', onClick = { files.importPlanner(window, state, builder = false) })
+                    Item("from DDO Builder...", mnemonic = 'D', onClick = { files.importPlanner(window, state, builder = true) })
+                }
                 // The Export submenu (frmMain.frm:219).
                 Menu("Export", mnemonic = 'E', enabled = state.opened != null) {
                     Item("to Forums...", mnemonic = 'F', onClick = { state.export.open() })
@@ -430,6 +453,9 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 }
                 if (state.messages.isOpen) {
                     Item("Messages", onClick = { messagesWindow[0]?.toFront() })
+                }
+                if (state.imports.isOpen) {
+                    Item("Import", onClick = { importWindow[0]?.toFront() })
                 }
             }
             // frmMain's Help menu (frmMain.frm:496, mnuHelp_Click :778).
@@ -502,6 +528,20 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         ) {
             exportWindow[0] = window
             ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
+        }
+    }
+    if (state.imports.isOpen) {
+        // frmImport: the client area is 815 x 518 at 100%.
+        Window(
+            onCloseRequest = {
+                saveDialogPosition(state.settings, importWindow[0])
+                state.imports.close()
+            },
+            title = "Import",
+            state = rememberWindowState(position = dialogPosition(state.settings, 520, 100), width = 831.dp, height = 561.dp),
+        ) {
+            importWindow[0] = window
+            ImportWindowContent(state, onPaste = { exports.paste() })
         }
     }
     if (optionsOpen) {

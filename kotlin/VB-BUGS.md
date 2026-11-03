@@ -43,6 +43,12 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     after the file is chosen, before anything is written. *Fix:* skip classes where `GetRonClassID`
     returns `rceUnknown`.
 
+6b. **File › Import from Ron's Planner or DDO Builder stops on some files.** `basFormatRon`/`basFormatBuilder`
+    have no error handler, so an index past an array stops the program: a DDO Builder feat at a level
+    with no slot of its kind (`ProcessFeat`, `basFormatBuilder.bas:540`, where `.Feat(lngIndex)` is read
+    one past the end), more than 30 levels of feats (`mtypFeat(1 To 30)`), a `Class0` or out-of-range
+    `LevelN` tag. *Fix:* `If lngIndex > build.Feat(enType).Feats Then Exit Sub`, and range checks.
+
 ## Data loss and wrong results
 
 7. **Deity feats saved by character level, read by class level.** Save: `Modules/Build/basFormatLite.bas:422`
@@ -163,6 +169,47 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     "Enhancements … Errors" in the output. *Fix:* return True unconditionally (the flag is unused
     elsewhere), or check what was meant.
 
+18j. **Import from Forums reads only levels 1-5 of the Level Order.** `Forms/Build/frmImport.frm:557`
+    `ParseLevelOrder` reads 18-character columns (1, 19, 38, 57), but the output (`basOutput.bas:361`)
+    writes the first column unpadded and pads class names to `Len(MAX_CLASS_NAME) + 1`, so columns 2-4
+    start elsewhere. Levels 6-20 get no class, so their skills, class feats and spell levels are lost too
+    (and a spell line for a level the class doesn't reach stops the import, 18l). *Fix:* find each
+    "n." in the line instead of using fixed columns.
+
+18k. **Import from Forums fails on any build with destinies.** `frmImport.frm:400` `ParseSection` looks
+    for "Destiny", but the output's heading is "Destinies (Spent…" (`basOutput.bas:2201`). The destiny
+    lines are then read as more tiers of the last enhancement tree, which runs past its tiers ("Subscript
+    out of range"), and the error handler says "Invalid or Incomplete build text". *Fix:* also accept
+    "Destinies".
+
+18l. **Import from Forums: spells.** `frmImport.frm:955` `ParseSpells` stores each spell as written,
+    so the output's "Cure Light Wounds (3)" becomes the spell's name. A line with fewer spells than the
+    level has slots reads past `strSpell` (error), and a free spell calls `AddFreeSpellSlot`, which
+    ReDims the slot array inside `With .Slot(i)` on it (error 10, "This array is fixed or temporarily
+    locked"); either makes the import fail. *Fix:* drop " (n)", stop at the last spell given, and add
+    free slots after the loop.
+
+18m. **Import from Forums: destiny abilities.** `frmImport.frm:1209` passes `build.Destiny(mlngDestiny)`,
+    the destiny's number among all destinies, not among the build's ("TODO Fix"); unless it happens to be
+    in range the import fails. `AddAbility` (:1143) gives every destiny ability the enhancement tier
+    variable `mlngTier`, which the Destiny heading sets to 1. *Fix:* use `build.Destinies` and
+    `mlngDestinyTier`.
+
+18n. **Import from Forums reads Half-Elf and Wood Elf as Elf, and Deep Gnome as Gnome.**
+    `frmImport.frm:531` `ParseAlignRace` takes the first race, in enum order, whose name the line ends
+    with. *Fix:* take the longest match.
+
+18o. **Import from Forums' "best fit" build points look at the wrong guess.** `frmImport.frm:703`
+    `BestGuess` tests `mtypGuess(mlngGuesses)` (the last) on every pass and then takes guess `i` (the
+    first). *Fix:* `mtypGuess(i)`.
+
+18p. **Import from Forums ignores the level 32 and 36 level-ups.** `frmImport.frm:636` accepts only
+    levels 4 to 28. *Fix:* up to `MAX_LEVELUPS * 4`.
+
+18q. **DDO Builder export and import disagree on a Drow's build points.** Export (`basFormatBuilder.bas:167`)
+    writes Champion/Hero/Legend as 28/30/32 for a Drow; import (`FilterPoints`, :446) reads 28 as
+    Adventurer and 30 as Champion. *Fix:* read 28-36 by race, as `GetBuildPoints` does.
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`
@@ -267,3 +314,5 @@ spell; `Tomes.txt` values go through `Val`, so "3 3" means 33.
   Expertise" (the feat is "Simple Thrown Expertise").
 - `Help.txt:379-380` (Options topic) breaks the Spinners link over two lines, so the window shows
   "=Spinners}Spinners" as plain text. Join the lines and restore `{hlp=Spinners}`.
+- `FeatMap.txt:208` maps DDO Builder's "Half-Elf Dilettante: Wizard" to Half-Elf Dilettante: Warlock (it should
+  be "Half-Elf Dilettante: Warlock"); which line an import finds depends on the map's sort order.

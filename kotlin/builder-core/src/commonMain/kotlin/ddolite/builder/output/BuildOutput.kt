@@ -732,6 +732,16 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
         fun ranks(skill: Skill, level: Int): Int = build.skills[skill.ordinal][level - 1] * native[skill.ordinal][level]
     }
 
+    /**
+     * For frmImport.AddGuess: ValidSkills(…, True) and ValidFeats(True), which ignore the section
+     * shown: how complete the skills and the feats are.
+     */
+    fun importValidity(): Pair<Valid, Valid> {
+        view = OutputView.ALL
+        val skills = validSkills(SkillOutput()).first
+        return Pair(skills, validFeats())
+    }
+
     /** OutputSkills (:674): the skill points grid for the skills with ranks. */
     private fun outputSkills() {
         if (!display && !exportSection(OutputView.SKILLS)) {
@@ -2034,7 +2044,8 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
 
     // ---------------------------------------------------------------- writing
 
-    private enum class Valid { SKIP, EMPTY, ERRORS, INCOMPLETE, COMPLETE }
+    /** ValidEnum (basOutput.bas): how complete a section is. */
+    enum class Valid { SKIP, EMPTY, ERRORS, INCOMPLETE, COMPLETE }
 
     /** SpecialCodeEnum (:21): Courier for this text, or from here, or up to here. */
     private enum class Special { NONE, COURIER, COURIER_BEGIN, COURIER_END }

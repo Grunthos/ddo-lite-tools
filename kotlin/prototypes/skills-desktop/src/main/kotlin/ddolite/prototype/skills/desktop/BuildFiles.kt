@@ -7,6 +7,8 @@ import ddolite.builder.build.BuildPoints
 import ddolite.builder.build.readBuildFile
 import ddolite.builder.build.writeBuildFile
 import ddolite.builder.data.BuilderData
+import ddolite.builder.imports.PlannerImport
+import ddolite.dataformat.Windows1252
 import ddolite.prototype.skills.BuilderPrompts
 import ddolite.prototype.skills.PrototypeState
 import java.awt.Component
@@ -102,6 +104,52 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
                 JOptionPane.WARNING_MESSAGE,
             )
         }
+    }
+
+    /** The folders the Ron's Planner and DDO Builder import dialogs start in (VB's cfg.RonPath, cfg.BuilderPath), for this run. */
+    private var ronFolder = folder
+    private var builderFolder = folder
+
+    /**
+     * File › Import › from Ron's Planner or from DDO Builder: ImportFileRon (basFormatRon.bas:333) and
+     * ImportFileBuilder (basFormatBuilder.bas:286) with OpenDialog (basDocuments.bas:59). The build
+     * replaces the open one, unsaved and with no file (ClearBuild).
+     */
+    fun importPlanner(parent: Frame, state: PrototypeState, builder: Boolean) {
+        if (checkDirty(parent, state)) {
+            return
+        }
+        val extension = if (builder) "ddocp" else "txt"
+        val dialog = FileDialog(parent, if (builder) "DDO Builder Files" else "Ron's Planner Files", FileDialog.LOAD)
+        dialog.directory = (if (builder) builderFolder else ronFolder).path
+        dialog.file = "*.$extension"
+        dialog.setFilenameFilter { _, name -> name.lowercase().endsWith(".$extension") }
+        dialog.isVisible = true
+        if (dialog.file == null) {
+            return
+        }
+        val chosen = File(dialog.directory, dialog.file)
+        if (builder) {
+            builderFolder = chosen.parentFile
+        } else {
+            ronFolder = chosen.parentFile
+        }
+        val text: String
+        try {
+            text = Windows1252.decode(chosen.readBytes())
+        } catch (e: Exception) {
+            JOptionPane.showMessageDialog(parent, "Can't read " + chosen.name + ":\n" + e.message, "Import", JOptionPane.ERROR_MESSAGE)
+            return
+        }
+        val preferred = state.settings.buildPoints
+        val result = if (builder) PlannerImport.builder(text, data, preferred) else PlannerImport.ron(text, chosen.path, data, preferred)
+        file = null
+        state.importBuild(result)
+    }
+
+    /** The open build no longer has a file (ClearBuild's mstrFile), as after an import. */
+    fun forgetFile() {
+        file = null
     }
 
     /** No build open. Returns false if the user cancelled at "Save changes?". */

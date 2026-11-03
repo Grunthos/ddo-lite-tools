@@ -89,6 +89,9 @@ class PrototypeState(
     /** The Help window (frmHelp). */
     val help = HelpScreenState(this)
 
+    /** File › Import › from Forums (frmImport). */
+    val imports = ImportScreenState(this)
+
     /** Called after a change, with what changed, so the app can close windows that no longer make sense. */
     var onCascade: (CascadeChange) -> Unit = {}
 
@@ -127,6 +130,15 @@ class PrototypeState(
         rules.cascadeAll()
         show(BuildLoadResult(build, rules, Deprecations(), emptyList()))
         dirty = false
+    }
+
+    /**
+     * Shows an imported build: basDocuments.BuildWasImported (basDocuments.bas:290), or frmImport's
+     * ShowBuild: open, CascadeChanges cceAll, and unsaved (SetDirty True).
+     */
+    fun importBuild(result: BuildLoadResult) {
+        show(result)
+        dirty = true
     }
 
     /** Shows an opened build in every screen. */

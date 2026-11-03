@@ -38,6 +38,9 @@ class BuilderData(
     /** Sorted by type, then old name (VB `db.NameChange`). */
     val nameChanges: List<NameChange>,
 ) {
+    /** The feat map in VB's working order (`db.FeatMap` as last sorted by an import or export). */
+    val featMapOrder = FeatMapOrder(featMap)
+
     private val spellsByName = HashMap<String, Spell>()
     private val featsByName = HashMap<String, Feat>()
 

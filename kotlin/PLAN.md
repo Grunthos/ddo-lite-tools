@@ -316,7 +316,9 @@ the VB routine they port). Unmatched ones that are mouse/drag plumbing, develope
       Cascade Windows (cfg.CascadeWindows) and the tick on the active window.
 - [ ] **Options not yet acted on**: child windows (owned by the main window), the
       Skills screen's "Native First" order, the Feats screen's "Group Related" order (IndexFeatDisplay, OrderChanged).
-- [ ] **Import** (frmImport, Ron's Planner, DDO Builder) and the **format editor** (frmFormat).
+- [x] **Import** (frmImport, Ron's Planner, DDO Builder): builder-core `imports/`; VB's Import from Forums is
+      broken against its own current output (VB-BUGS 18j-18p) and is copied as it is.
+- [ ] The **format editor** (frmFormat).
 - [ ] **Convert Builds** (frmConvert, the binary .bld formats) and its start-up prompt when Save has .bld files.
 - [ ] **Colors** editor (VB's separate Colors program).
 - Dropped (VB never shows them, or developer-only): Tools › Exceptions (always hidden), Refresh Data (debug

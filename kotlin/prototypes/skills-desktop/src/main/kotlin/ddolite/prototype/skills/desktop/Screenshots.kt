@@ -150,6 +150,13 @@ fun main(args: Array<String>) {
     ImageComposeScene(width = 262, height = 139, density = Density(1f)) { ddolite.prototype.skills.AboutWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("7h-about.png"))
     }
+    // The Import window (File > Import > from Forums) with pasted text.
+    prototype.imports.open()
+    prototype.imports.paste(listOf("Kensei Warpriest", "12/8 Fighter/Cleric, Epic 10", "Human", "", "Level Order").joinToString("\n"))
+    ImageComposeScene(width = 815, height = 518, density = Density(1f)) { ddolite.prototype.skills.ImportWindowContent(prototype) { null } }.use { scene ->
+        save(scene, outDir.resolve("7i-import.png"))
+    }
+    prototype.imports.close()
     ImageComposeScene(width = 1100, height = 820, density = Density(1f)) { SkillsScreen(state) }.use { scene ->
         save(scene, outDir.resolve("8-opened-skills.png"))
     }

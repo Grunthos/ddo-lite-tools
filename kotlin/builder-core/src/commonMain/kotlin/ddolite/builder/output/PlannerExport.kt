@@ -9,9 +9,9 @@ import ddolite.builder.build.MAX_LEVELUPS
 import ddolite.builder.build.RACE_DROW
 import ddolite.builder.build.StatRules
 import ddolite.builder.data.KNOWN_CLASSES
+import ddolite.builder.data.FeatMapKey
 import ddolite.builder.model.Alignment
 import ddolite.builder.model.CharacterClass
-import ddolite.builder.model.FeatMapEntry
 import ddolite.builder.model.Skill
 import ddolite.builder.model.Stat
 
@@ -179,15 +179,15 @@ class PlannerExport(private val rules: BuildRules) {
     /**
      * Each level's feats with their names in the other planners, and the slot kinds. InitExportFeats
      * (:199), TransposeFeats (:218) and IdentifyChannels (:274); the feat map is searched by our
-     * names after VB's shellsort (SortFeatMap :375, SeekFeatMap :408), so duplicate names find the
-     * same line as VB.
+     * names in VB's working order ([ddolite.builder.data.FeatMapOrder]).
      */
     fun exportFeats(): List<List<ExportFeat>> {
         val levels = ArrayList<ArrayList<ExportFeat>>()
         for (i in 0..MAX_LEVEL) {
             levels.add(ArrayList())
         }
-        val map = sortedFeatMap()
+        val map = data.featMapOrder
+        map.sort(FeatMapKey.LITE)
         rules.initFeatList()
         val list = rules.featList
         for (i in list.indices) {
@@ -218,7 +218,7 @@ class PlannerExport(private val rules: BuildRules) {
             if (selector != 0) {
                 lite = lite + ": " + feat.selectors[selector - 1].name
             }
-            val found = seekFeatMap(map, lite) ?: continue
+            val found = map.seek(lite) ?: continue
             levels[entry.level].add(ExportFeat(t, entry.level, entry.characterClass, entry.classLevel, lite, found.ron, found.builder))
         }
         for (level in levels) {
@@ -227,57 +227,6 @@ class PlannerExport(private val rules: BuildRules) {
             }
         }
         return levels
-    }
-
-    /** SortFeatMap (:375) by our names: VB's shellsort (not stable), 1-based as VB's array. */
-    private fun sortedFeatMap(): List<FeatMapEntry> {
-        val a = ArrayList<FeatMapEntry?>()
-        a.add(null)
-        a.addAll(data.featMap)
-        val min = 1
-        val max = data.featMap.size
-        var gap = min
-        do {
-            gap = 3 * gap + 1
-        } while (gap <= max)
-        do {
-            gap /= 3
-            for (i in gap + min..max) {
-                val swap = a[i]!!
-                var hold = i
-                while (a[hold - gap]!!.lite > swap.lite) {
-                    a[hold] = a[hold - gap]
-                    hold -= gap
-                    if (hold < min + gap) {
-                        break
-                    }
-                }
-                a[hold] = swap
-            }
-        } while (gap != 1)
-        val result = ArrayList<FeatMapEntry>()
-        for (i in 1..max) {
-            result.add(a[i]!!)
-        }
-        return result
-    }
-
-    /** SeekFeatMap (:408): a binary search by our name. */
-    private fun seekFeatMap(map: List<FeatMapEntry>, lite: String): FeatMapEntry? {
-        var first = 0
-        var last = map.size - 1
-        while (first <= last) {
-            val mid = (first + last) / 2
-            val c = map[mid].lite.compareTo(lite)
-            if (c < 0) {
-                first = mid + 1
-            } else if (c > 0) {
-                last = mid - 1
-            } else {
-                return map[mid]
-            }
-        }
-        return null
     }
 
     /** IdentifyChannels (:274): the slot kind in each planner. */

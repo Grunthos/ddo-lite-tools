@@ -8,6 +8,7 @@ import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
 import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.JOptionPane
@@ -20,6 +21,19 @@ class Exports(private val files: BuildFiles) {
     /** Copy to Clipboard (frmExport.lnkNav_MouseDown, :311). */
     fun copy(text: String) {
         Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+    }
+
+    /** The clipboard's text, or null if it has none (frmImport's Paste from Clipboard: Clipboard.GetText). */
+    fun paste(): String? {
+        try {
+            val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+            if (!clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+                return null
+            }
+            return clipboard.getData(DataFlavor.stringFlavor) as String
+        } catch (e: Exception) {
+            return null
+        }
     }
 
     /** Save to File (frmExport, :317): "<build name>.txt" in the Save folder. */
