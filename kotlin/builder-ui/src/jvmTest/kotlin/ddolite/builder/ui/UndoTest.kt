@@ -1,17 +1,7 @@
 package ddolite.builder.ui
 
-import ddolite.builder.build.BuildPoints
-import ddolite.builder.build.readBuildFile
 import ddolite.builder.build.writeBuildFile
-import ddolite.builder.data.LoadLog
-import ddolite.builder.data.loadBuilderData
 import ddolite.builder.model.Stat
-import ddolite.common.theme.ThemeFileKind
-import ddolite.common.theme.loadTheme
-import ddolite.dataformat.DirectoryDataSource
-import ddolite.dataformat.decodeText
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -20,26 +10,7 @@ import kotlin.test.assertTrue
 
 /** Edit › Undo and Redo through the session, as the windows use them. */
 class UndoTest {
-    private val dataDir = Path.of(System.getProperty("ddolite.dataDir"))
-    private val source = DirectoryDataSource(dataDir)
-    private val data = loadBuilderData(source, LoadLog())
-
-    private object NoPrompts : BuilderPrompts {
-        override fun confirm(message: String): Boolean = true
-        override fun notice(message: String) {}
-        override fun yesNoCancel(message: String, title: String): Boolean? = null
-        override fun chooseLevel(min: Int, max: Int): Int? = null
-    }
-
-    private fun session(): BuilderSession {
-        val file = dataDir.resolveSibling("Settings").resolve("Black.screen")
-        val theme = loadTheme(decodeText(Files.readAllBytes(file)).text, "Black", ThemeFileKind.SCREEN).theme
-        val skills = SkillsScreenState(data, listOf(theme), prototypePresets())
-        val state = BuilderSession(data, skills, TreeSlotsState(data, readTreeHeaders(source), skills), NoPrompts)
-        val build = Path.of(System.getProperty("ddolite.saveDir")).resolve("Kensei Warpriest.build")
-        state.openBuild(readBuildFile(Files.readAllBytes(build), data, BuildPoints.ADVENTURER))
-        return state
-    }
+    private fun session(): BuilderSession = TestSession.open("Kensei Warpriest.build")
 
     @Test
     fun undoAndRedoAChange() {
