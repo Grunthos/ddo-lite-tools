@@ -266,7 +266,7 @@ private fun StatsColumn(screen: StatsScreenState, rules: StatRules, theme: Theme
 
 /** A Frame with its caption on the border (lblGroup over shpGroup). */
 @Composable
-private fun GroupFrame(theme: Theme, caption: String, left: Int, top: Int, width: Int, height: Int) {
+internal fun GroupFrame(theme: Theme, caption: String, left: Int, top: Int, width: Int, height: Int) {
     Frame(theme, left, top + 8, width, height - 8)
     BasicText(
         caption,

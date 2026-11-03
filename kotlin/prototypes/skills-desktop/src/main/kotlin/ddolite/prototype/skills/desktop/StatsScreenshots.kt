@@ -1,6 +1,13 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package ddolite.prototype.skills.desktop
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.use
 import ddolite.builder.build.BuildPoints
@@ -26,8 +33,22 @@ fun statsScreenshots(prototype: PrototypeState, kensei: ByteArray, outDir: Path)
         save(scene, outDir.resolve("16-stats-schedule.png"))
         prototype.stats.showTab(schedule = false)
     }
-    ImageComposeScene(width = 1000, height = 720, density = Density(1f)) { SkillsWindowContent(prototype) }.use { scene ->
+    val icons = loadClassIcons()
+    ImageComposeScene(width = 870, height = 517, density = Density(1f)) { SkillsWindowContent(prototype, icons) {} }.use { scene ->
         save(scene, outDir.resolve("17-skills-kensei.png"))
+        // A right-click on the third skill name (Concentration) opens its menu. The grid's rows
+        // are about 17 pixels from y = 83 with the icon row; the names start near x = 97.
+        scene.render()
+        val name = Offset(120f, 83f + 17f * 2.5f)
+        scene.sendPointerEvent(PointerEventType.Move, name)
+        scene.sendPointerEvent(PointerEventType.Press, name, buttons = PointerButtons(isSecondaryPressed = true), button = PointerButton.Secondary)
+        scene.sendPointerEvent(PointerEventType.Release, name, buttons = PointerButtons(), button = PointerButton.Secondary)
+        save(scene, outDir.resolve("17b-skills-menu.png"))
+        println("Skill menu for row " + prototype.skills.menuRow)
+        prototype.skills.menuRow = 0
+        prototype.skills.tomesTab = true
+        save(scene, outDir.resolve("17c-skills-tomes.png"))
+        prototype.skills.tomesTab = false
     }
 
     prototype.openBuild(newBuild)

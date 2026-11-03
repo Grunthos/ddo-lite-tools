@@ -3,12 +3,14 @@ package ddolite.prototype.skills
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -19,6 +21,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import ddolite.builder.rules.RankStatus
 import ddolite.builder.rules.formatRanks
@@ -29,24 +33,38 @@ import kotlinx.coroutines.Job
 private const val SKILL_ROWS = 21
 private const val LEVEL_COLUMNS = 20
 
-/**
- * Sizes of the grid, in pixels. Ported from `frmSkills.InitGrid` (Source/Forms/Build/frmSkills.frm:1304):
- * - the skill name column is as wide as "Use Magic Device  " in bold;
- * - each level column is as wide as "10½";
- * - there are one or two header rows (class initials, if more than one class, then level numbers),
- *   21 skill rows and two footer rows (points spent, points available); the column after level 20
- *   holds each skill's total.
- *
- * VB sizes rows to fill the window; the prototype uses a fixed height per row instead.
- */
-class GridLayout(textMeasurer: TextMeasurer, normal: TextStyle, bold: TextStyle, val classRow: Boolean) {
-    val nameWidth: Float = textMeasurer.measure("Use Magic Device  ", bold).size.width.toFloat()
-    val cellWidth: Float = textMeasurer.measure("10½", normal).size.width * 1.35f
-    val rowHeight: Float = textMeasurer.measure("Xg", normal).size.height * 1.45f
-    val headerRows: Int = if (classRow) 2 else 1
+/** The grid's font: picGrid.FontSize = 10 (InitGrid), 10 pt at 96 dpi. */
+internal val GRID_FONT_SIZE = 13.33.sp
 
+/**
+ * Sizes of the grid, in pixels: the skill name column ([nameWidth], VB's mlngLeft), each level
+ * column ([cellWidth], mlngWidth) and each row ([rowHeight], mlngHeight). The header is one row of
+ * level numbers, with the classes above it if the build has more than one: a row of initials, or
+ * of icons [iconSize] pixels square (mlngIconWidth), [iconOffset] in from the column's left. Then
+ * 21 skill rows and two footer rows (points spent, points available); the column after level 20
+ * holds each skill's total.
+ */
+data class GridLayout(
+    val nameWidth: Float,
+    val cellWidth: Float,
+    val rowHeight: Float,
+    val classRow: Boolean,
+    val iconSize: Float,
+    val iconOffset: Float,
+) {
     /** Top of the first skill row (VB's mlngTop). */
-    val top: Float = rowHeight * headerRows
+    val top: Float = gridTop()
+
+    private fun gridTop(): Float {
+        if (!classRow) {
+            return rowHeight
+        }
+        if (iconSize > 0) {
+            return iconSize + rowHeight
+        }
+        return rowHeight * 2
+    }
+
     val width: Float = nameWidth + cellWidth * (LEVEL_COLUMNS + 1)
     val height: Float = top + rowHeight * (SKILL_ROWS + 2)
 
@@ -84,21 +102,95 @@ class GridLayout(textMeasurer: TextMeasurer, normal: TextStyle, bold: TextStyle,
     }
 }
 
+/** The grid's place in the window and its sizes: picGrid.Move in InitGrid. */
+data class WindowGrid(val left: Float, val top: Float, val layout: GridLayout)
+
 /**
- * The skills grid: draws the build's skill ranks per level and handles the mouse. Prototype of the
- * `picGrid` picture box on frmSkills; drawing follows `DrawGrid` (:1400) and the Draw* routines
- * after it, interaction goes to [SkillsScreenState].
+ * Sizes and places the grid to fill the space between the header and footer bars. Ported from
+ * frmSkills.InitGrid (Source/Forms/Build/frmSkills.frm:1304):
+ * - the skill names are as wide as "Use Magic Device  " in bold, each level column as "10½";
+ * - icons are four fifths of a column wide, in whole pixels, and square;
+ * - the rows share the height: 25 rows less the icons, 26 rows with initials, or 25 rows for one
+ *   class (the grid is 24 rows or 25 with initials, centred in that space);
+ * - the grid is centred across the window, then moved right by a quarter of the width of "½"
+ *   (VB's lngFudge, so it looks centred without the totals column);
+ * - if it's too wide for the window, the skill names get narrower (VB, 6/22/24).
+ */
+fun windowGridLayout(
+    textMeasurer: TextMeasurer,
+    classRow: Boolean,
+    icons: Boolean,
+    clientWidth: Float,
+    headerHeight: Float,
+    footerTop: Float,
+): WindowGrid {
+    val normal = TextStyle(fontSize = GRID_FONT_SIZE)
+    val bold = TextStyle(fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
+    var nameWidth = textMeasurer.measure("Use Magic Device  ", bold).size.width.toFloat()
+    val cellWidth = textMeasurer.measure("10½", normal).size.width.toFloat()
+    val fudge = (textMeasurer.measure("½", normal).size.width / 4).toFloat()
+    val iconSize = (cellWidth * 4 / 5).toInt().toFloat()
+    val iconOffset = ((cellWidth - iconSize) / 2).toInt().toFloat()
+    var width = nameWidth + cellWidth * 21
+    if (width + fudge > clientWidth) {
+        nameWidth = clientWidth - (cellWidth * 21 + fudge)
+        width = nameWidth + cellWidth * 21
+    }
+    val space = footerTop - headerHeight
+    var rowHeight: Float
+    if (classRow && icons) {
+        rowHeight = ((space - iconSize) / 25).toInt().toFloat()
+    } else if (classRow) {
+        rowHeight = (space / 26).toInt().toFloat()
+    } else {
+        rowHeight = (space / 25).toInt().toFloat()
+    }
+    var iconRow = 0f
+    if (classRow && icons) {
+        iconRow = iconSize
+    }
+    val layout = GridLayout(nameWidth, cellWidth, rowHeight, classRow, iconRow, iconOffset)
+    val left = ((clientWidth - width) / 2).toInt() + fudge
+    val top = headerHeight + ((space - layout.height) / 2).toInt()
+    return WindowGrid(left, top, layout)
+}
+
+/**
+ * Fixed sizes for the single-window prototype on Android, which scrolls the grid instead of
+ * fitting it to a window (no icons; initials when there's more than one class).
+ */
+fun compactGridLayout(textMeasurer: TextMeasurer, classRow: Boolean): GridLayout {
+    val normal = TextStyle(fontSize = GRID_FONT_SIZE)
+    val bold = TextStyle(fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
+    val nameWidth = textMeasurer.measure("Use Magic Device  ", bold).size.width.toFloat()
+    val cellWidth = textMeasurer.measure("10½", normal).size.width * 1.35f
+    val rowHeight = textMeasurer.measure("Xg", normal).size.height * 1.45f
+    return GridLayout(nameWidth, cellWidth, rowHeight, classRow, 0f, 0f)
+}
+
+/**
+ * The skills grid: draws the build's skill ranks per level and handles the mouse. The `picGrid`
+ * picture box on frmSkills; drawing follows `DrawGrid` (:1400) and the Draw* routines after it,
+ * interaction goes to [SkillsScreenState]. [classIcons] (by [classResourceId]) are drawn above the
+ * levels when [layout] has room for them. [onMenu] gets the pointer position when a right-click on a
+ * skill name asks for its menu (picGrid_MouseDown's PopupMenu).
  */
 @Composable
-fun SkillsGrid(state: SkillsScreenState, modifier: Modifier = Modifier) {
+fun SkillsGrid(
+    state: SkillsScreenState,
+    layout: GridLayout,
+    classIcons: Map<String, ImageBitmap>,
+    modifier: Modifier = Modifier,
+    onMenu: (Offset) -> Unit = {},
+) {
     val textMeasurer = rememberTextMeasurer()
     val scope = rememberCoroutineScope()
     val theme = state.theme
-    val normal = TextStyle(fontSize = 13.sp, color = Color.Unspecified)
-    val bold = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Unspecified)
-    val classRow = state.isMulticlass()
-    val layout = remember(textMeasurer, classRow) { GridLayout(textMeasurer, normal, bold, classRow) }
+    val fontSize = GRID_FONT_SIZE
+    val normal = TextStyle(fontSize = fontSize, color = Color.Unspecified)
+    val bold = TextStyle(fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.Unspecified)
     val density = LocalDensity.current
+    val currentOnMenu by rememberUpdatedState(onMenu)
 
     // Reading these here makes the grid redraw when they change.
     val grid = state.grid
@@ -123,6 +215,9 @@ fun SkillsGrid(state: SkillsScreenState, modifier: Modifier = Modifier) {
                             // From picGrid_MouseDown: act now, then repeat while held.
                             if (state.press(row, col, pressedButton(event))) {
                                 repeating = startRepeating(scope) { state.repeat() }
+                            }
+                            if (state.menuRow != 0) {
+                                currentOnMenu(position)
                             }
                             event.changes[0].consume()
                         } else if (event.type == PointerEventType.Release) {
@@ -149,20 +244,33 @@ fun SkillsGrid(state: SkillsScreenState, modifier: Modifier = Modifier) {
         if (state.revision < 0) {
             return@Canvas
         }
-        val fills = cellFills(theme, Contrast.LOW)
+        val fills = cellFills(theme, state.contrast)
         val wrkBackground = theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)
         val wrkText = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
 
         drawRect(wrkBackground)
 
-        // Column headers: class initials (if more than one class) and level numbers. From DrawColumnHeader (:1510).
+        // Column headers: the class (if more than one) as an icon or initials, then the level number.
+        // From DrawColumnHeader (:1510).
         for (col in 1..grid.levels) {
             val style = if (col == activeCol) bold.copy(color = wrkText) else normal.copy(color = wrkText)
             val left = layout.cellLeft(col)
             var top = 0f
             if (layout.classRow) {
-                drawCentred(textMeasurer, state.classInitial(col), style, left, left + layout.cellWidth, layout.rowHeight, top)
-                top = layout.rowHeight
+                val icon = classIcons[classResourceId(grid.classAt(col))]
+                if (layout.iconSize > 0 && icon != null) {
+                    // PaintPicture LoadResPicture(GetClassResourceID(...)), scaled to the icon size.
+                    val size = layout.iconSize.toInt()
+                    drawImage(
+                        icon,
+                        dstOffset = IntOffset((left + 1 + layout.iconOffset).toInt(), 0),
+                        dstSize = IntSize(size, size),
+                    )
+                    top = layout.iconSize
+                } else {
+                    drawCentred(textMeasurer, state.classInitial(col), style, left, left + layout.cellWidth, layout.rowHeight, top)
+                    top = layout.rowHeight
+                }
             }
             drawCentred(textMeasurer, col.toString(), style, left, left + layout.cellWidth, layout.rowHeight, top)
         }

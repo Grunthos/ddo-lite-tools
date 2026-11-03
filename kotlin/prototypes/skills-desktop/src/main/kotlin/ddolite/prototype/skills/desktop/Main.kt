@@ -286,6 +286,16 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                     Item(screen.title, mnemonic = screen.mnemonic, enabled = menuEnabled(screen, state), onClick = { openScreen(screen, state, windows) })
                 }
             }
+            // frmMain's Tools menu (frmMain.frm:357). VB's Colors... opens a dialog for editing colours;
+            // here it lists the themes in Settings/ to choose from.
+            Menu("Tools", mnemonic = 'T') {
+                Menu("Colors", mnemonic = 'C') {
+                    val skills = state.skills
+                    for (i in skills.themes.indices) {
+                        RadioButtonItem(skills.themes[i].name, selected = skills.themeIndex == i, onClick = { skills.selectTheme(i) })
+                    }
+                }
+            }
             // frmMain's Window menu lists the open screens (tmrWindowMenu_Timer, frmMain.frm:819).
             Menu("Window", mnemonic = 'W') {
                 for (screen in EditScreen.entries) {
@@ -311,8 +321,9 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         }
     }
     if (windows.isOpen(BuildScreen.SKILLS)) {
-        ScreenWindow(windows, BuildScreen.SKILLS, "Skills", 520, 40, 1000, 760) {
-            SkillsWindowContent(state)
+        // The form's client area is 870 x 517 at 100%.
+        ScreenWindow(windows, BuildScreen.SKILLS, "Skills", 520, 40, 886, 560) {
+            SkillsWindowContent(state, icons) { link -> footerLink(link, BuildScreen.SKILLS, state, windows) }
         }
     }
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {

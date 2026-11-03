@@ -14,9 +14,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +90,10 @@ fun SkillsScreen(state: SkillsScreenState) {
                 .verticalScroll(rememberScrollState())
                 .horizontalScroll(rememberScrollState()),
         ) {
-            SkillsGrid(state)
+            val textMeasurer = rememberTextMeasurer()
+            val classRow = state.isMulticlass()
+            val layout = remember(textMeasurer, classRow) { compactGridLayout(textMeasurer, classRow) }
+            SkillsGrid(state, layout, emptyMap())
         }
 
         BasicText(

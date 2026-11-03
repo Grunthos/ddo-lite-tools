@@ -597,7 +597,7 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         "erase the Leveling Guide?" question. Rules in core `OverviewRules` with tests; the build part
         of `CascadeChanges` in `BuildRules.cascadeChanges`.
       - [ ] Overview still open: the combo-box layout used when icons are off in Options (needs the
-        settings), the Help link, the footer's "Stats >" (needs Stats), saved window positions, and a
+        settings), the Help link, saved window positions, and a
         by-eye comparison with the VB form (fonts: Verdana isn't bundled yet).
       - Not ported in the cascade yet: `InitBuildSkills` (the Skills screen builds its own grid) and
         `CheckSlotErrors` (comes with the Feats screen).
@@ -613,8 +613,13 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         level 36 level-up never raises the score.
       - [x] Skills uses the Intelligence modifier at each level from Stats; the presets and the
         Intelligence spinner only show with no build open (Android).
-      - [ ] Skills next: class icons above the level columns (`cfg.IconSkills`, frmSkills.frm:1529), tomes tab,
-        footer links, the right-click menu on skill names.
+      - [x] Skills window as frmSkills: the grid sized and placed as `InitGrid` does, class icons above
+        the levels for a multiclass build (`cfg.IconSkills`, VB's default; initials on Android), the
+        right-click menu on skill names, the Contrast menu (default Medium), the Skill Tomes tab,
+        Clear Skills / Clear Tomes, and the footer links.
+      - [ ] Skills still open: the Help link, `cfg.SkillOrderScreen` "native skills first" row order,
+        VB's unique class initials (`GetClassSplit`) when icons are off, saving the Contrast setting.
+      - Manual checks for Philip are listed in `TESTING.md`.
       - `Save/Eresh WFWizRog.build` (saved by a current VB) reads and writes back byte for byte: the first exact
         golden. It isn't committed (it's your file); the round-trip tests use whatever is in `Save/`.
 9. [ ] F0: inventory in Edit-menu order: `frmMain`, `frmOverview`, `frmStats`, then `frmSkills`. Layout tool done (`tools/form-layout`, §8.1); Philip to compare its wireframes with the real forms.

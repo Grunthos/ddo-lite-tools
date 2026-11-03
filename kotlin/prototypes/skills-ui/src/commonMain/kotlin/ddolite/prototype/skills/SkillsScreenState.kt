@@ -226,11 +226,13 @@ class SkillsScreenState(
             }
             maxRanksRow = 0
         } else {
-            // VB shows a popup menu (half/full/even/clear) for a right-click on a skill name;
-            // the prototype has no menu yet, so a right-click there does nothing.
-            if (col > 0) {
-                grid.decrement(spend, skill, col)
+            if (col == 0) {
+                // VB pops up mnuMain(0) here; the window shows the menu for [menuRow] and calls [chooseMenu].
+                menuRow = row
+                maxRanksRow = 0
+                return false
             }
+            grid.decrement(spend, skill, col)
             maxRanksRow = 0
         }
         changed()
@@ -273,6 +275,80 @@ class SkillsScreenState(
         } else {
             grid.clearSkill(spend, skill)
         }
+    }
+
+    /** The skill-name menu's items (mnuSkill(0..4)); "-" is a separator. */
+    val menuItems = listOf("Max Ranks (Half Ranks)", "Max Ranks (Full Ranks)", "Max Ranks (Even Levels)", "-", "Clear Ranks")
+
+    /** The row whose skill-name menu is showing; 0 = none. */
+    var menuRow by mutableIntStateOf(0)
+
+    /**
+     * An item chosen from the skill-name menu. Ported from mnuSkill_Click (frmSkills.frm:1698):
+     * "Clear Ranks" clears the skill; the others fill it as clicking the name does, and set the
+     * mode that the next click on the same name moves on from.
+     */
+    fun chooseMenu(index: Int) {
+        val row = menuRow
+        menuRow = 0
+        if (row < 1 || row > rowSkills.size) {
+            return
+        }
+        val skill = rowSkills[row - 1]
+        if (index == 4) {
+            grid.clearSkill(spend, skill)
+        } else {
+            applyMaxRanks(skill, index + 1)
+        }
+        changed()
+    }
+
+    /** How strongly class skills stand out (cfg.Contrast, default Medium: clsConfig.cls:456). */
+    var contrast by mutableStateOf(Contrast.MEDIUM)
+
+    /** The Skill Tomes tab is showing (picTomes visible; usrHeader_Click, frmSkills.frm:1186). */
+    var tomesTab by mutableStateOf(false)
+
+    /** "Clear Skills" after the user agreed: Erase build.Skills (usrFooter_Click, :1203). */
+    fun clearSkills() {
+        for (skill in Skill.entries) {
+            for (level in 1..HEROIC_LEVELS) {
+                spend.set(skill, level, 0)
+            }
+        }
+        changed()
+    }
+
+    /**
+     * A skill tome's spinner on the Skill Tomes tab, or 0 if no build is open. VB's LoadData
+     * (:1376) shows a tome above the current maximum as the maximum, without changing the build.
+     */
+    fun tome(skill: Skill): Int {
+        val build = openedBuild ?: return 0
+        val value = build.skillTomes[skill.ordinal]
+        if (value > data.tomes.skill.max) {
+            return data.tomes.skill.max
+        }
+        return value
+    }
+
+    /** The highest skill tome (tomes.Skill.Max). */
+    val tomeMax: Int get() = data.tomes.skill.max
+
+    /** usrspnSkill_Change (:1390). */
+    fun setTome(skill: Skill, value: Int) {
+        val build = openedBuild ?: return
+        build.skillTomes[skill.ordinal] = value
+        changed()
+    }
+
+    /** "Clear Tomes" after the user agreed: Erase build.SkillTome (tmrFocus_Timer, :1229). */
+    fun clearTomes() {
+        val build = openedBuild ?: return
+        for (i in build.skillTomes.indices) {
+            build.skillTomes[i] = 0
+        }
+        changed()
     }
 
     private fun changed() {

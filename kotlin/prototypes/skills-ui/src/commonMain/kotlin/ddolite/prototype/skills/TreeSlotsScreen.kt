@@ -100,40 +100,6 @@ fun TreeSlotsWindowContent(state: PrototypeState) {
     }
 }
 
-/**
- * The Skills window: header (tabs "Skill Ranks" and "Skill Tomes"; links "Contrast" and "Help"),
- * the skills grid, and the footer ("< Stats", "Feats >"), as in frmSkills.
- */
-@Composable
-fun SkillsWindowContent(state: PrototypeState) {
-    val theme = state.skills.theme
-    var tab by remember { mutableIntStateOf(0) }
-    Column(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        HeaderBar(
-            theme,
-            listOf("Skill Ranks", "Skill Tomes"),
-            tab,
-            listOf("Contrast", "Help"),
-            isEnabled = { link -> link == "Skill Ranks" || link == "Skill Tomes" },
-            onClick = { link ->
-                if (link == "Skill Ranks") {
-                    tab = 0
-                } else if (link == "Skill Tomes") {
-                    tab = 1
-                }
-            },
-        )
-        Box(modifier = Modifier.weight(1f)) {
-            if (tab == 0) {
-                SkillsScreen(state.skills)
-            } else {
-                NotInPrototype(theme, "Skill tomes aren't in the prototype yet.")
-            }
-        }
-        HeaderBar(theme, listOf("< Stats"), null, listOf("Feats >"), isEnabled = { false }, onClick = {})
-    }
-}
-
 /** Placeholder text for parts of a window the prototype doesn't have. */
 @Composable
 private fun NotInPrototype(theme: Theme, message: String) {
