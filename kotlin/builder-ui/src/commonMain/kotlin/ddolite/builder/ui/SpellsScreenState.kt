@@ -258,14 +258,14 @@ class SpellsScreenState(private val session: BuilderSession) {
      * The slot menu (ContextMenu, :471): "Clear this spell" (only for standard and free slots),
      * "Clear Class spells" (with more than one class), "Clear all spells".
      */
-    fun menuItems(): List<Pair<String, Boolean>> {
+    fun menuItems(): List<MenuChoice> {
         val slot = rows().getOrNull(menuRow - 1) ?: return emptyList()
-        val items = ArrayList<Pair<String, Boolean>>()
-        items.add(Pair("Clear this spell", slot.type == SpellSlotType.STANDARD || slot.type == SpellSlotType.FREE))
+        val items = ArrayList<MenuChoice>()
+        items.add(MenuChoice("Clear this spell", slot.type == SpellSlotType.STANDARD || slot.type == SpellSlotType.FREE))
         if (classes.size > 1) {
-            items.add(Pair("Clear " + (spellClass?.name ?: "") + " spells", true))
+            items.add(MenuChoice("Clear " + (spellClass?.name ?: "") + " spells", true))
         }
-        items.add(Pair("Clear all spells", true))
+        items.add(MenuChoice("Clear all spells", true))
         return items
     }
 

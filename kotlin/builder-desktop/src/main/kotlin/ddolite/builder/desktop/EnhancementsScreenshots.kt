@@ -30,7 +30,7 @@ fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: P
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
         shot(scene, outDir.resolve("30-enh-trees.png"))
         screen.chooseTab(1)
-        println("Enhancements tab: " + screen.comboTree + ", " + screen.slotRows().size + " slots, " + screen.abilities.size + " offered; " + screen.apCaption().first)
+        println("Enhancements tab: " + screen.comboTree + ", " + screen.slotRows().size + " slots, " + screen.abilities.size + " offered; " + screen.apCaption().text)
         shot(scene, outDir.resolve("31-enh-abilities.png"))
         screen.clickSlot(2, PointerButton.PRIMARY)
         shot(scene, outDir.resolve("32-enh-slot-details.png"))
@@ -48,7 +48,7 @@ fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: P
                 screen.doubleClickList(fromSelectors = false)
                 println("Double-clicked " + text + ": " + screen.slotRows().size + " slots")
             } else {
-                val item = EnhancementDrag.ListAbility(screen.abilities[i].first, screen.abilities[i].second)
+                val item = EnhancementDrag.ListAbility(screen.abilities[i].tier, screen.abilities[i].ability)
                 println("Drag allowed: " + screen.startAbilityDrag(item) + ", " + screen.slotRows().size + " slots with the blank")
                 shot(scene, outDir.resolve("33-enh-dragging.png"))
                 var blank = 0
@@ -72,7 +72,7 @@ fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: P
             }
         }
         shot(scene, outDir.resolve("34-enh-after.png"))
-        println("After: " + screen.apCaption().first + ", dirty " + prototype.dirty)
+        println("After: " + screen.apCaption().text + ", dirty " + prototype.dirty)
     }
     guideScreenshots(prototype, repoRoot, outDir)
 }
@@ -90,11 +90,11 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
     val guide = screen.guide
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
         screen.chooseTab(2)
-        println("Guide: trees " + guide.trees.map { it.first } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
-        guide.clickTree(guide.trees.indexOfFirst { it.first == "Kensei" })
+        println("Guide: trees " + guide.trees.map { it.text } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
+        guide.clickTree(guide.trees.indexOfFirst { it.text == "Kensei" })
         println("  Kensei offers " + guide.choices.size + ": " + guide.choices.take(4).map { it.text })
         guide.clickChoice(0)
-        println("  selectors showing " + guide.selectorsShowing + ": " + guide.selectors.map { it.first })
+        println("  selectors showing " + guide.selectorsShowing + ": " + guide.selectors.map { it.text })
         shot(scene, outDir.resolve("40-guide-selectors.png"))
         guide.clickSelector(0)
         guide.chooseAbility()
@@ -112,7 +112,7 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
                 break
             }
         }
-        guide.clickTree(guide.trees.indexOfFirst { it.second == 0 })
+        guide.clickTree(guide.trees.indexOfFirst { it.number == 0 })
         println("  commands: " + guide.choices.map { it.text })
         guide.clickChoice(0)
         guide.chooseAbility()

@@ -146,9 +146,9 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, onMenu: ()
         cellText = { row, col ->
             val columns = screen.treeColumns(row)
             when (col) {
-                0 -> columns.first
-                2 -> columns.second
-                3 -> columns.third
+                0 -> columns.className
+                2 -> columns.tier
+                3 -> columns.ap
                 else -> ""
             }
         },
@@ -183,10 +183,10 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, onMenu: ()
     )
     val ap = screen.apCaption()
     var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.second) {
+    if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.first, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
+    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
 
     // fraDestinyAP: lblPermDestinyPoints over shpPermDestinyPoints (which starts 16 pixels lower).
     Frame(theme, 427, 308, 333, 149)
@@ -273,7 +273,7 @@ private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, onMenu: () ->
         theme, abilityTexts, { i -> i == screen.abilityIndex }, 368, 104, 233, 201, screen.drag,
         onPress = { i, _ -> screen.clickAbility(i) },
         onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = false) },
-        dragItem = { i -> EnhancementDrag.ListAbility(screen.abilities[i].first, screen.abilities[i].second) },
+        dragItem = { i -> EnhancementDrag.ListAbility(screen.abilities[i].tier, screen.abilities[i].ability) },
         onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
         onDrop = { item, target -> screen.abilityDropped(item, target) },
         dropKey = AbilityListKey,
@@ -288,7 +288,7 @@ private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, onMenu: () ->
         onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = true) },
         dragItem = { _ ->
             val item = screen.abilities.getOrNull(screen.abilityIndex)
-            if (item == null) null else EnhancementDrag.ListAbility(item.first, item.second)
+            if (item == null) null else EnhancementDrag.ListAbility(item.tier, item.ability)
         },
         onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
         onDrop = { item, target -> screen.abilityDropped(item, target) },
@@ -304,10 +304,10 @@ private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, onMenu: () ->
     DetailsBox(theme, details?.lines ?: emptyList(), 368, 329, 425, 136)
     val ap = screen.apCaption()
     var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.second) {
+    if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.first, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 468.dp))
+    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 468.dp))
     Label(screen.spentCaption(), label, 288, 468)
     if (details != null) {
         Label(details.ranks, label, 480, 468)

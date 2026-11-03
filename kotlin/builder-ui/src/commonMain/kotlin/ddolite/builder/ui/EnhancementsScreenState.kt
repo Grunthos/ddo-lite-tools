@@ -1,5 +1,7 @@
 package ddolite.builder.ui
 
+import ddolite.builder.build.AbilityRef
+import ddolite.builder.build.AbilityChoice
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -210,13 +212,13 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** usrTree's Class, Tier and AP columns for a build tree (ShowTrees). */
-    fun treeColumns(row: Int): Triple<String, String, String> {
-        val r = rules ?: return Triple("", "", "")
-        val bt = treeRows().getOrNull(row - 1) ?: return Triple("", "", "")
+    fun treeColumns(row: Int): TreeColumns {
+        val r = rules ?: return TreeColumns("", "", "")
+        val bt = treeRows().getOrNull(row - 1) ?: return TreeColumns("", "", "")
         if (bt.treeType == TreeStyle.RACE) {
-            return Triple("", "4", r.quickSpentInTree(row).toString())
+            return TreeColumns("", "4", r.quickSpentInTree(row).toString())
         }
-        return Triple(bt.source?.name ?: "", r.maxTier(bt).toString(), r.quickSpentInTree(row).toString())
+        return TreeColumns(bt.source?.name ?: "", r.maxTier(bt).toString(), r.quickSpentInTree(row).toString())
     }
 
     /**
@@ -239,10 +241,10 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** The AP line (ShowSpentAll, :1390). */
-    fun apCaption(): Pair<String, Boolean> {
-        val r = rules ?: return Pair("", false)
+    fun apCaption(): Caption {
+        val r = rules ?: return Caption("", false)
         val totals = r.apTotals()
-        return Pair(totals.caption(), totals.overspent)
+        return Caption(totals.caption(), totals.overspent)
     }
 
     /**
@@ -346,16 +348,16 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** The tree menu (mnuTrees): "Delete Abbr" (disabled for the race tree), "Delete All Trees", "-", "Reset Abbr", "Reset All Trees". */
-    fun treeMenuItems(): List<Pair<String, Boolean>> {
+    fun treeMenuItems(): List<MenuChoice> {
         val r = session.rules ?: return emptyList()
         val bt = r.build.trees.getOrNull(treeMenuRow - 1) ?: return emptyList()
         val abbreviation = r.data.findTree(bt.treeName)?.abbreviation ?: ""
         return listOf(
-            Pair("Delete $abbreviation", bt.treeType != TreeStyle.RACE),
-            Pair("Delete All Trees", true),
-            Pair("-", true),
-            Pair("Reset $abbreviation", true),
-            Pair("Reset All Trees", true),
+            MenuChoice("Delete $abbreviation", bt.treeType != TreeStyle.RACE),
+            MenuChoice("Delete All Trees", true),
+            MenuChoice("-", true),
+            MenuChoice("Reset $abbreviation", true),
+            MenuChoice("Reset All Trees", true),
         )
     }
 
@@ -570,7 +572,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     var slotHover by mutableIntStateOf(0)
 
     /** The ability list (lstAbility) as (tier, ability), and its highlighted row (-1 = none). */
-    var abilities: List<Pair<Int, Int>> by mutableStateOf(emptyList())
+    var abilities: List<AbilityRef> by mutableStateOf(emptyList())
         private set
     var abilityIndex by mutableIntStateOf(-1)
         private set
@@ -665,7 +667,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
             } else {
                 val info = r.slotInfo(tree, a)
                 val error = r.abilityError(tree, bt, a, spend) != null
-                rows.add(AbilitySlotRow(a.tier.toString(), info.first, info.second.toString(), a.rank, info.third, error))
+                rows.add(AbilitySlotRow(a.tier.toString(), info.caption, info.cost.toString(), a.rank, info.maxRanks, error))
             }
         }
         return rows
@@ -706,9 +708,9 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** lstAbility's text for a row: "tier: Abbreviation". */
-    fun abilityText(item: Pair<Int, Int>): String {
+    fun abilityText(item: AbilityRef): String {
         val tree = currentTree() ?: return ""
-        return item.first.toString() + ": " + tree.tiers[item.first][item.second].abbreviation
+        return item.tier.toString() + ": " + tree.tiers[item.tier][item.ability].abbreviation
     }
 
     /** usrchkShowAll_UserChange (:2178). */
@@ -864,14 +866,14 @@ class EnhancementsScreenState(private val session: BuilderSession) {
         abilityIndex = index
         selectors = emptyList()
         selectorIndex = -1
-        showDetails(item.first, item.second, 0, 0)
-        val ability = tree.tiers[item.first][item.second]
+        showDetails(item.tier, item.ability, 0, 0)
+        val ability = tree.tiers[item.tier][item.ability]
         if (ability.selectorStyle == SelectorStyle.NONE) {
             changed()
             return true
         }
         // ShowSelectors (:2276): the valid ones, in data order (lstSub isn't sorted).
-        val valid = r.selectors(tree, item.first, item.second)
+        val valid = r.selectors(tree, item.tier, item.ability)
         val list = ArrayList<SelectorItem>()
         for (i in 1..ability.selectors.size) {
             if (valid[i]) {
@@ -889,20 +891,20 @@ class EnhancementsScreenState(private val session: BuilderSession) {
         val selector = selectors.getOrNull(index) ?: return
         selectorIndex = index
         selectSlot(0)
-        showDetails(item.first, item.second, selector.number, 0)
+        showDetails(item.tier, item.ability, selector.number, 0)
         changed()
     }
 
     /** GetUserChoices (:1763): (tier, ability, selector) chosen in the lists, or null if a needed selector isn't. */
-    private fun userChoice(): Triple<Int, Int, Int>? {
+    private fun userChoice(): AbilityChoice? {
         val tree = currentTree() ?: return null
         val item = abilities.getOrNull(abilityIndex) ?: return null
         var selector = 0
-        if (tree.tiers[item.first][item.second].selectorStyle != SelectorStyle.NONE) {
+        if (tree.tiers[item.tier][item.ability].selectorStyle != SelectorStyle.NONE) {
             val s = selectors.getOrNull(selectorIndex) ?: return null
             selector = s.number
         }
-        return Triple(item.first, item.second, selector)
+        return AbilityChoice(item.tier, item.ability, selector)
     }
 
     /**
@@ -913,7 +915,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
         val edits = edits() ?: return true
         val choice = userChoice() ?: return true
         val bt = currentBuildTree() ?: return true
-        val question = edits.tier5Question(bt, choice.first) ?: return true
+        val question = edits.tier5Question(bt, choice.tier) ?: return true
         if (!session.ask(question)) {
             return false
         }
@@ -950,8 +952,8 @@ class EnhancementsScreenState(private val session: BuilderSession) {
         val tree = currentTree() ?: return false
         val bt = currentBuildTree() ?: return false
         val choice = userChoice() ?: return false
-        val ranks = tree.tiers[choice.first][choice.second].ranks
-        val insert = edits.insertAbility(bt, choice.first, choice.second, ranks, choice.third, blank)
+        val ranks = tree.tiers[choice.tier][choice.ability].ranks
+        val insert = edits.insertAbility(bt, choice.tier, choice.ability, ranks, choice.selector, blank)
         showAbilities()
         slotHover = insert + 1
         return true
@@ -983,7 +985,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
             if (a.ability != BLANK_ABILITY) {
                 states.add(DropState.DEFAULT)
             } else {
-                val check = BuildAbility(choice.first, choice.second, 1, choice.third)
+                val check = BuildAbility(choice.tier, choice.ability, 1, choice.selector)
                 states.add(if (r.abilityError(tree, bt, check, spend) != null) DropState.CAN_DROP_ERROR else DropState.CAN_DROP)
             }
         }
@@ -1015,7 +1017,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
                 val tree = currentTree()
                 if (choice != null && tree != null) {
                     dragComplete = true
-                    TreeEdits(r, destinies = false).dropAbility(bt, target.row, choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
+                    TreeEdits(r, destinies = false).dropAbility(bt, target.row, choice.tier, choice.ability, tree.tiers[choice.tier][choice.ability].ranks, choice.selector)
                     showAbilities()
                     slotHover = target.row
                     showAvailable()

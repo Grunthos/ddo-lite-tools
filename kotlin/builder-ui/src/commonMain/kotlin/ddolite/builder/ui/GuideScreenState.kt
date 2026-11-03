@@ -1,5 +1,6 @@
 package ddolite.builder.ui
 
+import ddolite.builder.build.GuideListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,7 @@ class GuideScreenState(private val session: BuilderSession) {
         private set
 
     /** lstGuideTree: display and guide tree (0 = "(Commands)"), and the highlighted row. */
-    var trees: List<Pair<String, Int>> by mutableStateOf(emptyList())
+    var trees: List<GuideListItem> by mutableStateOf(emptyList())
         private set
     var treeIndex by mutableIntStateOf(-1)
         private set
@@ -52,7 +53,7 @@ class GuideScreenState(private val session: BuilderSession) {
     /** picSelector (shown in place of the tree list) with lstGuideSub: name and selector number. */
     var selectorsShowing by mutableStateOf(false)
         private set
-    var selectors: List<Pair<String, Int>> by mutableStateOf(emptyList())
+    var selectors: List<GuideListItem> by mutableStateOf(emptyList())
         private set
     var selectorIndex by mutableIntStateOf(-1)
         private set
@@ -218,7 +219,7 @@ class GuideScreenState(private val session: BuilderSession) {
         choices = emptyList()
         choiceIndex = -1
         treeIndex = index
-        guideTree = trees.getOrNull(index)?.second ?: 0
+        guideTree = trees.getOrNull(index)?.number ?: 0
         showGuideAvailable()
         if (index != -1) { // VB leaves before SaveBackup with nothing selected
             session.saveBackup()
@@ -301,10 +302,10 @@ class GuideScreenState(private val session: BuilderSession) {
     private fun showGuideSelectors(tier: Int, ability: Int) {
         val g = rules() ?: return
         val offered = g.selectors(guideTree, tier, ability)
-        val list = ArrayList<Pair<String, Int>>()
+        val list = ArrayList<GuideListItem>()
         for (i in 1 until offered.size) {
             if (offered[i]) {
-                list.add(Pair(g.selectorName(guideTree, tier, ability, i), i))
+                list.add(GuideListItem(g.selectorName(guideTree, tier, ability, i), i))
             }
         }
         selectors = list
@@ -333,7 +334,7 @@ class GuideScreenState(private val session: BuilderSession) {
             if (selectorIndex == -1) {
                 showGuideSelectors(choice.tier, choice.ability)
             } else {
-                selector = selectors[selectorIndex].second
+                selector = selectors[selectorIndex].number
             }
         } else {
             hideGuideSelectors()
@@ -376,7 +377,7 @@ class GuideScreenState(private val session: BuilderSession) {
                 if (selectorIndex == -1) {
                     return
                 }
-                selector = selectors[selectorIndex].second
+                selector = selectors[selectorIndex].number
                 hideGuideSelectors()
                 if (selector == 0) {
                     return
@@ -497,7 +498,7 @@ class GuideScreenState(private val session: BuilderSession) {
     }
 
     /** The row menu's items and whether each is enabled: PopupGuideMenu (:3299). */
-    fun menuItems(): List<Pair<String, Boolean>> {
+    fun menuItems(): List<MenuChoice> {
         syncSelection()
         var count = 0
         for (s in selected) {
@@ -507,19 +508,19 @@ class GuideScreenState(private val session: BuilderSession) {
         }
         val plural = if (count > 1) "s" else ""
         val rowSelected = isSelected(menuRow)
-        val items = ArrayList<Pair<String, Boolean>>()
+        val items = ArrayList<MenuChoice>()
         if (moveRows) {
-            items.add(Pair("Insert Row$plural Here", !rowSelected))
-            items.add(Pair("-", true))
-            items.add(Pair("Delete Row$plural", rowSelected))
-            items.add(Pair("Delete to End", rowSelected && count == 1))
+            items.add(MenuChoice("Insert Row$plural Here", !rowSelected))
+            items.add(MenuChoice("-", true))
+            items.add(MenuChoice("Delete Row$plural", rowSelected))
+            items.add(MenuChoice("Delete to End", rowSelected && count == 1))
         } else {
-            items.add(Pair("Move Row$plural", true))
-            items.add(Pair("-", true))
-            items.add(Pair("Delete Row$plural", true))
-            items.add(Pair("Delete to End", count == 1))
+            items.add(MenuChoice("Move Row$plural", true))
+            items.add(MenuChoice("-", true))
+            items.add(MenuChoice("Delete Row$plural", true))
+            items.add(MenuChoice("Delete to End", count == 1))
         }
-        items.add(Pair("Delete All", true))
+        items.add(MenuChoice("Delete All", true))
         return items
     }
 
@@ -531,7 +532,7 @@ class GuideScreenState(private val session: BuilderSession) {
         if (g == null) {
             return
         }
-        val caption = menuItems().getOrNull(index)?.first ?: ""
+        val caption = menuItems().getOrNull(index)?.caption ?: ""
         syncSelection()
         if (caption.startsWith("Insert Row")) {
             val (first, count) = g.insertRows(selected, row)

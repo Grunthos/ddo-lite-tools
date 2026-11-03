@@ -65,7 +65,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     if (screen.selectorsShowing) {
         val names = ArrayList<String>()
         for (s in screen.selectors) {
-            names.add(s.first)
+            names.add(s.text)
         }
         ListBox(
             theme, names, isSelected = { it == screen.selectorIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 205,
@@ -76,7 +76,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         CheckBox(theme, "Show All", screen.showAllTrees, true, 16, TAB_TOP + 16, 125) { screen.toggleShowAllTrees() }
         val names = ArrayList<String>()
         for (t in screen.trees) {
-            names.add(t.first)
+            names.add(t.text)
         }
         ListBox(
             theme, names, isSelected = { it == screen.treeIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 237,

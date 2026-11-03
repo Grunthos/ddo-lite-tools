@@ -26,7 +26,7 @@ fun destinyScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) 
         screen.opened()
         val file = name.replace(" ", "-").lowercase()
         ImageComposeScene(width = 815, height = 518, density = Density(1f)) { DestinyWindowContent(prototype) {} }.use { scene ->
-            println(name + ": " + screen.comboTrees() + "; " + screen.apCaption().first)
+            println(name + ": " + screen.comboTrees() + "; " + screen.apCaption().text)
             shot(scene, outDir.resolve("50-destiny-$file-trees.png"))
             screen.chooseTab(1)
             println("  " + screen.comboTree + ": " + screen.slotRows().size + " slots, " + screen.abilities.size + " offered")
@@ -36,7 +36,7 @@ fun destinyScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) 
                 if (screen.clickAbility(i)) {
                     val text = screen.abilityText(screen.abilities[i])
                     screen.doubleClickList(fromSelectors = false)
-                    println("  added " + text + ": " + screen.slotRows().size + " slots; " + screen.apCaption().first)
+                    println("  added " + text + ": " + screen.slotRows().size + " slots; " + screen.apCaption().text)
                     break
                 }
             }

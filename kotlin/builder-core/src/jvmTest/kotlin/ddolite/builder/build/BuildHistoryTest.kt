@@ -35,11 +35,11 @@ class BuildHistoryTest {
             history.record(rules.build)
             val treesAfter = rules.build.trees.size // the cascade puts the race tree back
             val undone = assertNotNull(history.undo(), name)
-            assertContentEquals(before, writeBuildFile(undone.second), name)
+            assertContentEquals(before, writeBuildFile(undone), name)
             assertTrue(history.atSaved, name)
             val redone = assertNotNull(history.redo(), name)
-            assertEquals("Changed", redone.first.buildName, name)
-            assertEquals(treesAfter, redone.first.trees.size, name)
+            assertEquals("Changed", redone.build.buildName, name)
+            assertEquals(treesAfter, redone.build.trees.size, name)
             assertFalse(history.canRedo, name)
         }
     }
@@ -66,8 +66,8 @@ class BuildHistoryTest {
             history.record(rules.build)
         }
         // Only three states are kept: names 3, 4 and 5.
-        assertEquals("Name 4", history.undo()?.first?.buildName)
-        assertEquals("Name 3", history.undo()?.first?.buildName)
+        assertEquals("Name 4", history.undo()?.build?.buildName)
+        assertEquals("Name 3", history.undo()?.build?.buildName)
         assertFalse(history.canUndo)
         rules.build.buildName = "Other"
         history.record(rules.build)

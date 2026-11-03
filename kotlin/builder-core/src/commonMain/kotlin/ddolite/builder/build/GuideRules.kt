@@ -104,6 +104,10 @@ class GuideDetails(
  * The guide is VB's `Guide` ([BuildRules.guideTrees], [BuildRules.guideEnhancements]) kept with
  * the build's own `build.Guide` ([Build.guide]).
  */
+/** An entry in one of the Leveling Guide tab's lists: what it shows, and its number (a guide tree,
+ * 0 for "(Commands)"; or a selector). */
+class GuideListItem(val text: String, val number: Int)
+
 class GuideRules(private val rules: BuildRules) {
     private val build = rules.build
     private val data = rules.data
@@ -782,17 +786,17 @@ class GuideRules(private val rules: BuildRules) {
 
     /**
      * The tree list (lstGuideTree): the build's trees, or with [showAll] every tree the guide can
-     * use, then "(Commands)" (0). Pairs of display and guide tree. Ported from LoadGuideTrees (:2570).
+     * use, then "(Commands)" (0). Ported from LoadGuideTrees (:2570).
      */
-    fun treeList(showAll: Boolean): List<Pair<String, Int>> {
-        val result = ArrayList<Pair<String, Int>>()
+    fun treeList(showAll: Boolean): List<GuideListItem> {
+        val result = ArrayList<GuideListItem>()
         val trees = rules.guideTrees
         for (i in trees.indices) {
             if (showAll || trees[i].buildTree != 0) {
-                result.add(Pair(trees[i].display, i + 1))
+                result.add(GuideListItem(trees[i].display, i + 1))
             }
         }
-        result.add(Pair("(Commands)", 0))
+        result.add(GuideListItem("(Commands)", 0))
         return result
     }
 

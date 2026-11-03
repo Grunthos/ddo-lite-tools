@@ -1,5 +1,7 @@
 package ddolite.builder.ui
 
+import ddolite.builder.build.AbilityRef
+import ddolite.builder.build.AbilityChoice
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -149,12 +151,12 @@ class DestinyScreenState(private val session: BuilderSession) {
      * usrTree's columns for a destiny (ShowDestinies, :887). VB bug kept: the max tier goes in the
      * "Destiny" column (`SetText i, 1, GetMaxTier(i)`) and the Tier column stays empty.
      */
-    fun treeColumns(row: Int): Triple<String, String, String> {
-        val r = rules ?: return Triple("", "", "")
+    fun treeColumns(row: Int): TreeColumns {
+        val r = rules ?: return TreeColumns("", "", "")
         if (treeRows().getOrNull(row - 1) == null) {
-            return Triple("", "", "")
+            return TreeColumns("", "", "")
         }
-        return Triple("5", "", r.quickSpentInDestiny(row).toString())
+        return TreeColumns("5", "", r.quickSpentInDestiny(row).toString())
     }
 
     /** ShowDestinies (:887). */
@@ -173,10 +175,10 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** The destiny AP line (ShowSpentAll, :924). */
-    fun apCaption(): Pair<String, Boolean> {
-        val r = rules ?: return Pair("", false)
+    fun apCaption(): Caption {
+        val r = rules ?: return Caption("", false)
         val totals = r.destinyTotals()
-        return Pair(totals.caption(), totals.overspent)
+        return Caption(totals.caption(), totals.overspent)
     }
 
     /** ShowAvailableDestinies (:962) and AddDestiny (:975): destinies not chosen or locked out. */
@@ -397,7 +399,7 @@ class DestinyScreenState(private val session: BuilderSession) {
 
     var slotHover by mutableIntStateOf(0)
 
-    var abilities: List<Pair<Int, Int>> by mutableStateOf(emptyList())
+    var abilities: List<AbilityRef> by mutableStateOf(emptyList())
         private set
     var abilityIndex by mutableIntStateOf(-1)
         private set
@@ -474,7 +476,7 @@ class DestinyScreenState(private val session: BuilderSession) {
                 rows.add(AbilitySlotRow("", "", "", 0, 0, false))
             } else {
                 val info = r.slotInfo(tree, a)
-                rows.add(AbilitySlotRow(a.tier.toString(), info.first, info.second.toString(), a.rank, info.third, r.abilityError(tree, bt, a, spend) != null))
+                rows.add(AbilitySlotRow(a.tier.toString(), info.caption, info.cost.toString(), a.rank, info.maxRanks, r.abilityError(tree, bt, a, spend) != null))
             }
         }
         return rows
@@ -507,9 +509,9 @@ class DestinyScreenState(private val session: BuilderSession) {
         changed()
     }
 
-    fun abilityText(item: Pair<Int, Int>): String {
+    fun abilityText(item: AbilityRef): String {
         val tree = currentTree() ?: return ""
-        return item.first.toString() + ": " + tree.tiers[item.first][item.second].abbreviation
+        return item.tier.toString() + ": " + tree.tiers[item.tier][item.ability].abbreviation
     }
 
     fun changeShowAll(value: Boolean) {
@@ -628,13 +630,13 @@ class DestinyScreenState(private val session: BuilderSession) {
         abilityIndex = index
         selectors = emptyList()
         selectorIndex = -1
-        showDetails(item.first, item.second, 0, 0)
-        val ability = tree.tiers[item.first][item.second]
+        showDetails(item.tier, item.ability, 0, 0)
+        val ability = tree.tiers[item.tier][item.ability]
         if (ability.selectorStyle == SelectorStyle.NONE) {
             changed()
             return true
         }
-        val valid = r.selectors(tree, item.first, item.second)
+        val valid = r.selectors(tree, item.tier, item.ability)
         val list = ArrayList<SelectorItem>()
         for (i in 1..ability.selectors.size) {
             if (valid[i]) {
@@ -652,19 +654,19 @@ class DestinyScreenState(private val session: BuilderSession) {
         val selector = selectors.getOrNull(index) ?: return
         selectorIndex = index
         slotStates = selectedStates(slotStates.size, 0)
-        showDetails(item.first, item.second, selector.number, 0)
+        showDetails(item.tier, item.ability, selector.number, 0)
         changed()
     }
 
-    private fun userChoice(): Triple<Int, Int, Int>? {
+    private fun userChoice(): AbilityChoice? {
         val tree = currentTree() ?: return null
         val item = abilities.getOrNull(abilityIndex) ?: return null
         var selector = 0
-        if (tree.tiers[item.first][item.second].selectorStyle != SelectorStyle.NONE) {
+        if (tree.tiers[item.tier][item.ability].selectorStyle != SelectorStyle.NONE) {
             val s = selectors.getOrNull(selectorIndex) ?: return null
             selector = s.number
         }
-        return Triple(item.first, item.second, selector)
+        return AbilityChoice(item.tier, item.ability, selector)
     }
 
     /** ConfirmDestinyTier5Change (:1355). */
@@ -672,7 +674,7 @@ class DestinyScreenState(private val session: BuilderSession) {
         val edits = edits() ?: return true
         val choice = userChoice() ?: return true
         val bt = currentBuildTree() ?: return true
-        val question = edits.tier5Question(bt, choice.first) ?: return true
+        val question = edits.tier5Question(bt, choice.tier) ?: return true
         if (!session.ask(question)) {
             return false
         }
@@ -706,8 +708,8 @@ class DestinyScreenState(private val session: BuilderSession) {
         val tree = currentTree() ?: return false
         val bt = currentBuildTree() ?: return false
         val choice = userChoice() ?: return false
-        val ranks = tree.tiers[choice.first][choice.second].ranks
-        val insert = edits.insertAbility(bt, choice.first, choice.second, ranks, choice.third, blank)
+        val ranks = tree.tiers[choice.tier][choice.ability].ranks
+        val insert = edits.insertAbility(bt, choice.tier, choice.ability, ranks, choice.selector, blank)
         showAbilities()
         slotHover = insert + 1
         return true
@@ -736,7 +738,7 @@ class DestinyScreenState(private val session: BuilderSession) {
             if (a.ability != BLANK_ABILITY) {
                 states.add(DropState.DEFAULT)
             } else {
-                val check = BuildAbility(choice.first, choice.second, 1, choice.third)
+                val check = BuildAbility(choice.tier, choice.ability, 1, choice.selector)
                 states.add(if (r.abilityError(tree, bt, check, spend) != null) DropState.CAN_DROP_ERROR else DropState.CAN_DROP)
             }
         }
@@ -768,7 +770,7 @@ class DestinyScreenState(private val session: BuilderSession) {
                 val tree = currentTree()
                 if (choice != null && tree != null) {
                     dragComplete = true
-                    edits()?.dropAbility(bt, target.row, choice.first, choice.second, tree.tiers[choice.first][choice.second].ranks, choice.third)
+                    edits()?.dropAbility(bt, target.row, choice.tier, choice.ability, tree.tiers[choice.tier][choice.ability].ranks, choice.selector)
                     showAbilities()
                     slotHover = target.row
                     showAvailable()

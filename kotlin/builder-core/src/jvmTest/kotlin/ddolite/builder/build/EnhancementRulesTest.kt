@@ -45,12 +45,12 @@ class EnhancementRulesTest {
         val er = EnhancementRules(open("Warlock Blaster.build"))
         // Class trees: core 4 needs 20 AP spent and 12 class levels; tier 5 needs 30 AP and 12 character levels.
         assertEquals(20, er.spentReq(TreeStyle.CLASS, 0, 4))
-        assertEquals(Pair(0, 12), er.levelReqs(TreeStyle.CLASS, 0, 4))
+        assertEquals(LevelReqs(0, 12), er.levelReqs(TreeStyle.CLASS, 0, 4))
         assertEquals(30, er.spentReq(TreeStyle.CLASS, 5, 1))
-        assertEquals(Pair(12, 5), er.levelReqs(TreeStyle.CLASS, 5, 1))
+        assertEquals(LevelReqs(12, 5), er.levelReqs(TreeStyle.CLASS, 5, 1))
         // Racial trees: tier 4 needs 15 AP; core 2 needs 4 character levels.
         assertEquals(15, er.spentReq(TreeStyle.RACE, 4, 1))
-        assertEquals(Pair(4, 0), er.levelReqs(TreeStyle.RACE, 0, 2))
+        assertEquals(LevelReqs(4, 0), er.levelReqs(TreeStyle.RACE, 0, 2))
         // Class tree cores count as the tier of their number; the first core as tier 0.
         assertEquals(0, er.spentTier(0, 1, TreeStyle.CLASS))
         assertEquals(3, er.spentTier(0, 3, TreeStyle.CLASS))
@@ -118,8 +118,8 @@ class EnhancementRulesTest {
         assertTrue(offered.isNotEmpty())
         val spend = er.spentInTree(tree, bt)
         for (item in offered) {
-            assertTrue(!er.abilityTaken(bt, item.first, item.second))
-            assertNull(er.abilityError(tree, bt, BuildAbility(item.first, item.second, 0, 0), spend))
+            assertTrue(!er.abilityTaken(bt, item.tier, item.ability))
+            assertNull(er.abilityError(tree, bt, BuildAbility(item.tier, item.ability, 0, 0), spend))
         }
         assertTrue(er.availableAbilities(tree, bt, showAll = true).size >= offered.size)
     }

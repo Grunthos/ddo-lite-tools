@@ -17,7 +17,7 @@ class GuideRulesTest {
 
     private fun open(): BuildRules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
 
-    private fun guideTree(g: GuideRules, display: String): Int = g.treeList(false).first { it.first == display }.second
+    private fun guideTree(g: GuideRules, display: String): Int = g.treeList(false).first { it.text == display }.number
 
     @Test
     fun emptyGuide() {
@@ -28,7 +28,7 @@ class GuideRulesTest {
         assertEquals("Cur. Level: 1", totals.levelCaption())
         assertEquals("Available: 4 + 0r + 0u", totals.apCaption())
         assertEquals("Spent: 0 + 0r +0u", totals.spentCaption())
-        assertEquals("(Commands)", g.treeList(false).last().first)
+        assertEquals("(Commands)", g.treeList(false).last().text)
         assertTrue(g.treeList(true).size >= g.treeList(false).size)
         assertEquals(listOf("Bank 4 AP"), g.commands(4).map { it.text })
     }

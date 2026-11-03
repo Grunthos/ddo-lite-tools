@@ -7,7 +7,7 @@ import ddolite.builder.data.BuilderData
  *
  * The history holds copies of the build ([Build.deepCopy]) as it was after each change, starting
  * with the build as opened. [record] adds the current state after a change (dropping anything that
- * had been undone); [undo] and [redo] return the state to show, as a fresh build with its rules.
+ * had been undone); [undo] and [redo] return the state to show: a fresh build with its rules ([BuildRules.build]).
  * The copies are the build alone: the rules' lists are worked out again by [restore].
  *
  * @param limit the most states kept; the oldest go first.
@@ -83,7 +83,7 @@ class BuildHistory(private val data: BuilderData, private val limit: Int = 200) 
     }
 
     /** The state before the current one, or null if there's none. */
-    fun undo(): Pair<Build, BuildRules>? {
+    fun undo(): BuildRules? {
         if (!canUndo) {
             return null
         }
@@ -93,7 +93,7 @@ class BuildHistory(private val data: BuilderData, private val limit: Int = 200) 
     }
 
     /** The state after the current one (after an undo), or null if there's none. */
-    fun redo(): Pair<Build, BuildRules>? {
+    fun redo(): BuildRules? {
         if (!canRedo) {
             return null
         }
@@ -107,13 +107,13 @@ class BuildHistory(private val data: BuilderData, private val limit: Int = 200) 
      * keep their pact spells (a fresh [BuildRules.cascadeAll] alone would empty them, as VB does when
      * a file is opened), then everything else as after any change.
      */
-    private fun restore(state: Build): Pair<Build, BuildRules> {
+    private fun restore(state: Build): BuildRules {
         val build = state.deepCopy()
         val rules = BuildRules(data, build)
         if (build.levelClass(1) != null) {
             rules.initBuildFeats()
         }
         rules.cascadeAll()
-        return Pair(build, rules)
+        return rules
     }
 }

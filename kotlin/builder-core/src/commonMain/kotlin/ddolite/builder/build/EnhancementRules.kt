@@ -46,6 +46,18 @@ class AbilityDetails(val caption: String, val lines: List<DetailLine>, val ranks
 /** The blank ability VB puts in a tree while an ability is dragged over it (`Ability = 0`). */
 const val BLANK_ABILITY = -1
 
+/** An ability in a tree: its tier and its 0-based position in the tier. */
+data class AbilityRef(val tier: Int, val ability: Int)
+
+/** An ability chosen in the Enhancements or Destinies lists, with its selector (numbered from 1; 0 for none). */
+data class AbilityChoice(val tier: Int, val ability: Int, val selector: Int)
+
+/** The character level and class level an ability needs. */
+data class LevelReqs(val levels: Int, val classLevels: Int)
+
+/** A slot's caption, its cost (times its ranks) and the ability's most ranks. */
+class SlotInfo(val caption: String, val cost: Int, val maxRanks: Int)
+
 /**
  * The enhancement rules: AP spent and available, what an ability needs (levels, AP spent in the
  * tree, ranks, requirements), selectors, the tier 5 tree, and the Enhancements screen's lists and
@@ -223,7 +235,7 @@ class EnhancementRules(val rules: BuildRules) {
      * `GetLevelReqs` (basBuild.bas:2701), `GetLevelReqsCore` (:2735) and `GetLevelReqsTier` (:2775);
      * [abilityNumber] is 1-based.
      */
-    fun levelReqs(style: TreeStyle, tier: Int, abilityNumber: Int): Pair<Int, Int> {
+    fun levelReqs(style: TreeStyle, tier: Int, abilityNumber: Int): LevelReqs {
         var levels = 0
         var classLevels = 0
         if (tier == 0) {
@@ -285,7 +297,7 @@ class EnhancementRules(val rules: BuildRules) {
                 TreeStyle.RACE -> {}
             }
         }
-        return Pair(levels, classLevels)
+        return LevelReqs(levels, classLevels)
     }
 
     /**
@@ -846,13 +858,13 @@ class EnhancementRules(val rules: BuildRules) {
     // ---------------------------------------------------------------- the Enhancements screen
 
     /**
-     * The abilities offered for [buildTree] of [tree], as (tier, ability): every one up to the
+     * The abilities offered for [buildTree] of [tree]: every one up to the
      * tree's max tier that isn't taken and, unless [showAll], has no error at rank 1. Ported from
      * frmEnhancements.ShowAvailable (:2241) and frmDestiny2.ShowAvailable (:1722); destinies offer
      * every tier ([tierLimit] 5, frmDestiny2.GetMaxTier :1676).
      */
-    fun availableAbilities(tree: Tree, buildTree: BuildTree?, showAll: Boolean, tierLimit: Int = -1): List<Pair<Int, Int>> {
-        val result = ArrayList<Pair<Int, Int>>()
+    fun availableAbilities(tree: Tree, buildTree: BuildTree?, showAll: Boolean, tierLimit: Int = -1): List<AbilityRef> {
+        val result = ArrayList<AbilityRef>()
         val spend = spentInTree(tree, buildTree)
         var maxTier = tierLimit
         if (maxTier < 0) {
@@ -871,7 +883,7 @@ class EnhancementRules(val rules: BuildRules) {
                 if (!showAll && abilityError(tree, holder, BuildAbility(tier, i, 0, 0), spend) != null) {
                     continue
                 }
-                result.add(Pair(tier, i))
+                result.add(AbilityRef(tier, i))
             }
         }
         return result
@@ -1001,7 +1013,7 @@ class EnhancementRules(val rules: BuildRules) {
      * A slot's caption, cost and ranks: "Abbr", "Abbr: Selector" or the selector alone; the cost
      * times the ranks; the ability's max ranks. Ported from frmEnhancements.GetSlotInfo (:1726).
      */
-    fun slotInfo(tree: Tree, ability: BuildAbility): Triple<String, Int, Int> {
+    fun slotInfo(tree: Tree, ability: BuildAbility): SlotInfo {
         val data = abilityOf(tree, ability)
         var caption = data.abbreviation
         var cost = data.cost
@@ -1013,6 +1025,6 @@ class EnhancementRules(val rules: BuildRules) {
         if (ability.rank != 0) {
             cost *= ability.rank
         }
-        return Triple(caption, cost, data.ranks)
+        return SlotInfo(caption, cost, data.ranks)
     }
 }

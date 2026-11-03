@@ -258,11 +258,11 @@ class BuilderSession(
      * Shows a state from the history in every window, as if just opened (selections are cleared and
      * windows that no longer apply close). It'"'"'s unsaved unless it'"'"'s the state last saved.
      */
-    private fun showHistory(state: Pair<Build, BuildRules>?) {
+    private fun showHistory(state: BuildRules?) {
         if (state == null) {
             return
         }
-        display(BuildLoadResult(state.first, state.second, Deprecations(), emptyList()))
+        display(BuildLoadResult(state.build, state, Deprecations(), emptyList()))
         if (history.atSaved) {
             dirtyState = false
             onDeleteBackup()

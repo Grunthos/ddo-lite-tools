@@ -181,12 +181,12 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
             val items = screen.menuItems()
             val captions = ArrayList<String>()
             for (item in items) {
-                captions.add(item.first)
+                captions.add(item.caption)
             }
             PopupMenu(captions, -1, at, density, onChoose = { index ->
                 menuAt = null
-                if (items[index].second) {
-                    screen.chooseMenu(items[index].first)
+                if (items[index].enabled) {
+                    screen.chooseMenu(items[index].caption)
                 } else {
                     screen.closeMenu()
                 }

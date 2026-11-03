@@ -114,11 +114,11 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
             val items = screen.treeMenuItems()
             val captions = ArrayList<String>()
             for (item in items) {
-                captions.add(item.first)
+                captions.add(item.caption)
             }
             PopupMenu(captions, -1, at, density, onChoose = { index ->
                 menuAt = null
-                if (items[index].second) {
+                if (items[index].enabled) {
                     screen.chooseTreeMenu(index)
                 } else {
                     screen.closeTreeMenu()
@@ -132,7 +132,7 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
             val items = screen.guide.menuItems()
             val captions = ArrayList<String>()
             for (item in items) {
-                captions.add(item.first)
+                captions.add(item.caption)
             }
             PopupMenu(captions, -1, at, density, onChoose = { index ->
                 menuAt = null
@@ -140,7 +140,7 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
             }, onDismiss = {
                 menuAt = null
                 screen.guide.closeMenu()
-            }, clientWidth = ENH_WIDTH, enabled = { index -> items[index].second })
+            }, clientWidth = ENH_WIDTH, enabled = { index -> items[index].enabled })
         } else if (at != null && screen.slotMenuRow != 0) {
             PopupMenu(listOf("Clear this ability", "Reset tree"), -1, at, density, onChoose = { index ->
                 menuAt = null
@@ -170,9 +170,9 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -
         cellText = { row, col ->
             val columns = screen.treeColumns(row)
             when (col) {
-                0 -> columns.first
-                2 -> columns.second
-                3 -> columns.third
+                0 -> columns.className
+                2 -> columns.tier
+                3 -> columns.ap
                 else -> ""
             }
         },
@@ -214,10 +214,10 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -
     )
     val ap = screen.apCaption()
     var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.second) {
+    if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.first, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
+    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
 
     // fraRacialAP
     GroupFrame(theme, "Racial Past Life AP", 80, 292, 333, 157)
@@ -315,7 +315,7 @@ private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: 
         theme, abilityTexts, { i -> i == screen.abilityIndex }, 368, 104, 233, 201, screen.drag,
         onPress = { i, _ -> screen.clickAbility(i) },
         onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = false) },
-        dragItem = { i -> EnhancementDrag.ListAbility(screen.abilities[i].first, screen.abilities[i].second) },
+        dragItem = { i -> EnhancementDrag.ListAbility(screen.abilities[i].tier, screen.abilities[i].ability) },
         onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
         onDrop = { item, target -> screen.abilityDropped(item, target) },
         dropKey = AbilityListKey,
@@ -330,7 +330,7 @@ private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: 
         onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = true) },
         dragItem = { _ ->
             val item = screen.abilities.getOrNull(screen.abilityIndex)
-            if (item == null) null else EnhancementDrag.ListAbility(item.first, item.second)
+            if (item == null) null else EnhancementDrag.ListAbility(item.tier, item.ability)
         },
         onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
         onDrop = { item, target -> screen.abilityDropped(item, target) },
@@ -346,10 +346,10 @@ private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: 
     DetailsBox(theme, details?.lines ?: emptyList(), 368, 329, 425, 176)
     val ap = screen.apCaption()
     var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.second) {
+    if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.first, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 508.dp))
+    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 508.dp))
     Label(screen.spentCaption(), label, 304, 508)
     if (details != null) {
         Label(details.ranks, label, 464, 508)
