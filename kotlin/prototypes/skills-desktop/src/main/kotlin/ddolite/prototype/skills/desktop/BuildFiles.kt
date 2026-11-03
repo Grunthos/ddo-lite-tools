@@ -39,8 +39,7 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             return false
         }
         file = null
-        // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.
-        state.newBuild(BuildPoints.ADVENTURER)
+        state.newBuild(state.settings.buildPoints) // cfg.BuildPoints
         return true
     }
 
@@ -59,6 +58,29 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         }
         val chosen = File(dialog.directory, dialog.file)
         folder = chosen.parentFile
+        openFile(parent, state, chosen)
+    }
+
+    /**
+     * Opens a recent file: File › 1., 2. … (frmMain.MRUOpen, :703, and BuildOpenMRU,
+     * basDocuments.bas:78). A file that's gone asks "File not found. Remove from MRU list?".
+     */
+    fun openRecent(parent: Frame, state: PrototypeState, path: String) {
+        if (checkDirty(parent, state)) {
+            return
+        }
+        val chosen = File(path)
+        if (!chosen.isFile) {
+            if (state.prompts.confirm("File not found. Remove from MRU list?")) {
+                state.settings.mruList.remove(path)
+            }
+            return
+        }
+        openFile(parent, state, chosen)
+    }
+
+    /** Reads [chosen] and shows it, adding it to the recent files (LoadBuild, :521, with cfg.AddMRU). */
+    private fun openFile(parent: Frame, state: PrototypeState, chosen: File) {
         val bytes: ByteArray
         try {
             bytes = chosen.readBytes()
@@ -66,9 +88,9 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             JOptionPane.showMessageDialog(parent, "Can't read " + chosen.name + ":\n" + e.message, "Open", JOptionPane.ERROR_MESSAGE)
             return
         }
-        // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.
-        val result = readBuildFile(bytes, data, BuildPoints.ADVENTURER)
+        val result = readBuildFile(bytes, data, state.settings.buildPoints)
         file = chosen
+        state.settings.addRecent(chosen.path)
         state.openBuild(result)
         if (result.problems.isNotEmpty()) {
             // VB asks "Ignore error and load anyway?" for each one; the prototype carries on and lists them.
@@ -101,6 +123,7 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         if (!write(parent, state, current)) {
             return true
         }
+        state.settings.addRecent(current.path) // BuildSave (basDocuments.bas:120)
         state.dirty = false
         return false
     }
@@ -128,6 +151,7 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
             return true
         }
         file = chosen
+        state.settings.addRecent(chosen.path) // BuildSaveAs (basDocuments.bas:138)
         state.dirty = false
         return false
     }

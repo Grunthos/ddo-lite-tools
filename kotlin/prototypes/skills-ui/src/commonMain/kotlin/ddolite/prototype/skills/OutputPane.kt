@@ -47,9 +47,16 @@ fun outputColorValue(color: OutputColor): ColorValue = when (color) {
     OutputColor.ORANGE -> ColorValue.ORANGE
 }
 
-/** The output settings the session uses now (the options and format come with the Options window). */
-fun outputSettings(state: PrototypeState): OutputSettings =
-    OutputSettings(guideFirst = state.enhancementsOpen && state.enhancements.tab == 2)
+/** The output options from the settings (Options window), and whether the guide tab is showing. */
+fun outputSettings(state: PrototypeState): OutputSettings {
+    val s = state.settings
+    return OutputSettings(
+        featOrder = s.featOrderOutput,
+        featShowAll = s.featShowAll,
+        skillOrder = s.skillOrderOutput,
+        guideFirst = state.enhancementsOpen && state.enhancements.tab == 2,
+    )
+}
 
 /**
  * The main window's output (frmMain's picBuild): the build as basOutput draws it for the window
@@ -70,7 +77,7 @@ fun OutputPane(state: PrototypeState) {
     ) {
         if (rules != null) {
             val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
-            OutputLines(lines, theme)
+            OutputLines(lines, theme, state.settings.outputMargin)
         }
     }
 }
@@ -78,13 +85,15 @@ fun OutputPane(state: PrototypeState) {
 private val OUTPUT_FONT_SIZE = 12.sp
 
 @Composable
-private fun OutputLines(lines: List<DisplayLine>, theme: Theme) {
+private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current.density
     val plain = TextStyle(fontSize = OUTPUT_FONT_SIZE)
     val indent = (measurer.measure("XXXXX", plain).size.width / density).toInt()
     val lineHeight = (measurer.measure("X", plain).size.height / density).toInt()
-    Column(modifier = Modifier.padding(start = 0.dp, top = 0.dp)) {
+    // ResizeOutput: the output starts cfg.OutputMargin spaces in.
+    val marginWidth = if (margin > 0) (measurer.measure(" ".repeat(margin), plain).size.width / density).toInt() else 0
+    Column(modifier = Modifier.padding(start = marginWidth.dp, top = 0.dp)) {
         for (line in lines) {
             Row(modifier = Modifier.height(lineHeight.dp)) {
                 val prefix = line.prefix

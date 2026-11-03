@@ -285,6 +285,13 @@ Each step lists its deliverables and the test that marks it done.
 - [ ] Port `basFormatRon`, `basFormatBuilder` (import + export), leveling guide csv/txt.
 - **Done when:** golden output tests pass for all builds, formats and exports. From here on, porting more rules means making more golden diffs pass.
 
+### B7 – Settings
+- [x] `BuilderSettings` (clsConfig: the Character Builder Lite, Output and Shared sections, the Colors section as
+      text, other tools' sections kept) with tests. The desktop reads Settings-Kotlin.txt, or VB's Settings.txt when
+      there's none yet, and only writes Settings-Kotlin.txt (on exit). Used: theme and saved colours, output format
+      and options, default build points, skills contrast, recent files, main window and dialog positions.
+- [ ] The Options window (frmOptions); child windows, icons, confirmation prompts, error log on startup.
+
 ### B6 – Rules (taken out of `basBuild`, `basProcess` and the forms, using the F0 inventory)
 Order: BAB/stats → skills → granted/deity/selected feats and exchanges → spells → enhancement trees → destinies and twists → leveling guide.
 - [ ] Commands on `BuildState` (e.g. `setRace`, `setClassAtLevel`, `setStatPoints`, `setSkillRanks`, `selectFeat`, `exchangeFeat`, `placeAbility`, `swapTrees`, `moveGuideRows`).

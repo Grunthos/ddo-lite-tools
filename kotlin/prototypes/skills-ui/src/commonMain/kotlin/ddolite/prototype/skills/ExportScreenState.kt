@@ -94,6 +94,8 @@ class ExportScreenState(private val session: PrototypeState) {
         val format = session.formats.load(name) ?: return
         session.outputFormat = format
         session.formatName = name
+        session.settings.output = format // cfg.SetOutputFormat
+        session.settings.bbCodes = name
         regenerate()
     }
 

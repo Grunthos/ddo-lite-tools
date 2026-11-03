@@ -26,6 +26,16 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import ddolite.builder.build.BuildScreen
 import ddolite.builder.output.OutputView
+import ddolite.builder.settings.BuilderSettings
+import ddolite.builder.settings.Coords
+import ddolite.builder.settings.WindowSize
+import ddolite.common.theme.ColorGroup
+import ddolite.common.theme.ColorValue
+import ddolite.common.theme.themeToText
+import ddolite.prototype.skills.Contrast
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowState
+import java.io.File
 import ddolite.builder.build.closesAfterChange
 import ddolite.builder.build.openScreenNotice
 import ddolite.builder.data.LoadLog
@@ -72,6 +82,9 @@ import javax.imageio.ImageIO
  */
 fun main(args: Array<String>) {
     val repoRoot = findAppRoot(args)
+    val store = SettingsStore(repoRoot)
+    val settings = store.load()
+    println("Settings: " + store.source)
 
     val log = LoadLog()
     val dataSource = DirectoryDataSource(repoRoot.resolve("Data"))
@@ -79,17 +92,26 @@ fun main(args: Array<String>) {
     for (issue in log.issues) {
         println(issue.message)
     }
-    val themes = loadThemes(repoRoot.resolve("Settings"))
+    val themes = withSettingsColors(loadThemes(repoRoot.resolve("Settings")), settings)
     val skills = SkillsScreenState(data, themes, prototypePresets())
+    for (i in themes.indices) {
+        if (themes[i].name == settings.screenColors) {
+            skills.selectTheme(i)
+        }
+    }
+    skills.contrast = Contrast.entries.getOrElse(settings.contrast) { Contrast.MEDIUM }
     val prompts = DesktopPrompts { KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow }
     val state = PrototypeState(data, skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills), prompts)
     val files = BuildFiles(data, repoRoot.resolve("Save").toFile())
     val exports = Exports(files)
     state.formats = loadFormats(repoRoot.resolve("Settings"))
+    state.settings = settings
+    state.outputFormat = settings.output
+    state.formatName = settings.bbCodes
     val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files, exports, icons)
+        BuilderWindows(state, files, exports, store, icons)
     }
 }
 
@@ -256,10 +278,11 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, icons: Map<String, ImageBitmap>) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     SideEffect {
         state.enhancementsOpen = windows.isOpen(BuildScreen.ENHANCEMENTS)
     }
@@ -277,11 +300,12 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         onCloseRequest = {
             val parent = mainWindow[0]
             if (parent == null || !files.checkDirty(parent, state)) {
+                quit(state, store, mainWindow[0])
                 exitApplication()
             }
         },
         title = appCaption(files, state),
-        state = rememberWindowState(position = WindowPosition(40.dp, 40.dp), width = 460.dp, height = 640.dp),
+        state = mainWindowState(state.settings),
         onKeyEvent = { event -> mainWindowKey(event, windows, state) },
     ) {
         mainWindow[0] = window
@@ -323,9 +347,20 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Separator()
                 Item("Exit", mnemonic = 'x', onClick = {
                     if (!files.checkDirty(window, state)) {
+                        quit(state, store, window)
                         exitApplication()
                     }
                 })
+                // The recent files (ShowMRU, clsConfig.cls): "1. Name" …, after a separator.
+                val recent = ArrayList(state.settings.mruList)
+                if (recent.isNotEmpty()) {
+                    Separator()
+                    for (i in recent.indices) {
+                        Item((i + 1).toString() + ". " + File(recent[i]).nameWithoutExtension, mnemonic = ('1' + i), onClick = {
+                            files.openRecent(window, state, recent[i])
+                        })
+                    }
+                }
             }
             Menu("Edit", mnemonic = 'E') {
                 for (screen in EditScreen.entries) {
@@ -343,7 +378,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Menu("Colors", mnemonic = 'C') {
                     val skills = state.skills
                     for (i in skills.themes.indices) {
-                        RadioButtonItem(skills.themes[i].name, selected = skills.themeIndex == i, onClick = { skills.selectTheme(i) })
+                        RadioButtonItem(skills.themes[i].name, selected = skills.themeIndex == i, onClick = { chooseTheme(state, i) })
                     }
                 }
             }
@@ -357,11 +392,15 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 if (state.export.isOpen) {
         // frmExport: the client area is 815 x 518 at 100%.
         Window(
-            onCloseRequest = { state.export.close() },
+            onCloseRequest = {
+                saveDialogPosition(state.settings, exportWindow[0])
+                state.export.close()
+            },
             title = "Export",
             resizable = false,
-            state = rememberWindowState(position = WindowPosition(520.dp, 100.dp), width = 831.dp, height = 561.dp),
+            state = rememberWindowState(position = dialogPosition(state.settings, 520, 100), width = 831.dp, height = 561.dp),
         ) {
+            exportWindow[0] = window
             ExportWindowContent(state, onCopy = { exports.copy(it) }, onSave = { exports.saveText(window, state, it) })
         }
     }
@@ -419,10 +458,13 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         // frmDeprecate: the client area is 815 x 517 at 100%; a fixed dialog, opened after a build file
         // with things the data no longer has (tmrDeprecate, frmMain.frm:673) or from Tools › Messages.
         Window(
-            onCloseRequest = { state.messages.close() },
+            onCloseRequest = {
+                saveDialogPosition(state.settings, messagesWindow[0])
+                state.messages.close()
+            },
             title = "Messages",
             resizable = false,
-            state = rememberWindowState(position = WindowPosition(500.dp, 120.dp), width = 831.dp, height = 560.dp),
+            state = rememberWindowState(position = dialogPosition(state.settings, 500, 120), width = 831.dp, height = 560.dp),
         ) {
             messagesWindow[0] = window
             MessagesWindowContent(state)
@@ -445,6 +487,7 @@ private fun ScreenWindow(
 ) {
     Window(
         onCloseRequest = {
+            saveDialogPosition(state.settings, windows.awtWindows[screen])
             windows.close(screen)
             // UnloadForm (basMain.bas:224): with no other Edit window left, the output shows everything again.
             var others = false
@@ -458,7 +501,7 @@ private fun ScreenWindow(
             }
         },
         title = title,
-        state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp),
+        state = rememberWindowState(position = dialogPosition(state.settings, x, y), width = width.dp, height = height.dp),
     ) {
         windows.awtWindows[screen] = window
         // Form_Activate → ActivateForm: the main window's output shows this window's sections.
@@ -583,4 +626,99 @@ private fun findAppRoot(args: Array<String>): Path {
         }
     }
     return Path.of("..")
+}
+
+// ---------------------------------------------------------------- settings
+
+/** Twips (VB's coordinates) per pixel at 100%. */
+private const val TWIPS = 15
+
+/**
+ * The themes, with the settings' Colors section as the theme named in ScreenColors: VB applies the
+ * saved colours, not the .screen file (clsConfig.LoadColors, :948), so any changes made with the
+ * Colors tool are kept.
+ */
+private fun withSettingsColors(themes: List<Theme>, settings: BuilderSettings): List<Theme> {
+    val colors = settings.colorsText ?: return themes
+    val loaded = loadTheme(colors, settings.screenColors, ThemeFileKind.ALL)
+    if (!loaded.valid) {
+        return themes
+    }
+    val result = ArrayList<Theme>()
+    var replaced = false
+    for (t in themes) {
+        if (t.name == settings.screenColors) {
+            result.add(loaded.theme)
+            replaced = true
+        } else {
+            result.add(t)
+        }
+    }
+    if (!replaced) {
+        result.add(0, loaded.theme)
+    }
+    return result
+}
+
+/**
+ * Tools › Colors: a .screen file sets every colour but the Output ones, which stay as they were
+ * (LoadColors with cfeScreen); the settings remember the name and the colours.
+ */
+private fun chooseTheme(state: PrototypeState, index: Int) {
+    val skills = state.skills
+    val old = skills.theme
+    val chosen = skills.themes[index]
+    for (value in ColorValue.entries) {
+        chosen.set(ColorGroup.OUTPUT, value, old.get(ColorGroup.OUTPUT, value))
+    }
+    skills.selectTheme(index)
+    state.settings.screenColors = chosen.name
+    state.settings.colorsText = "\r\n\r\n" + themeToText(chosen) + "\r\n\r\n\r\n"
+    state.markOutputChanged()
+}
+
+/**
+ * The main window as the settings say (cfg.SizeWindow, clsConfig.cls:1541): maximized, or at the
+ * saved place and size; the whole desktop for "Fill Desktop" or when nothing is saved.
+ */
+private fun mainWindowState(settings: BuilderSettings): WindowState {
+    if (settings.windowSize == WindowSize.MAXIMIZED || (settings.windowSize == WindowSize.REMEMBER && settings.maximized)) {
+        return WindowState(placement = WindowPlacement.Maximized)
+    }
+    val c = settings.windowCoords
+    if (settings.windowSize == WindowSize.FILL_DESKTOP || c.width == 0 || c.height == 0) {
+        val desktop = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds
+        return WindowState(position = WindowPosition(desktop.x.dp, desktop.y.dp), width = desktop.width.dp, height = desktop.height.dp)
+    }
+    return WindowState(position = WindowPosition((c.left / TWIPS).dp, (c.top / TWIPS).dp), width = (c.width / TWIPS).dp, height = (c.height / TWIPS).dp)
+}
+
+/** Leaving: the main window's place (SaveWindowSize, :1574), the skills contrast, then SaveSettings. */
+private fun quit(state: PrototypeState, store: SettingsStore, window: ComposeWindow?) {
+    val settings = state.settings
+    if (window != null) {
+        settings.maximized = (window.extendedState and java.awt.Frame.MAXIMIZED_BOTH) == java.awt.Frame.MAXIMIZED_BOTH
+        if (!settings.maximized) {
+            settings.windowCoords = Coords(window.x * TWIPS, window.y * TWIPS, window.width * TWIPS, window.height * TWIPS)
+        }
+    }
+    settings.contrast = state.skills.contrast.ordinal
+    store.save(settings)
+}
+
+/** Where a dialog opens: the saved DialogCoords (MoveForm, :1603), or [x], [y] when there are none. */
+private fun dialogPosition(settings: BuilderSettings, x: Int, y: Int): WindowPosition {
+    val c = settings.dialogCoords
+    if (c.left == 0 && c.top == 0) {
+        return WindowPosition(x.dp, y.dp)
+    }
+    return WindowPosition((c.left / TWIPS).dp, (c.top / TWIPS).dp)
+}
+
+/** SavePosition (:1655): every Edit window, the Export and the Messages windows share one place. */
+private fun saveDialogPosition(settings: BuilderSettings, window: ComposeWindow?) {
+    if (window == null) {
+        return
+    }
+    settings.dialogCoords = Coords(window.x * TWIPS, window.y * TWIPS)
 }

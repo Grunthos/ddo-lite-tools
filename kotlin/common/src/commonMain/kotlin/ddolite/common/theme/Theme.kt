@@ -252,3 +252,23 @@ private val SYSTEM_COLOR_NAMES = listOf(
     "Window Frame", "Application Workspace", "Gray Text", "Inactive Caption Text", "Menu Text",
     "Highlight Text", "Highlight", "Active Border", "Inactive Border", "Info Text", "Info Background",
 )
+
+/**
+ * A theme as the Colors section of the settings file writes it: "WrkBackground=0,0,0" for every
+ * group and colour, Workspace to Output, each colour in VB's order. Ported from
+ * `clsConfig.MakeColorSettings` (clsConfig.cls:1340) with `cfeAll`, and `ColorToString` (:1367).
+ * VB writes Windows system colours by name; a [Theme] holds only RGB, so these are always numbers.
+ */
+fun themeToText(theme: Theme): String {
+    val lines = ArrayList<String>()
+    for (group in ColorGroup.entries) {
+        for (value in ColorValue.entries) {
+            val c = theme.get(group, value)
+            val red = (c shr 16) and 0xFF
+            val green = (c shr 8) and 0xFF
+            val blue = c and 0xFF
+            lines.add(group.prefix + value.settingName + "=" + red + "," + green + "," + blue)
+        }
+    }
+    return lines.joinToString("\r\n")
+}

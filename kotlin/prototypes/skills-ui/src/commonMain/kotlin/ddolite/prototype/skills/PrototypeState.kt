@@ -73,6 +73,9 @@ class PrototypeState(
     /** The Enhancements window is open (the output puts the leveling guide first when it's on that tab). */
     var enhancementsOpen by mutableStateOf(false)
 
+    /** The program's settings (VB's cfg): the app reads and saves them; the screens read them here. */
+    var settings = ddolite.builder.settings.BuilderSettings()
+
     /** The output formats there are (the .bbcodes files in Settings); the app sets these at start. */
     var formats = OutputFormats(emptyList())
 
@@ -224,6 +227,12 @@ class PrototypeState(
         dirty = true
         revision++
         export.refreshIfChanged() // SetDirty: frmExport.Cascade
+    }
+
+    /** Something the output depends on changed (colours, format, options) but not the build: redraw it. */
+    fun markOutputChanged() {
+        revision++
+        export.refreshIfChanged()
     }
 
     /** A window changed the build without a cascade (VB's SetDirty alone). */

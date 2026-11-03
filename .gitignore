@@ -31,3 +31,6 @@ kotlin/.gradle/
 kotlin/.kotlin/
 kotlin/.idea/
 kotlin/local.properties
+
+# The Kotlin version's own settings (it reads Settings.txt only if this is missing)
+Settings-Kotlin.txt
