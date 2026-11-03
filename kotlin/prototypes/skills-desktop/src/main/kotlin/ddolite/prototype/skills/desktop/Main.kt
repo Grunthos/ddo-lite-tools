@@ -340,6 +340,18 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
     state.help.onUrl = { helpFiles.openUrl(it) }
     state.help.onRun = { helpFiles.run(state, it) }
     // OpenForm (basMain.bas:130) for the windows the help links name; frmConvert isn't built yet.
+    // "(Errors)" in an output heading (new): the section's window, as the Edit menu opens it.
+    state.onOutputLink = { section ->
+        when (section) {
+            "Skills" -> openScreen(EditScreen.SKILLS, state, windows)
+            "Feats" -> openScreen(EditScreen.FEATS, state, windows)
+            "Enhancements" -> openScreen(EditScreen.ENHANCEMENTS, state, windows)
+            "Leveling Guide" -> if (openScreen(EditScreen.ENHANCEMENTS, state, windows)) {
+                state.enhancements.chooseTab(2)
+            }
+            "Destinies" -> openScreen(EditScreen.DESTINY, state, windows)
+        }
+    }
     state.help.onForm = { name ->
         when (name) {
             "frmOptions" -> {

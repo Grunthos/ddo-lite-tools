@@ -1,5 +1,6 @@
 package ddolite.prototype.skills
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.background
@@ -100,7 +101,7 @@ fun OutputPane(state: PrototypeState) {
         Box(modifier = modifier.size(contentWidth.dp, contentHeight.dp).verticalScroll(vertical).horizontalScroll(horizontal)) {
             if (rules != null) {
                 val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
-                OutputLines(lines, theme, state.settings.outputMargin)
+                OutputLines(lines, theme, state.settings.outputMargin) { link -> state.onOutputLink(link) }
             }
         }
         ScrollBar(theme, vertical, width - SCROLL_BAR, 0, contentHeight)
@@ -111,7 +112,7 @@ fun OutputPane(state: PrototypeState) {
 private val OUTPUT_FONT_SIZE = 12.sp
 
 @Composable
-private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int) {
+private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int, onLink: (String) -> Unit) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current.density
     val plain = TextStyle(fontSize = OUTPUT_FONT_SIZE)
@@ -130,7 +131,15 @@ private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int) {
                     BasicText(prefix.text, style = runStyle(prefix, theme), maxLines = 1, softWrap = false)
                 }
                 for (run in line.runs) {
-                    BasicText(run.text, style = runStyle(run, theme), maxLines = 1, softWrap = false)
+                    if (run.link.isEmpty()) {
+                        BasicText(run.text, style = runStyle(run, theme), maxLines = 1, softWrap = false)
+                    } else {
+                        // A heading'"'"'s "(Errors)": underlined, and a click opens that section'"'"'s window.
+                        BasicText(
+                            run.text, style = runStyle(run, theme).copy(textDecoration = TextDecoration.Underline), maxLines = 1, softWrap = false,
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable { onLink(run.link) },
+                        )
+                    }
                 }
             }
         }

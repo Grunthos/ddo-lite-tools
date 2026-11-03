@@ -115,6 +115,9 @@ class PrototypeState(
     /** The Help window (frmHelp). */
     val help = HelpScreenState(this)
 
+    /** A link in the main window'"'"'s output was clicked: the section name ("Feats", "Skills", …); the app opens its window. */
+    var onOutputLink: (String) -> Unit = {}
+
     /** The template files (Stats › Customize); the app sets this. */
     var templateFiles: TemplateFiles? = null
 

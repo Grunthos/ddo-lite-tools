@@ -58,7 +58,11 @@ class OutputSettings(
 )
 
 /** A piece of text on the screen in one style. */
-class DisplayRun(val text: String, val color: OutputColor, val courier: Boolean, val bold: Boolean, val underline: Boolean)
+/**
+ * A piece of a screen output line in one style. [link] names the section whose window it opens (a
+ * heading'"'"'s "(Errors)"; new, VB'"'"'s output has no links), or "" for plain text.
+ */
+class DisplayRun(val text: String, val color: OutputColor, val courier: Boolean, val bold: Boolean, val underline: Boolean, val link: String = "")
 
 /**
  * One line of the screen output. A list item's [prefix] ("1. ", "• ") ends at [listLevel] times
@@ -2067,6 +2071,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
         special: Special = Special.NONE,
         bold: Boolean = false,
         underline: Boolean = false,
+        link: String = "",
     ) {
         if (display) {
             // SetStyle (:2469)
@@ -2076,7 +2081,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
             if (special == Special.COURIER || special == Special.COURIER_BEGIN) {
                 courier = true
             }
-            lineRuns.add(DisplayRun(text, foreColor, courier, bold, underline))
+            lineRuns.add(DisplayRun(text, foreColor, courier, bold, underline, link))
             if (newLine) {
                 endLine()
             }
@@ -2129,7 +2134,8 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
                 outputText(" $extra", newLine = false)
             }
             if (error.isNotEmpty()) {
-                outputText(" $error", newLine = false, color = OutputColor.TEXT_ERROR)
+                // New: on screen the error mark is a link to the section'"'"'s window.
+                outputText(" $error", newLine = false, color = OutputColor.TEXT_ERROR, link = text)
             }
             blankLine()
         }

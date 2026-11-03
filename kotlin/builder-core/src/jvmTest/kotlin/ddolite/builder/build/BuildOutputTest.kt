@@ -72,6 +72,21 @@ class BuildOutputTest {
     }
 
     @Test
+    fun errorMarksLinkToTheirWindows() {
+        val lines = BuildOutput(open("Kensei Warpriest.build"), OutputFormat.DEFAULT, OutputSettings()).display(OutputView.ALL)
+        val links = ArrayList<String>()
+        for (line in lines) {
+            for (run in line.runs) {
+                if (run.link.isNotEmpty()) {
+                    links.add(run.link + ":" + run.text)
+                }
+            }
+        }
+        assertTrue(links.contains("Enhancements: Errors"), links.toString())
+        assertTrue(links.contains("Destinies: Errors"), links.toString())
+    }
+
+    @Test
     fun formatFiles() {
         val reddit = OutputFormat.load("Reddit", "Codes=True\r\nDots=False\r\nTextColors=True\r\nBold=False\t\t\r\nLists=False\t\t\t\t\r\nReddit=True")
         assertTrue(reddit.reddit)

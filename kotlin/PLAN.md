@@ -59,8 +59,8 @@ Still open from B8: the child-windows option, Convert Builds (.bld), the Colors 
 - [x] Feats, Trees and Destiny slot lists had extra padding and overflowed (7 trees didn't fit): text was
       measured in pixels but laid out in dp, so at Windows scaling above 100% everything grew. Fixed in
       `UserList`, `FeatsWindow` and `GuideTab`.
-- [ ] "Errors" in the output's Feats heading: VB offers Tools › Messages while messages are unresolved (kept);
-      a link from the heading to the Feats window would be new. Decide.
+- [x] "Errors" in an output heading is now a link (new; Philip's choice): Skills, Feats, Enhancements,
+      Leveling Guide and Destinies open their window. Tools › Messages still shows while messages are unresolved.
 
 ---
 
