@@ -265,6 +265,10 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     `Forms/Build/frmDestiny2.frm:655` asks for `ShowHelp "Destinies"`, but Help.txt's topic is
     "Destiny" (:758). *Fix:* `ShowHelp "Destiny"`.
 
+22i. **The Destinies window is never listed in the Window menu.** `Forms/Build/frmMain.frm:440`
+    lists "frmDestiny", the old destiny form, so `tmrWindowMenu_Timer` never finds frmDestiny2. *Fix:*
+    caption the menu item "frmDestiny2".
+
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
 

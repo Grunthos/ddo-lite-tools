@@ -13,18 +13,23 @@ private const val TEMPLATES_FILE = "Templates.txt"
 /**
  * Loads Templates.txt. Ported from `basDataLoad.LoadTemplates` (Build/basDataLoad.bas:590).
  *
- * Not ported yet: VB reads the user's own Templates.txt (in the app's settings folder) instead,
- * if it exists and isn't older than the shipped one (`DataFile`, `UserTemplateOlder`). That needs
- * the settings location, which comes with the app shell.
+ * VB reads the user's own Templates.txt (in cfg.LitePath, the Save folder) instead, if it exists
+ * and isn't older than the shipped one (`DataFile`, `UserTemplateOlder`); the platform decides that
+ * and passes its text to [loadTemplatesText].
  */
-fun loadTemplates(source: DataSource, log: LoadLog): List<StatTemplate> {
-    val decoded = source.readText(BuilderRecordFile.TEMPLATES.path)
-    if (decoded == null) {
+fun loadTemplates(source: DataSource, log: LoadLog): List<StatTemplate> = loadTemplatesText(source.readText(BuilderRecordFile.TEMPLATES.path)?.text, log)
+
+/**
+ * Reads templates from a Templates.txt's text: the shipped one, or the user's own (Save\Templates.txt,
+ * which VB's DataFile reads instead when it isn't older). Null is a missing file.
+ */
+fun loadTemplatesText(text: String?, log: LoadLog): List<StatTemplate> {
+    if (text == null) {
         log.fileNotFound(TEMPLATES_FILE)
         return emptyList()
     }
     val templates = ArrayList<StatTemplate>()
-    for (record in splitRecords(decoded.text, BuilderRecordFile.TEMPLATES.marker).records) {
+    for (record in splitRecords(text, BuilderRecordFile.TEMPLATES.marker).records) {
         templates.add(loadTemplate(record, log))
     }
     return templates

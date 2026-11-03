@@ -37,8 +37,43 @@ class SkillsScreenState(
     val themes: List<Theme>,
     val presets: List<BuildPreset>,
 ) {
-    /** The skill on each grid row (index 0 = row 1). Alphabetical, VB's `sosAlphabetical` order (frmSkills.InitRows). */
-    val rowSkills: List<Skill> = Skill.entries
+    /** The skill on each grid row (index 0 = row 1), as [orderRows] sets them. */
+    var rowSkills: List<Skill> by mutableStateOf(Skill.entries)
+        private set
+
+    /**
+     * InitRows (frmSkills.frm:1256): Alphabetical, or Native First: the main class's native skills,
+     * then the other classes' native skills, then the rest, each in skill order. [split] is the
+     * class split, most levels first; with none the rows stay as they were.
+     */
+    fun orderRows(split: List<ddolite.builder.model.CharacterClass>, nativeFirst: Boolean) {
+        if (split.isEmpty()) {
+            return
+        }
+        if (!nativeFirst) {
+            rowSkills = Skill.entries
+            return
+        }
+        val rows = ArrayList<Skill>()
+        for (skill in Skill.entries) {
+            if (split[0].nativeSkills.contains(skill)) {
+                rows.add(skill)
+            }
+        }
+        for (skill in Skill.entries) {
+            for (i in 1 until split.size) {
+                if (split[i].nativeSkills.contains(skill) && !rows.contains(skill)) {
+                    rows.add(skill)
+                }
+            }
+        }
+        for (skill in Skill.entries) {
+            if (!rows.contains(skill)) {
+                rows.add(skill)
+            }
+        }
+        rowSkills = rows
+    }
 
     var presetIndex by mutableIntStateOf(0)
         private set

@@ -35,3 +35,4 @@ kotlin/local.properties
 # The Kotlin version's own settings (it reads Settings.txt only if this is missing) and error log
 Settings-Kotlin.txt
 Error-Kotlin.log
+Backup-Kotlin.build

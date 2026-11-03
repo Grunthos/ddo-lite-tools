@@ -219,6 +219,7 @@ class FeatsScreenState(private val session: PrototypeState) {
             return
         }
         showTab(newTab)
+        session.saveBackup()
         changed()
     }
 
@@ -472,6 +473,9 @@ class FeatsScreenState(private val session: PrototypeState) {
     }
 
     // ---------------------------------------------------------------- feat and selector lists
+
+    /** A feat as the list shows it (indented under a related feat with Group Related). */
+    fun listCaption(feat: ddolite.builder.model.Feat): String = session.data.featListCaption(feat)
 
     /**
      * Refills the feat list. Ported from ShowAvailable (frmFeats.frm:1266) and FeatListTitle

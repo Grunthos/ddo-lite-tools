@@ -179,7 +179,7 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
         Label("Selectors", label, 648, 48)
         val featNames = ArrayList<String>()
         for (feat in screen.feats) {
-            featNames.add(feat.abbreviation)
+            featNames.add(screen.listCaption(feat))
         }
         ListBox(
             theme, featNames, { i -> i == screen.featIndex }, 448, 64, 185, 282, screen,

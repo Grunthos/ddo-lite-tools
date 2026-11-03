@@ -121,6 +121,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
         }
         tab = newTab
         showTab()
+        session.saveBackup()
         changed()
     }
 
@@ -672,6 +673,7 @@ class EnhancementsScreenState(private val session: PrototypeState) {
     fun chooseComboTree(name: String) {
         comboTree = name
         treeClick()
+        session.saveBackup()
         changed()
     }
 

@@ -24,7 +24,7 @@ class BuilderData(
     val classes: List<CharacterClass>,
     /** Sorted by name, as VB keeps `db.Spell`. */
     val spells: List<Spell>,
-    val templates: List<StatTemplate>,
+    templates: List<StatTemplate>,
     /** In file order, as VB keeps `db.Feat`. */
     val feats: List<Feat>,
     /** FeatMap.txt, in file order (blank entries for bad lines, as VB). */
@@ -38,6 +38,28 @@ class BuilderData(
     /** Sorted by type, then old name (VB `db.NameChange`). */
     val nameChanges: List<NameChange>,
 ) {
+    /** The stat templates; [reloadTemplates] replaces them. */
+    var templates: List<StatTemplate> = templates
+        private set
+
+    /**
+     * Stats › Customize › Reload Templates (frmStats.ReloadTemplates, :1497): LoadTemplates from
+     * [text] (null: no file), and their checks.
+     *
+     * Difference from VB: VB runs all of ProcessData again, so its error log also repeats the
+     * cross-file checks' errors; here only the templates' errors are logged.
+     */
+    fun reloadTemplates(text: String?, log: LoadLog) {
+        val loaded = loadTemplatesText(text, log)
+        for (template in loaded) {
+            if (findClass(template.className) == null) {
+                log.loadError("Templates.txt", null, "Class not recognized: ${template.className}")
+            }
+        }
+        checkTemplates(loaded, log)
+        templates = loaded
+    }
+
     /** The feat map in VB's working order (`db.FeatMap` as last sorted by an import or export). */
     val featMapOrder = FeatMapOrder(featMap)
 
@@ -70,16 +92,44 @@ class BuilderData(
      */
     fun findFeat(name: String): Feat? = featsByName[name]
 
+    /** cfg.FeatOrder is Group Related (foeGroupRelated) rather than Alphabetical. */
+    var featOrderGroupRelated = false
+        private set
+
     /**
      * VB's `db.FeatDisplay`: the order the Feats screen lists feats in. Ported from
-     * `IndexFeatDisplay` (Build/basDataLoad.bas:1142) with `cfg.FeatOrder` at its default,
-     * alphabetical: sorted by abbreviation (case-sensitive), equal ones in file order. The other
-     * order (by `SortName`, grouping related feats) comes with the settings.
+     * `IndexFeatDisplay` (Build/basDataLoad.bas:1142): sorted (case-sensitive) by abbreviation, or by
+     * `SortName` for Group Related; equal ones in file order, as its insertion sort leaves them.
      */
-    val featsInDisplayOrder: List<Feat> by lazy {
+    var featsInDisplayOrder: List<Feat> = displayOrder(false)
+        private set
+
+    /** IndexFeatDisplay for the Feat Order setting: at start-up (InitData) and when it changes in Options. */
+    fun indexFeatDisplay(groupRelated: Boolean) {
+        featOrderGroupRelated = groupRelated
+        featsInDisplayOrder = displayOrder(groupRelated)
+    }
+
+    private fun displayOrder(groupRelated: Boolean): List<Feat> {
         val sorted = ArrayList(feats)
-        sorted.sortWith { a, b -> a.abbreviation.compareTo(b.abbreviation) } // stable, like its insertion sort
-        sorted
+        if (groupRelated) {
+            sorted.sortWith { a, b -> a.sortName.compareTo(b.sortName) }
+        } else {
+            sorted.sortWith { a, b -> a.abbreviation.compareTo(b.abbreviation) }
+        }
+        return sorted
+    }
+
+    /**
+     * A feat as the Feats screen's list shows it (frmFeats.ShowAvailable, :1322): its abbreviation,
+     * two spaces in when grouped under a related feat (Group Related, and a SortName that differs
+     * from the name and ends in a digit).
+     */
+    fun featListCaption(feat: Feat): String {
+        if (featOrderGroupRelated && feat.sortName != feat.name && feat.sortName.isNotEmpty() && feat.sortName.last().isDigit()) {
+            return "  " + feat.abbreviation
+        }
+        return feat.abbreviation
     }
 
     /** VB's `db.FeatLookup`: the feats sorted by name (case-sensitive), equal names in file order. */
@@ -193,10 +243,13 @@ private fun canonicalName(table: List<KnownName>, text: String): String {
  * Loads all the Builder data ported so far and checks references between files.
  * Corresponds to `basDataLoad.InitData` (Build/basDataLoad.bas:6), in its order, followed by the
  * checks from `basProcess.ProcessData` (Build/basProcess.bas:8) for the files loaded so far.
+ *
+ * [userTemplates] is the text of the user's own Templates.txt, read in place of the shipped one.
  */
-fun loadBuilderData(source: DataSource, log: LoadLog): BuilderData {
+fun loadBuilderData(source: DataSource, log: LoadLog, userTemplates: String? = null): BuilderData {
     val races = loadRaces(source, log)
-    val templates = loadTemplates(source, log)
+    // DataFile (basDataLoad.bas:28): the user's Templates.txt when the platform found one to use.
+    val templates = if (userTemplates != null) loadTemplatesText(userTemplates, log) else loadTemplates(source, log)
     val spells = loadSpells(source, log)
     val classes = loadClasses(source, log)
     val feats = processFeatSelectors(loadFeats(source, races, classes, log), log)

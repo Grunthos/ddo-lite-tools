@@ -81,6 +81,21 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         openFile(parent, state, chosen)
     }
 
+    /**
+     * The build named on the command line (CheckCommandLine → BuildOpen, basDocuments.bas:45): opened
+     * as File › Open opens one. A binary .bld can't be read yet.
+     */
+    fun openCommandLine(parent: Frame, state: PrototypeState, chosen: File) {
+        if (checkDirty(parent, state)) {
+            return
+        }
+        if (chosen.name.lowercase().endsWith(".bld")) {
+            state.prompts.notice("Binary builds (.bld) can't be opened by this version.")
+            return
+        }
+        openFile(parent, state, chosen)
+    }
+
     /** Reads [chosen] and shows it, adding it to the recent files (LoadBuild, :521, with cfg.AddMRU). */
     private fun openFile(parent: Frame, state: PrototypeState, chosen: File) {
         val bytes: ByteArray

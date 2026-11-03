@@ -1,5 +1,6 @@
 package ddolite.prototype.skills
 
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -180,8 +181,10 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
         // lnkTemplate drops down the list of classes (mnuTemplate).
         LinkLabel(theme, templateClass.name + " Templates", 272, 320) { openList = if (openList == "class") "" else "class" }
     }
-    // Editing the template files (lnkCustomize) isn't ported yet.
-    Label("Customize", label.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)), 718, 320)
+    // lnkCustomize drops down mnuCustomize (lnkCustomize_MouseDown, :1429).
+    @Suppress("UNUSED_VARIABLE")
+    val templatesRevision = screen.templatesRevision
+    LinkLabel(theme, "Customize", 718, 320) { openList = if (openList == "customize") "" else "customize" }
     for (i in templates.indices) {
         val template = templates[i]
         TemplateButton(theme, template.caption, 292, TEMPLATE_TOPS[i]) { screen.applyTemplate(i) }
@@ -212,6 +215,18 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
             openList = ""
             screen.chooseLevelup(index, if (chosen == 0) null else Stat.entries[chosen - 1])
         }
+    } else if (openList == "customize") {
+        val density = LocalDensity.current.density
+        PopupMenu(
+            screen.customizeItems, -1, Offset(718 * density, 336 * density), density,
+            onChoose = { index ->
+                openList = ""
+                screen.customize(index)
+            },
+            onDismiss = { openList = "" },
+            clientWidth = 815,
+            enabled = { screen.customizeEnabled(it) },
+        )
     } else if (openList == "class") {
         // InitTemplatesMenu (:1064): every class, with the current one ticked.
         val classes = rules.rules.data.classes

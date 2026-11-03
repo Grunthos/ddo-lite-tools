@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import ddolite.builder.build.BuildPoints
 import ddolite.builder.build.CascadeChange
 import ddolite.builder.build.StatRules
+import ddolite.builder.data.LoadLog
 import ddolite.builder.model.CharacterClass
 import ddolite.builder.model.Stat
 import ddolite.builder.model.StatTemplate
@@ -30,6 +31,10 @@ class StatsScreenState(private val session: PrototypeState) {
 
     /** Bumped when a warning appears, so the screen restarts its 5-second timer (tmrWarning). */
     var warningRevision by mutableIntStateOf(0)
+        private set
+
+    /** Bumped when the templates are reloaded (Customize › Reload Templates). */
+    var templatesRevision by mutableIntStateOf(0)
         private set
 
     val rules: StatRules?
@@ -128,6 +133,48 @@ class StatsScreenState(private val session: PrototypeState) {
     }
 
     // ---------------------------------------------------------------- templates
+
+    /** mnuCustomize (frmStats.frm:904), in order; "-" is a separator. */
+    val customizeItems = listOf("Edit Custom Templates", "Reload Templates", "-", "Delete Custom Templates", "-", "Edit System Templates")
+
+    /** lnkCustomize_MouseDown (:1429): Delete Custom Templates only when there are custom templates. */
+    fun customizeEnabled(index: Int): Boolean {
+        if (customizeItems[index] == "Delete Custom Templates") {
+            return session.templateFiles?.userExists() == true
+        }
+        return true
+    }
+
+    /** mnuCustomize_Click (:1439). */
+    fun customize(index: Int) {
+        val files = session.templateFiles ?: return
+        when (customizeItems[index]) {
+            "Edit Custom Templates" -> files.editUser()
+            "Delete Custom Templates" -> if (files.deleteUser()) {
+                reloadTemplates()
+            }
+            "Edit System Templates" -> files.editSystem()
+            "Reload Templates" -> reloadTemplates()
+        }
+    }
+
+    /**
+     * ReloadTemplates (:1497): the templates read again (LoadTemplates, through DataFile's choice of
+     * file), the error log written and shown if there were errors (CreateErrorLog True), then
+     * DefaultTemplates.
+     */
+    private fun reloadTemplates() {
+        val files = session.templateFiles ?: return
+        val log = LoadLog()
+        session.data.reloadTemplates(files.templatesText(), log)
+        files.showErrorLog(log)
+        val r = rules
+        if (r != null) {
+            templateClass = r.defaultTemplateClass()
+        }
+        warningIndex = -1
+        templatesRevision++
+    }
 
     fun templates(): List<StatTemplate> = rules?.templatesFor(templateClass) ?: emptyList()
 

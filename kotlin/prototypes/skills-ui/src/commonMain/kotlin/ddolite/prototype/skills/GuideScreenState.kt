@@ -220,6 +220,9 @@ class GuideScreenState(private val session: PrototypeState) {
         treeIndex = index
         guideTree = trees.getOrNull(index)?.second ?: 0
         showGuideAvailable()
+        if (index != -1) { // VB leaves before SaveBackup with nothing selected
+            session.saveBackup()
+        }
         changed()
     }
 
@@ -227,6 +230,7 @@ class GuideScreenState(private val session: PrototypeState) {
     fun chooseFilter(newFilter: GuideFilter) {
         filter = newFilter
         showGuideAvailable()
+        session.saveBackup()
         changed()
     }
 

@@ -92,6 +92,8 @@ import javax.imageio.ImageIO
  * `./gradlew :prototypes:skills-desktop:portableZip`.
  */
 fun main(args: Array<String>) {
+    // VB's Command: a build to open (CheckCommandLine); a folder argument is the app's folder (new code).
+    val command = commandArgument(args)
     val repoRoot = findAppRoot(args)
     val store = SettingsStore(repoRoot)
     val settings = store.load()
@@ -99,7 +101,13 @@ fun main(args: Array<String>) {
 
     val log = LoadLog()
     val dataSource = DirectoryDataSource(repoRoot.resolve("Data"))
-    val data = loadBuilderData(dataSource, log)
+    val helpFiles = HelpFiles(repoRoot)
+    val saveFolder = repoRoot.resolve("Save").toFile()
+    var openFolder: () -> File = { saveFolder }
+    val templateFiles = DesktopTemplateFiles(repoRoot, helpFiles) { openFolder() }
+    // DataFile (basDataLoad.bas:28): the user's Templates.txt in place of the shipped one, unless older.
+    val data = loadBuilderData(dataSource, log, templateFiles.userText())
+    data.indexFeatDisplay(settings.featOrder == 1) // InitData's IndexFeatDisplay with cfg.FeatOrder
     for (issue in log.issues) {
         println(issue.message)
     }
@@ -113,20 +121,22 @@ fun main(args: Array<String>) {
     skills.contrast = Contrast.entries.getOrElse(settings.contrast) { Contrast.MEDIUM }
     val prompts = DesktopPrompts { KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow }
     val state = PrototypeState(data, skills, TreeSlotsState(data, readTreeHeaders(dataSource), skills), prompts)
-    val files = BuildFiles(data, repoRoot.resolve("Save").toFile())
+    val files = BuildFiles(data, saveFolder)
+    openFolder = { files.folder } // cfg.LitePath follows the Open dialog
+    templateFiles.state = state
+    state.templateFiles = templateFiles
     val exports = Exports(files)
     state.formats = loadFormats(repoRoot.resolve("Settings"))
     state.settings = settings
     state.outputFormat = settings.output
     state.formatName = settings.bbCodes
-    val helpFiles = HelpFiles(repoRoot)
     state.help.help = helpFiles.loadHelp()
     // tmrData_Timer (frmMain.frm:646): the error log, shown if the settings say so.
     val errorLog = helpFiles.createErrorLog(log, settings.showErrors)
     val icons = loadClassIcons()
 
     application {
-        BuilderWindows(state, files, exports, store, icons, helpFiles, errorLog, repoRoot)
+        BuilderWindows(state, files, exports, store, icons, helpFiles, errorLog, repoRoot, BuildBackup(repoRoot, data), command, templateFiles)
     }
 }
 
@@ -293,13 +303,17 @@ private fun mainWindowKey(event: KeyEvent, windows: OpenWindows, state: Prototyp
 
 /** The main window (menus + output view) and whichever screen windows are open. */
 @Composable
-private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>, helpFiles: HelpFiles, errorLog: Boolean, appRoot: Path) {
+private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildFiles, exports: Exports, store: SettingsStore, icons: Map<String, ImageBitmap>, helpFiles: HelpFiles, errorLog: Boolean, appRoot: Path, backup: BuildBackup, command: String, templateFiles: DesktopTemplateFiles) {
     val windows = remember { OpenWindows() }
     val mainWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val messagesWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val exportWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val importWindow = remember { arrayOfNulls<ComposeWindow>(1) }
     val formatWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val helpWindow = remember { arrayOfNulls<ComposeWindow>(1) }
+    val activeWindow = remember { trackActiveWindow(mainWindow) }
+    state.onSaveBackup = { backup.save(state) }
+    state.onDeleteBackup = { backup.delete() }
     val settingsFolder = appRoot.resolve("Settings").toFile()
     state.format.onShow = { formatWindow[0]?.toFront() }
     state.format.onLoad = { chooseFormatFile(mainWindow[0], settingsFolder, FileDialog.LOAD)?.nameWithoutExtension }
@@ -355,6 +369,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
             val parent = mainWindow[0]
             if (parent == null || !files.checkDirty(parent, state)) {
                 quit(state, store, mainWindow[0])
+                backup.delete() // Form_Unload (frmMain.frm:590): DeleteBackup
                 exitApplication()
             }
         },
@@ -363,6 +378,18 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         onKeyEvent = { event -> mainWindowKey(event, windows, state) },
     ) {
         mainWindow[0] = window
+        // tmrData_Timer (frmMain.frm:659): the autosaved backup, else the build on the command line.
+        LaunchedEffect(Unit) {
+            if (!backup.load(window, state)) {
+                val build = commandLineBuild(command, appRoot.toFile())
+                if (build != null) {
+                    files.openCommandLine(window, state, build)
+                }
+            }
+            if (templateFiles.userOlder()) {
+                state.help.show("Stat Template Change")
+            }
+        }
         MenuBar {
             // frmMain's File menu (frmMain.frm:160), with the items the prototype has.
             Menu("File", mnemonic = 'F') {
@@ -411,6 +438,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 Item("Exit", mnemonic = 'x', onClick = {
                     if (!files.checkDirty(window, state)) {
                         quit(state, store, window)
+                        backup.delete()
                         exitApplication()
                     }
                 })
@@ -454,18 +482,24 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                     optionsWindow[0]?.toFront()
                 })
             }
-            // frmMain's Window menu lists the open screens (tmrWindowMenu_Timer, frmMain.frm:819).
+            // frmMain's Window menu (frmMain.frm:397; tmrWindowMenu_Timer :819, WindowActivate :802,
+            // mnuWindow_Click): Cascade Windows, then the open windows in VB's order with the active
+            // one ticked.
             Menu("Window", mnemonic = 'W') {
-                for (screen in EditScreen.entries) {
-                    if (windows.isOpen(screen.screen)) {
-                        Item(screen.title.removeSuffix("..."), onClick = { windows.show(screen.screen) })
+                val listed = windowMenuEntries(state, windows, exportWindow, importWindow, messagesWindow, optionsWindow, optionsOpen, formatWindow, helpWindow)
+                Item("Cascade Windows", enabled = listed.size > 1, onClick = {
+                    val main = mainWindow[0]
+                    if (main != null && state.opened != null) {
+                        cascadeWindows(main, cascadeList(windows, exportWindow, state))
                     }
+                })
+                if (listed.isNotEmpty()) {
+                    Separator()
                 }
-                if (state.messages.isOpen) {
-                    Item("Messages", onClick = { messagesWindow[0]?.toFront() })
-                }
-                if (state.imports.isOpen) {
-                    Item("Import", onClick = { importWindow[0]?.toFront() })
+                for (entry in listed) {
+                    CheckboxItem(entry.first, checked = entry.second != null && entry.second === activeWindow.value, onCheckedChange = {
+                        entry.second?.toFront()
+                    })
                 }
             }
             // frmMain's Help menu (frmMain.frm:496, mnuHelp_Click :778).
@@ -600,6 +634,7 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
                 }
             },
         ) {
+            helpWindow[0] = window
             LaunchedEffect(state.help.topic) { window.toFront() }
             HelpWindowContent(state)
         }
@@ -650,6 +685,7 @@ private fun ScreenWindow(
         onCloseRequest = {
             saveDialogPosition(state.settings, windows.awtWindows[screen])
             windows.close(screen)
+            state.saveBackup() // UnloadForm (basMain.bas:229)
             // UnloadForm (basMain.bas:224): with no other Edit window left, the output shows everything again.
             var others = false
             for (s in BuildScreen.entries) {
@@ -757,14 +793,22 @@ private fun loadThemes(settings: Path): List<Theme> {
     return themes
 }
 
+/** The command line as VB's Command sees it (the arguments joined), unless it names the app's folder. */
+private fun commandArgument(args: Array<String>): String {
+    if (args.isEmpty() || Files.isDirectory(Path.of(args[0]))) {
+        return ""
+    }
+    return args.joinToString(" ")
+}
+
 /**
- * The folder holding Data/ and Settings/. In order: the first argument; the `ddolite.repoRoot`
+ * The folder holding Data/ and Settings/. In order: the first argument, if it's a folder; the `ddolite.repoRoot`
  * property (set by `gradlew run`); the folder of the .exe and its parents (the portable app keeps
  * Data/ next to the .exe, like the VB release); the working folder and its parents.
  * New code: VB6 always used App.Path.
  */
 private fun findAppRoot(args: Array<String>): Path {
-    if (args.isNotEmpty()) {
+    if (args.isNotEmpty() && Files.isDirectory(Path.of(args[0]))) {
         return Path.of(args[0])
     }
     val property = System.getProperty("ddolite.repoRoot")
@@ -891,4 +935,101 @@ private fun saveDialogPosition(settings: BuilderSettings, window: ComposeWindow?
         return
     }
     settings.dialogCoords = Coords(window.x * TWIPS, window.y * TWIPS)
+}
+
+// ---------------------------------------------------------------- Window menu
+
+/**
+ * The Window menu's windows (frmMain.frm:409 onwards), each with its caption and AWT window, in VB's
+ * order: Overview, Stats, Skills, Feats, Spells, Enhancements, Export, Import, Messages, Options,
+ * Output Format, Help.
+ *
+ * VB bug, kept (VB-BUGS 22i): the menu lists "frmDestiny", the old Destiny form, so the Destinies
+ * window (frmDestiny2) never appears.
+ */
+private fun windowMenuEntries(
+    state: PrototypeState,
+    windows: OpenWindows,
+    exportWindow: Array<ComposeWindow?>,
+    importWindow: Array<ComposeWindow?>,
+    messagesWindow: Array<ComposeWindow?>,
+    optionsWindow: Array<ComposeWindow?>,
+    optionsOpen: Boolean,
+    formatWindow: Array<ComposeWindow?>,
+    helpWindow: Array<ComposeWindow?>,
+): List<Pair<String, ComposeWindow?>> {
+    val list = ArrayList<Pair<String, ComposeWindow?>>()
+    for (screen in EditScreen.entries) {
+        if (screen.screen != BuildScreen.DESTINY && windows.isOpen(screen.screen)) {
+            list.add(Pair(screen.title.removeSuffix("..."), windows.awtWindows[screen.screen]))
+        }
+    }
+    if (state.export.isOpen) {
+        list.add(Pair("Export", exportWindow[0]))
+    }
+    if (state.imports.isOpen) {
+        list.add(Pair("Import", importWindow[0]))
+    }
+    if (state.messages.isOpen) {
+        list.add(Pair("Messages", messagesWindow[0]))
+    }
+    if (optionsOpen) {
+        list.add(Pair("Options", optionsWindow[0]))
+    }
+    if (state.format.isOpen) {
+        list.add(Pair("Output Format", formatWindow[0]))
+    }
+    if (state.help.isOpen) {
+        list.add(Pair(state.help.topic?.caption() ?: "Help", helpWindow[0]))
+    }
+    return list
+}
+
+/** The windows Cascade Windows moves (cfg.CascadeWindows, clsConfig.cls:1758): the build screens and Export. */
+private fun cascadeList(windows: OpenWindows, exportWindow: Array<ComposeWindow?>, state: PrototypeState): List<ComposeWindow> {
+    val list = ArrayList<ComposeWindow>()
+    for (screen in EditScreen.entries) {
+        val w = windows.awtWindows[screen.screen]
+        if (windows.isOpen(screen.screen) && w != null) {
+            list.add(w)
+        }
+    }
+    val export = exportWindow[0]
+    if (state.export.isOpen && export != null) {
+        list.add(export)
+    }
+    return list
+}
+
+/**
+ * Cascade Windows: MoveForm with pblnCascade (clsConfig.cls:1599). Window n goes to n × its title
+ * bar and border height from the screen's left, and below the main window's title bar and menu by
+ * (n - 1) of them; each is brought forward in turn. As in VB, the positions are on the screen, not
+ * in the main window.
+ */
+private fun cascadeWindows(main: ComposeWindow, list: List<ComposeWindow>) {
+    val top = main.height - main.contentPane.height
+    for (i in list.indices) {
+        val w = list[i]
+        val offset = w.height - w.contentPane.height
+        w.setLocation((i + 1) * offset, top + i * offset)
+        w.toFront()
+    }
+}
+
+/**
+ * The window last activated other than the main one: WindowActivate ticks Screen.ActiveForm when a
+ * child window activates (ActivateForm), and the main window doesn't change it.
+ */
+private fun trackActiveWindow(mainWindow: Array<ComposeWindow?>): androidx.compose.runtime.MutableState<java.awt.Window?> {
+    val active = mutableStateOf<java.awt.Window?>(null)
+    java.awt.Toolkit.getDefaultToolkit().addAWTEventListener({ event ->
+        if (event.id == WindowEvent.WINDOW_ACTIVATED) {
+            val w = (event as WindowEvent).window
+            if (w !== mainWindow[0]) {
+                active.value = w
+            }
+        }
+    }, java.awt.AWTEvent.WINDOW_EVENT_MASK)
+    return active
 }

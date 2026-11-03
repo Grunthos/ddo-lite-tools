@@ -33,8 +33,7 @@ import ddolite.common.theme.Theme
  * redrawn where VB calls GenerateOutput or ResizeOutput. Laid out from the form's positions; the
  * client area is 474 x 428 at 100%.
  *
- * Not yet: the Colors button (VB's Colors program). Stored but not used yet: the skill order and
- * feat order of the screens, and child windows.
+ * Not yet: the Colors button (VB's Colors program). Stored but not used yet: child windows.
  */
 @Composable
 fun OptionsWindowContent(state: PrototypeState) {
@@ -152,11 +151,15 @@ fun OptionsWindowContent(state: PrototypeState) {
             "skillScreen" -> DropList(theme, control, skillScreenItems, 304, 153, 129) { i ->
                 open = ""
                 s.skillOrderScreen = i
+                state.skillsOrderChanged() // cboSkillOrderScreen_Click (:582): frmSkills.Cascade
                 changed()
             }
             "featScreen" -> DropList(theme, control, featScreenItems, 304, 201, 129) { i ->
                 open = ""
                 s.featOrder = i
+                // cboFeatOrder_Click (:596): IndexFeatDisplay, then frmFeats.OrderChanged (ShowAvailable).
+                state.data.indexFeatDisplay(i == 1)
+                state.feats.showAvailable()
                 changed()
             }
             "skillOutput" -> DropList(theme, control, skillOutputItems, 304, 297, 129) { i ->

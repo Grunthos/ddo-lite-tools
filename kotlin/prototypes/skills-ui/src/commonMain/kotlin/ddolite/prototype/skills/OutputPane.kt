@@ -1,7 +1,11 @@
 package ddolite.prototype.skills
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,12 +73,21 @@ fun OutputPane(state: PrototypeState) {
     @Suppress("UNUSED_VARIABLE")
     val revision = state.revision + state.skills.revision + state.enhancements.revision
     val rules = state.rules
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(theme.color(ColorGroup.OUTPUT, ColorValue.BACKGROUND))
-            .verticalScroll(rememberScrollState())
-            .horizontalScroll(rememberScrollState()),
-    ) {
+    val vertical = rememberScrollState()
+    val horizontal = rememberScrollState()
+    var modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.OUTPUT, ColorValue.BACKGROUND))
+    // CanDrag (basOutput.bas:2696): with a scroll bar showing, the output can be dragged with the mouse,
+    // under a hand cursor (picBuild_MouseDown/Move/Up, frmMain.frm:862).
+    if (vertical.maxValue > 0 || horizontal.maxValue > 0) {
+        modifier = modifier.pointerHoverIcon(PointerIcon.Hand).pointerInput(Unit) {
+            detectDragGestures { change, drag ->
+                change.consume()
+                horizontal.dispatchRawDelta(-drag.x)
+                vertical.dispatchRawDelta(-drag.y)
+            }
+        }
+    }
+    Box(modifier = modifier.verticalScroll(vertical).horizontalScroll(horizontal)) {
         if (rules != null) {
             val lines = BuildOutput(rules, state.outputFormat, outputSettings(state)).display(state.outputView)
             OutputLines(lines, theme, state.settings.outputMargin)

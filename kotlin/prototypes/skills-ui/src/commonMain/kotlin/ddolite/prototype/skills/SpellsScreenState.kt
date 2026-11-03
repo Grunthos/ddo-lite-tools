@@ -212,12 +212,14 @@ class SpellsScreenState(private val session: PrototypeState) {
         spellClass = c
         spellLevel = 1
         spellLevelChange()
+        session.saveBackup()
     }
 
     /** usrSpinner_Change (:729) → SpellLevelChange (:735). */
     fun chooseLevel(level: Int) {
         spellLevel = level
         spellLevelChange()
+        session.saveBackup()
     }
 
     private fun spellLevelChange() {

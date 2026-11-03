@@ -60,8 +60,34 @@ class PrototypeState(
     var revision by mutableIntStateOf(0)
         private set
 
-    /** Unsaved changes (VB's cfg.Dirty). */
-    var dirty by mutableStateOf(false)
+    private var dirtyState by mutableStateOf(false)
+
+    /**
+     * Unsaved changes (VB's cfg.Dirty). Setting it false is SetDirty False (basDocuments.bas:214),
+     * which deletes the autosaved backup ([onDeleteBackup]).
+     */
+    var dirty: Boolean
+        get() = dirtyState
+        set(value) {
+            dirtyState = value
+            if (!value) {
+                onDeleteBackup()
+            }
+        }
+
+    /** The platform's autosave: write the backup (SaveBackup's SaveBuild), and delete it (DeleteBackup). */
+    var onSaveBackup: () -> Unit = {}
+    var onDeleteBackup: () -> Unit = {}
+
+    /**
+     * SaveBackup (basDocuments.bas:302): autosaves the build when it has unsaved changes. VB calls it
+     * when a build window closes (UnloadForm) and when some tabs, lists and combos change.
+     */
+    fun saveBackup() {
+        if (dirty) {
+            onSaveBackup()
+        }
+    }
 
     /**
      * Which window's sections the main window's output shows (basOutput's menRemember): each Edit
@@ -88,6 +114,9 @@ class PrototypeState(
 
     /** The Help window (frmHelp). */
     val help = HelpScreenState(this)
+
+    /** The template files (Stats › Customize); the app sets this. */
+    var templateFiles: TemplateFiles? = null
 
     /** The format editor (frmFormat). */
     val format = FormatScreenState(this)
@@ -151,6 +180,16 @@ class PrototypeState(
         messages.buildOpened(result.deprecations)
     }
 
+    /**
+     * Shows the autosaved backup: LoadBackup (basDocuments.bas:313) opens it with LoadBuild, whose
+     * SetDirty False deletes the backup file, then SetDirty marks the build unsaved. The next autosave
+     * writes the file again.
+     */
+    fun restoreBackup(result: BuildLoadResult) {
+        openBuild(result)
+        dirty = true
+    }
+
     /** No build open (basDocuments.BuildClose, :99). */
     fun closeBuild() {
         opened = null
@@ -204,6 +243,12 @@ class PrototypeState(
         }
     }
 
+    /** The Skill Order option changed: the Skills screen's rows again. */
+    fun skillsOrderChanged() {
+        refreshScreens()
+        revision++
+    }
+
     private fun refreshScreens() {
         val result = opened
         if (result == null) {
@@ -215,6 +260,12 @@ class PrototypeState(
         for (level in 1..HEROIC_LEVELS) {
             intModifiers.add(statRules.stat(Stat.INT, level, modifier = true))
         }
+        // frmSkills.Cascade: InitRows, in the Skill Order setting's order.
+        val split = ArrayList<ddolite.builder.model.CharacterClass>()
+        for (s in result.rules.classSplit()) {
+            split.add(s.characterClass)
+        }
+        skills.orderRows(split, settings.skillOrderScreen == 1)
         skills.openBuild(result.build, result.rules.heroicLevels(), intModifiers)
         trees.openBuild(result.build)
         overview.refreshChoices()
@@ -301,4 +352,29 @@ class PrototypeState(
         skills.storeInto(result.build)
         return result.rules
     }
+}
+
+/**
+ * The platform's part of Stats › Customize: the template files. Ported from frmStats.frm
+ * (EditUserTemplates :1448, EditSystemTemplates :1467, DeleteCustomTemplates :1477) and
+ * basDataLoad (DataFile :28, UserTemplateOlder :47, SystemTemplates :60, UserTemplates :64).
+ */
+interface TemplateFiles {
+    /** The user's own Templates.txt exists. */
+    fun userExists(): Boolean
+
+    /** Edit Custom Templates: opens the user's file, first copying the shipped one if there's none. */
+    fun editUser()
+
+    /** Edit System Templates: opens the shipped file. */
+    fun editSystem()
+
+    /** Delete Custom Templates: asks "Delete your custom templates?"; true if it deleted the file. */
+    fun deleteUser(): Boolean
+
+    /** The text DataFile picks: the user's file unless it's older than the shipped one; null if none. */
+    fun templatesText(): String?
+
+    /** CreateErrorLog True: writes the error log and shows it, if there were errors. */
+    fun showErrorLog(log: ddolite.builder.data.LoadLog)
 }

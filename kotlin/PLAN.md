@@ -292,7 +292,7 @@ Each step lists its deliverables and the test that marks it done.
       and options, default build points, skills contrast, recent files, main window and dialog positions.
 - [x] The Options window (frmOptions): every setting, saved when it closes; the output options, indent and class
       icons take effect. Not yet: Colors (VB's Colors program); stored but unused so far: the screens' skill and
-      feat orders, child windows.
+      feat orders (done since), child windows.
 
 ### B8 – Missed features (audit 2026-11-03)
 
@@ -306,16 +306,21 @@ the VB routine they port). Unmatched ones that are mouse/drag plumbing, develope
 - [x] **Help**: frmHelp with Data/Builder/Help.txt (basHelp: InitHelp, ShowHelp), every window's Help link,
       the Help menu (What's New?, FAQ, Save File Specifications, DDO Forums, ddowiki Dashboard) and About (frmAbout).
       Not yet: the Help window's arrow-key and page scrolling; links to frmConvert and frmFormat.
-- [ ] **Autosave**: SaveBackup (basDocuments.bas:302) saves the build when a window closes or a tab changes;
-      LoadBackup offers it at the next start; DeleteBackup on a clean exit. (VB's backup is a binary .bld.)
-- [ ] **Command line**: a .build given on the command line opens at start (CheckCommandLine, :327).
-- [ ] **User templates**: VB reads Save\Templates.txt instead of the shipped one unless it's older
+- [x] **Autosave**: SaveBackup (basDocuments.bas:302) saves the build when a window closes or a tab changes;
+      LoadBackup offers it at the next start; DeleteBackup on a clean exit. (VB's backup is a binary .bld; this
+      version writes Backup-Kotlin.build.)
+- [x] **Command line**: a .build given on the command line opens at start (CheckCommandLine, :327); a folder
+      argument is still the app's folder.
+- [x] **User templates**: VB reads Save\Templates.txt instead of the shipped one unless it's older
       (DataFile, basDataLoad.bas:28); Stats › Customize (Edit Custom / Delete Custom / Edit System / Reload
       Templates); the "Stat Template Change" help notice at start-up (UserTemplateOlder).
-- [ ] **Main window**: drag the output with the mouse (picBuild_MouseDown/Move/Up, CanDrag); Window ›
-      Cascade Windows (cfg.CascadeWindows) and the tick on the active window.
-- [ ] **Options not yet acted on**: child windows (owned by the main window), the
-      Skills screen's "Native First" order, the Feats screen's "Group Related" order (IndexFeatDisplay, OrderChanged).
+- [x] **Main window**: drag the output with the mouse (picBuild_MouseDown/Move/Up, CanDrag); Window ›
+      Cascade Windows (cfg.CascadeWindows) and the tick on the active window; the Window menu in VB's order
+      (without Destinies, VB-BUGS 22i).
+- [x] **Options**: the Skills screen's "Native First" order (InitRows), the Feats screen's "Group Related" order
+      (IndexFeatDisplay, OrderChanged).
+- [ ] **Child windows** option (owned by the main window: above it, minimised with it): needs every window
+      made a dialog owned by the main one; left for the logic/screen tidy-up.
 - [x] **Import** (frmImport, Ron's Planner, DDO Builder): builder-core `imports/`; VB's Import from Forums is
       broken against its own current output (VB-BUGS 18j-18p) and is copied as it is.
 - [x] The **format editor** (frmFormat, "Output Format"), from Options › BBCodes, the Export window's "Format:"
