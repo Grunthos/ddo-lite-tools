@@ -84,9 +84,9 @@ import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
 
 /**
- * Desktop prototype, arranged like the VB Builder (PLAN.md §8.0): a main window with File / Edit /
- * Window menus and the output view, and each Edit-menu screen in its own window. Overview, Skills
- * and Enhancements exist so far; the other Edit items are shown disabled.
+ * The Character Builder desktop app, arranged like the VB Builder (PLAN.md §8.0): a main window with
+ * the File, Edit, Tools, Window and Help menus and the build output, and each Edit-menu screen in its
+ * own window.
  *
  * Reads Data/ and Settings/ from the folder found by [findAppRoot]. Run with
  * `./gradlew :builder-desktop:run`, or build the portable Windows app with
@@ -268,7 +268,7 @@ private fun menuEnabled(screen: EditScreen, state: BuilderSession): Boolean {
 private fun appCaption(files: BuildFiles, state: BuilderSession): String {
     val opened = state.opened
     if (opened == null || opened.build.buildName.isEmpty()) {
-        return "Character Builder Lite (Kotlin prototype)"
+        return "Character Builder Lite NG"
     }
     var caption = opened.build.buildName
     val file = files.file
@@ -427,7 +427,7 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
             }
         }
         MenuBar {
-            // frmMain's File menu (frmMain.frm:160), with the items the prototype has.
+            // frmMain's File menu (frmMain.frm:160).
             Menu("File", mnemonic = 'F') {
                 Item("New...", mnemonic = 'N', shortcut = KeyShortcut(Key.N, ctrl = true), onClick = {
                     windows.closeAll()

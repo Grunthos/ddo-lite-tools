@@ -122,8 +122,8 @@ class StatsScreenState(private val session: BuilderSession) {
         } else if (!session.ask("Clear stats and levelups?")) {
             return
         }
-        // TODO: the preferred point-buy column comes from the settings (cfg.BuildPoints); Adventurer for now.
-        r.clearStats(keepTomes, BuildPoints.ADVENTURER)
+        // tmrFocus_Timer (:1050): the preferred column from the Default Build Points setting (cfg.BuildPoints).
+        r.clearStats(keepTomes, session.settings.buildPoints)
         r.enforceTomeMax()
         warningIndex = -1
         statsChanged()

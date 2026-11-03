@@ -25,8 +25,8 @@ import javax.swing.SpinnerNumberModel
 /**
  * File > New, Open, Close, Save and Save As for .build files. Ported from basDocuments
  * (Build/basDocuments.bas): BuildNew (:32), BuildOpen (:45), BuildClose (:99), BuildSave (:112),
- * BuildSaveAs (:126), SaveAsDialog (:142), CheckDirty (:228) and PromptName (:236). Not yet: the
- * recent-files list (MRU), .bld files, the reserved Save\Binary folder and the autosaved backup.
+ * BuildSaveAs (:126), SaveAsDialog (:142), CheckDirty (:228) and PromptName (:236), with the recent
+ * files and the planner imports. Not yet: binary .bld files and the reserved Save\Binary folder.
  * The file dialogs are AWT's, which are the system's own and ask before overwriting.
  *
  * @property folder the folder the dialogs start in (VB's cfg.LitePath), remembered for this run only.
@@ -119,7 +119,7 @@ class BuildFiles(private val data: BuilderData, var folder: File) {
         state.settings.addRecent(chosen.path)
         state.openBuild(result)
         if (result.problems.isNotEmpty()) {
-            // VB asks "Ignore error and load anyway?" for each one; the prototype carries on and lists them.
+            // VB asks "Ignore error and load anyway?" for each one; this version carries on and lists them.
             JOptionPane.showMessageDialog(
                 parent,
                 result.problems.size.toString() + " line(s) couldn't be read; VB would have asked whether to carry on.\n" +

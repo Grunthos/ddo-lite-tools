@@ -7,7 +7,7 @@ import ddolite.builder.model.Feat
  * an item's ItemData is the group plus its 1-based place in that group's list.
  *
  * Not copied: the War Soul, binary tree, binary destiny and twist groups, which only binary
- * (.bld) builds produce; the prototype doesn't read those.
+ * (.bld) builds produce; this version doesn't read those.
  */
 enum class MessageGroup(val base: Int) {
     NAME_CHANGE(1000),
