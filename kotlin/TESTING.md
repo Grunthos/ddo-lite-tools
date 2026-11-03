@@ -90,9 +90,23 @@ look for anything different.
       name doesn't count; change a skill point): the Feats window should come back on Selected with the
       details box still wide and no "<<" link.
 
-## 7. Enhancements (Trees tab only so far)
+## 7. Enhancements (Trees and Enhancements tabs)
 
-- [ ] Tree list and the slots for an opened build; dragging trees into and out of slots.
+- [ ] Each sample build: the same trees, Class/Tier/AP columns, available trees and the
+      "Spent: … / Max: … AP" line as VB; the racial and universal AP spinners' limits.
+- [ ] Trees: double-click a listed tree to add it; drag one onto a row (replace) or the empty row
+      (add); drag a row onto another (swap); double-click a row to remove it; the right-click menu.
+- [ ] Enhancements tab, for each tree: the same slots, AP, ranks and red (error) slots as VB.
+      Note: the repository's sample builds were saved with older data, so several of their trees are
+      short of AP now (renamed abilities are dropped on load); VB should show the same red slots.
+- [ ] The abilities offered (and with Show All), the selectors, and the details text, ranks, cost and
+      "N AP spent in tree".
+- [ ] Add an ability by double-click and by drag (onto the yellow/pink blank slot); drag a slot onto
+      the ability list to clear it; double-click a slot; the rank arrows; the slot menu.
+- [ ] Taking a tier 5 ability in a second tree asks to move the tier 5 tree.
+- [ ] **VB quirks to confirm:** emptying a tree that isn't the tier 5 tree still clears the tier 5
+      tree; a tier 5 ability dragged into a tree (rather than double-clicked) doesn't make it the
+      tier 5 tree.
 
 ## 8. Display
 

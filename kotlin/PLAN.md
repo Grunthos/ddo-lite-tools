@@ -631,6 +631,23 @@ desktop first; Android only has to keep compiling (CI) until phase G.
       - [ ] Feats still open: tab error marks with channels on (`ShowChannelErrors`), the Help link,
         keeping the feat list's scroll position (`SaveScrollPosition`), the mouse wheel, the "group
         related feats" order (`cfg.FeatOrder`), and "Spells >" (needs Spells).
+      - [x] Enhancements, Trees and Enhancements tabs: core `EnhancementRules` (basBuild.bas's AP
+        spent and available with racial/universal pools, spent in tree, level and AP requirements,
+        `CheckAbilityErrors` with requirements and ranks, selectors, insertion order, tier 5, details
+        text) with tests. The window edits `build.Tree` directly, as VB: the tree list and slots
+        (add by double-click or drag, swap, delete/reset menus, double-click to remove), racial and
+        universal AP; the ability slots with ranks (arrows), errors, the ability and selector lists,
+        Show All, details, add by double-click or drag onto the blank slot, drag a slot to the list
+        to clear it, the slot menu, the tier 5 question. The old Trees stand-in stays only for the
+        Android demo.
+      - [ ] Enhancements still open: the Leveling Guide tab (about half of frmEnhancements, with
+        `InitGuideEnhancements` and the guide's errors in basBuild.bas), Export, Help, the mouse wheel,
+        keeping the ability list's scroll position, "Destiny >" and "< Spells" (need those windows).
+      - VB quirks kept: emptying any tree clears the tier 5 tree even if it's another tree; deleting or
+        resetting a tree from the menu leaves the tier 5 tree set; "Delete All Trees" loses the race
+        tree's abilities; a tier 5 ability added by drag doesn't make its tree the tier 5 tree (only
+        double-click does); the racial AP note appears only after the spinner changes; the universal
+        AP help says "+?".
       - VB quirks kept (documented in the code): `AddSpecialFeat` moves a new alternate/exchange back at
         most one place; an Arcane Trickster build skips the remaining list filters for spellcasting
         feats; the Arcane Trickster exception in `CheckFeatSlot`; with no alignment the selector alignment

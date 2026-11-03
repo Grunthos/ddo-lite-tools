@@ -43,7 +43,7 @@ import ddolite.prototype.skills.FeatsWindowContent
 import ddolite.prototype.skills.SkillsWindowContent
 import ddolite.prototype.skills.StatsWindowContent
 import ddolite.prototype.skills.TreeSlotsState
-import ddolite.prototype.skills.TreeSlotsWindowContent
+import ddolite.prototype.skills.EnhancementsWindowContent
 import ddolite.prototype.skills.prototypePresets
 import ddolite.prototype.skills.readTreeHeaders
 import java.awt.KeyboardFocusManager
@@ -144,6 +144,9 @@ private fun openScreen(screen: EditScreen, state: PrototypeState, windows: OpenW
     }
     if (screen == EditScreen.FEATS && !windows.isOpen(BuildScreen.FEATS)) {
         state.feats.opened() // frmFeats.Form_Load
+    }
+    if (screen == EditScreen.ENHANCEMENTS && !windows.isOpen(BuildScreen.ENHANCEMENTS)) {
+        state.enhancements.opened() // frmEnhancements.Form_Load
     }
     windows.show(screen.screen)
     return true
@@ -337,8 +340,9 @@ private fun ApplicationScope.BuilderWindows(state: PrototypeState, files: BuildF
         }
     }
     if (windows.isOpen(BuildScreen.ENHANCEMENTS)) {
-        ScreenWindow(windows, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 900, 640) {
-            TreeSlotsWindowContent(state)
+        // The form's client area is 815 x 555 at 100%.
+        ScreenWindow(windows, BuildScreen.ENHANCEMENTS, "Enhancements", 560, 80, 831, 598) {
+            EnhancementsWindowContent(state) { link -> footerLink(link, BuildScreen.ENHANCEMENTS, state, windows) }
         }
     }
 }

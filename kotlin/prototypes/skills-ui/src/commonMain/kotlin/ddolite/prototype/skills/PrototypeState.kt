@@ -72,9 +72,11 @@ class PrototypeState(
 
     val feats = FeatsScreenState(this)
 
+    val enhancements = EnhancementsScreenState(this)
+
     init {
         skills.onChanged = { skillsChanged() }
-        trees.onChanged = { storeScreens() }
+        trees.onChanged = { storeTrees() }
     }
 
     /** The open build's rules, or null. */
@@ -113,6 +115,7 @@ class PrototypeState(
         stats.refresh()
         refreshScreens()
         feats.cascade()
+        enhancements.cascade()
         revision++
         onCascade(CascadeChange.ALL)
     }
@@ -131,6 +134,12 @@ class PrototypeState(
         // VB cascades to the Feats window after every change but its own.
         if (change != CascadeChange.FEAT) {
             feats.cascade()
+        }
+        // And to the Enhancements window for these (basMain.bas:311).
+        if (change == CascadeChange.ALL || change == CascadeChange.RACE || change == CascadeChange.CLASS ||
+            change == CascadeChange.MAX_LEVEL || change == CascadeChange.FEAT || change == CascadeChange.ENHANCEMENTS
+        ) {
+            enhancements.cascade()
         }
         dirty = true
         revision++
@@ -160,20 +169,30 @@ class PrototypeState(
      * rechecks the feat slots and refreshes the Feats window.
      */
     private fun skillsChanged() {
-        storeScreens()
+        val result = opened ?: return
+        skills.storeInto(result.build)
+        dirty = true
+        revision++
         val r = rules ?: return
         r.cascadeChanges(CascadeChange.SKILL)
         feats.cascade()
     }
 
-    /** The Skills and Enhancements screens changed: copy their state into the build. */
-    private fun storeScreens() {
-        val result = opened
-        if (result == null) {
-            return
-        }
-        skills.storeInto(result.build)
+    /**
+     * The Android demo's tree slots changed: copy them into the build. (Only that screen keeps its
+     * own copy of the trees; the Enhancements window edits the build directly.)
+     */
+    private fun storeTrees() {
+        val result = opened ?: return
         trees.storeInto(result.rules)
+        dirty = true
+        revision++
+    }
+
+    /** The Enhancements window changed the trees or AP: SetDirty, and keep the demo's copy in step. */
+    fun enhancementsEdited() {
+        val result = opened ?: return
+        trees.openBuild(result.build)
         dirty = true
         revision++
     }
@@ -188,7 +207,6 @@ class PrototypeState(
             return null
         }
         skills.storeInto(result.build)
-        trees.storeInto(result.rules)
         return result.rules
     }
 }
