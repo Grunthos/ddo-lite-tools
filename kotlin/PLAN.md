@@ -645,6 +645,13 @@ desktop first; Android only has to keep compiling (CI) until phase G.
         and cure slots fixed), double-click / Enter / drag from the list, swap slots, drag to the list
         to clear, the slot menu. Opening it runs InitBuildSpells, so pact slots are filled (as VB's
         Form_Load). VB bugs kept, listed in `VB-BUGS.md` (18a-c).
+      - [x] Destinies (frmDestiny2): Destiny Trees tab (up to 3 destinies, add/swap/remove, menu,
+        permanent destiny points) and Destinies tab (as Enhancements: slots with ranks and errors,
+        lists, details, drag, tier 5 question). `EnhancementRules` gained the destiny AP pool, epic and
+        legendary levels, destiny tier 5 and the destiny details differences. VB bugs kept: 18d (no
+        destiny AP at exactly level 30), 18e, 22a in `VB-BUGS.md`.
+      - [ ] Destinies still open: Help, the mouse wheel, the ability list's scroll position. (VB's
+        older frmDestiny, with twists and fate points, isn't used by the Edit menu.)
       - [ ] Enhancements still open: the Leveling Guide tab (about half of frmEnhancements, with
         `InitGuideEnhancements` and the guide's errors in basBuild.bas), Export, Help, the mouse wheel,
         keeping the ability list's scroll position, "Destiny >" and "< Spells" (need those windows).

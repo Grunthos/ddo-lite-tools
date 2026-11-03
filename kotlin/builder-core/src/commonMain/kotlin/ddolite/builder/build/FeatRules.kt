@@ -186,7 +186,11 @@ class DetailsBuilder {
         lines.add(DetailLine("", null, false))
     }
 
-    /** The lines without the blank ones at the start and end (DrawText, :124). */
+    /**
+     * The lines without the blank ones at the start and end (DrawText, :124). Only the last line
+     * with a link keeps it: the control has one link label, which ProcessLines puts on the last
+     * linked line, so an earlier "(Wiki)" is plain text.
+     */
     fun build(): List<DetailLine> {
         var first = 0
         while (first < lines.size && lines[first].text.isEmpty()) {
@@ -196,9 +200,20 @@ class DetailsBuilder {
         while (last >= first && lines[last].text.isEmpty()) {
             last--
         }
+        var linked = -1
+        for (i in first..last) {
+            if (lines[i].link != null) {
+                linked = i
+            }
+        }
         val result = ArrayList<DetailLine>()
         for (i in first..last) {
-            result.add(lines[i])
+            val line = lines[i]
+            if (line.link != null && i != linked) {
+                result.add(DetailLine(line.text, null, line.error))
+            } else {
+                result.add(line)
+            }
         }
         return result
     }

@@ -127,6 +127,45 @@ class EnhancementRulesTest {
     }
 
     @Test
+    fun destinyTotals() {
+        // Kensei Warpriest is level 30: VB's GetEpicLevels has no case for exactly 30, so no base destiny AP.
+        val kensei = open("Kensei Warpriest.build")
+        val er = EnhancementRules(kensei)
+        assertEquals(0, er.epicLevels())
+        val totals = er.destinyTotals()
+        assertEquals("Spent: 36 +12pdp / Max: 0 +12pdp AP", totals.caption())
+        assertTrue(totals.overspent)
+        assertEquals(32, er.quickSpentInDestiny(kensei.build.destinies.indexOfFirst { it.treeName == "Legendary Dreadnought" } + 1))
+        // Level 36: 10 epic and 6 legendary levels, 4 AP each.
+        val test = open("TEST.build")
+        assertEquals(64, EnhancementRules(test).destinyTotals().maxBase)
+    }
+
+    @Test
+    fun destinyDetailsHaveNoLevelSection() {
+        val rules = open("Kensei Warpriest.build")
+        val er = EnhancementRules(rules)
+        val tree = data.findDestiny("Legendary Dreadnought")!!
+        val details = er.details(tree, rules.build.destinies[0], 0, 0, 0, null)
+        assertTrue(details.lines.none { it.text == "Level requirements:" })
+        assertTrue(details.lines.any { it.link != null && it.link!!.endsWith("#Core_abilities") })
+    }
+
+    @Test
+    fun destinyTier5() {
+        val rules = open("Kensei Warpriest.build")
+        val er = EnhancementRules(rules)
+        val first = rules.build.destinies[0].treeName
+        val second = rules.build.destinies[1].treeName
+        rules.build.destinyTier5 = first
+        er.setDestinyTier5(second)
+        assertEquals(second, rules.build.destinyTier5)
+        for (a in rules.build.destinies[0].abilities) {
+            assertTrue(a.tier < 5)
+        }
+    }
+
+    @Test
     fun details() {
         val rules = open("Warlock Blaster.build")
         val er = EnhancementRules(rules)

@@ -29,6 +29,14 @@ class ApTotals(
     val overspent: Boolean get() = spentBase > maxBase
 }
 
+/** Destiny AP spent and available, as the Destinies screen shows them (GetDestinyPointsSpentAndMax). */
+class DestinyTotals(val spentBase: Int, val spentPdp: Int, val maxBase: Int, val maxPdp: Int) {
+    /** "Spent: 10 +6pdp / Max: 40 +6pdp AP" (frmDestiny2.ShowSpentAll, :924). */
+    fun caption(): String = "Spent: $spentBase +${spentPdp}pdp / Max: $maxBase +${maxPdp}pdp AP"
+
+    val overspent: Boolean get() = spentBase > maxBase
+}
+
 /** AP spent in a tree: [byTier] is cumulative (index n = spent in tiers 0..n, as VB's plngSpent(0 To 6)). */
 class TreeSpend(val byTier: IntArray, val total: Int)
 
@@ -732,17 +740,124 @@ class EnhancementRules(val rules: BuildRules) {
         }
     }
 
+    // ---------------------------------------------------------------- destinies
+
+    /**
+     * Destiny AP spent and available: permanent destiny points are spent first, then the base
+     * (4 per epic and legendary level). Ported from `GetDestinyPointsSpentAndMax` (basBuild.bas:2331),
+     * `GetEpicLevels` (:119) and `GetLegendaryLevels` (:130).
+     *
+     * VB quirk kept: `GetEpicLevels` gives 0 at exactly level 30 (its cases are "< 30" and "> 30"),
+     * so a level 30 build has no base destiny AP.
+     */
+    fun destinyTotals(): DestinyTotals {
+        var base = 0
+        var pdp = 0
+        val maxPdp = build.permDestinyPoints
+        for (bt in build.destinies) {
+            val tree = data.findDestiny(bt.treeName) ?: continue
+            for (ability in bt.abilities) {
+                if (ability.ability == BLANK_ABILITY) {
+                    continue
+                }
+                val points = points(abilityOf(tree, ability), ability.selector, ability.rank)
+                if (pdp < maxPdp) {
+                    pdp += points
+                    if (pdp > maxPdp) {
+                        base = pdp - maxPdp
+                        pdp = maxPdp
+                    }
+                } else {
+                    base += points
+                }
+            }
+        }
+        return DestinyTotals(base, pdp, (epicLevels() + legendaryLevels()) * 4, maxPdp)
+    }
+
+    /** `GetEpicLevels` (basBuild.bas:119), with its level 30 gap. */
+    fun epicLevels(): Int {
+        val max = build.maxLevels
+        if (max <= 20) {
+            return 0
+        }
+        if (max < 30) {
+            return max - 20
+        }
+        if (max > 30) {
+            return 10
+        }
+        return 0
+    }
+
+    /** `GetLegendaryLevels` (basBuild.bas:130). */
+    fun legendaryLevels(): Int {
+        if (build.maxLevels >= 30) {
+            return build.maxLevels - 30
+        }
+        return 0
+    }
+
+    /** AP spent in destiny [buildDestiny] (1-based). Ported from `QuickSpentInDestiny` (basBuild.bas:2634). */
+    fun quickSpentInDestiny(buildDestiny: Int): Int {
+        val bt = build.destinies.getOrNull(buildDestiny - 1) ?: return 0
+        val tree = data.findDestiny(bt.treeName) ?: return 0
+        var total = 0
+        for (ability in bt.abilities) {
+            if (ability.ability != BLANK_ABILITY) {
+                total += points(abilityOf(tree, ability), ability.selector, ability.rank)
+            }
+        }
+        return total
+    }
+
+    /** 1-based position of the build destiny called [name], 0 if none. `FindDestinyTree` (basBuild.bas:2387). */
+    fun findBuildDestiny(name: String): Int {
+        for (i in build.destinies.indices) {
+            if (build.destinies[i].treeName == name) {
+                return i + 1
+            }
+        }
+        return 0
+    }
+
+    /** Removes a destiny's tier 5 abilities from the end of its list. frmDestiny2.ShaveTree (:1701). */
+    fun shaveDestiny(name: String) {
+        val index = findBuildDestiny(name)
+        if (index == 0) {
+            return
+        }
+        val abilities = build.destinies[index - 1].abilities
+        while (abilities.isNotEmpty() && abilities[abilities.size - 1].tier >= 5) {
+            abilities.removeAt(abilities.size - 1)
+        }
+    }
+
+    /** Makes [name] the tier 5 destiny ("" for none). frmDestiny2.SetDestinyTier5 (:1336). */
+    fun setDestinyTier5(name: String) {
+        if (build.destinyTier5.isEmpty()) {
+            build.destinyTier5 = name
+        } else if (build.destinyTier5 != name) {
+            shaveDestiny(build.destinyTier5)
+            build.destinyTier5 = name
+        }
+    }
+
     // ---------------------------------------------------------------- the Enhancements screen
 
     /**
      * The abilities offered for [buildTree] of [tree], as (tier, ability): every one up to the
      * tree's max tier that isn't taken and, unless [showAll], has no error at rank 1. Ported from
-     * frmEnhancements.ShowAvailable (:2241).
+     * frmEnhancements.ShowAvailable (:2241) and frmDestiny2.ShowAvailable (:1722); destinies offer
+     * every tier ([tierLimit] 5, frmDestiny2.GetMaxTier :1676).
      */
-    fun availableAbilities(tree: Tree, buildTree: BuildTree?, showAll: Boolean): List<Pair<Int, Int>> {
+    fun availableAbilities(tree: Tree, buildTree: BuildTree?, showAll: Boolean, tierLimit: Int = -1): List<Pair<Int, Int>> {
         val result = ArrayList<Pair<Int, Int>>()
         val spend = spentInTree(tree, buildTree)
-        val maxTier = maxTier(buildTree)
+        var maxTier = tierLimit
+        if (maxTier < 0) {
+            maxTier = maxTier(buildTree)
+        }
         val holder = buildTree ?: BuildTree(tree.name)
         for (tier in 0..maxTier) {
             if (tier >= tree.tiers.size) {
@@ -781,7 +896,9 @@ class EnhancementRules(val rules: BuildRules) {
     /**
      * The details box for ability [ability] of [tier] with [selector], and the slot's error if
      * [slot] is given. Ported from frmEnhancements.ShowDetails (:2293), ShowDetailsReqs (:2416),
-     * ShowRankReqs (:2433) and basWiki.TierLink.
+     * ShowRankReqs (:2433) and basWiki.TierLink; for destinies frmDestiny2.ShowDetails (:1778), where
+     * a selector's description gets a wiki link too and the level requirements aren't shown (VB's code
+     * for them is commented out).
      */
     fun details(tree: Tree, buildTree: BuildTree?, tier: Int, ability: Int, selector: Int, slot: BuildAbility?): AbilityDetails {
         val data = tree.tiers[tier][ability]
@@ -794,7 +911,15 @@ class EnhancementRules(val rules: BuildRules) {
             sel = data.selectors[selector - 1]
             if (sel.description.isNotEmpty()) {
                 out.addDescrip(sel.name, "")
-                out.addDescrip(sel.description, "")
+                if (tree.style == TreeStyle.DESTINY) {
+                    var wiki = sel.wiki
+                    if (wiki.isEmpty()) {
+                        wiki = tree.wiki
+                    }
+                    out.addDescrip(sel.description, makeWiki(wiki) + tierLink(tier))
+                } else {
+                    out.addDescrip(sel.description, "")
+                }
             }
         }
         val reqs = sel?.requirements ?: data.requirements
@@ -808,7 +933,7 @@ class EnhancementRules(val rules: BuildRules) {
         }
         val (levels, classLevels) = levelReqs(tree.style, tier, ability + 1)
         val buildLevels = buildLevelReq(levels, classLevels, treeClass(tree))
-        if (buildLevels > 1 || buildLevels == -1) {
+        if (tree.style != TreeStyle.DESTINY && (buildLevels > 1 || buildLevels == -1)) {
             out.addText("Level requirements:")
             if (classLevels != 0) {
                 out.addText(" - $classLevels class levels")

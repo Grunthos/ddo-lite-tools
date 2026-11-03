@@ -121,6 +121,16 @@ look for anything different.
       tree; a tier 5 ability dragged into a tree (rather than double-clicked) doesn't make it the
       tier 5 tree.
 
+## 7a. Destinies
+
+- [ ] Each build at level 20+: the same destinies, AP column and "Spent: … pdp / Max: … pdp AP" line;
+      the Perm Destiny Points spinner's limits.
+- [ ] **VB bug to confirm:** a level 30 build (e.g. Kensei Warpriest) shows "Max: 0" in red (VB-BUGS 18d).
+- [ ] **VB bug to confirm:** the Destiny Trees list shows "5" under "Destiny" and nothing under "Tier" (22a).
+- [ ] Add (double-click / drag, at most 3), swap, double-click to remove, the menu.
+- [ ] Destinies tab: slots, ranks, red slots, abilities offered, selectors, details (no level
+      requirements, as VB), adding by double-click and drag, clearing, the tier 5 question.
+
 ## 8. Display
 
 - [ ] Windows at 150% scaling (Windows display settings): text and layout still fit.

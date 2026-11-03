@@ -76,6 +76,8 @@ class PrototypeState(
 
     val spells = SpellsScreenState(this)
 
+    val destiny = DestinyScreenState(this)
+
     init {
         skills.onChanged = { skillsChanged() }
         trees.onChanged = { storeTrees() }
@@ -119,6 +121,7 @@ class PrototypeState(
         feats.cascade()
         enhancements.cascade()
         spells.cascade()
+        destiny.cascade()
         revision++
         onCascade(CascadeChange.ALL)
     }
@@ -140,6 +143,8 @@ class PrototypeState(
         }
         // VB cascades to the Spells window after every change (basMain.bas:309).
         spells.cascade()
+        // And to the Destinies window (basMain.bas:315).
+        destiny.cascade()
         // And to the Enhancements window for these (basMain.bas:311).
         if (change == CascadeChange.ALL || change == CascadeChange.RACE || change == CascadeChange.CLASS ||
             change == CascadeChange.MAX_LEVEL || change == CascadeChange.FEAT || change == CascadeChange.ENHANCEMENTS

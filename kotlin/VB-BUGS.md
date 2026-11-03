@@ -121,6 +121,17 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     different "Level" for the new slot until the slots are set up again. *Fix:* convert as
     `InitBuildSpellsSlotLevels` does.
 
+18d. **Level 30 builds get no destiny AP.** `Modules/Build/basBuild.bas:119` `GetEpicLevels` has
+    cases `<= 20`, `< 30` and `> 30`, but none for exactly 30, so it returns 0; `GetLegendaryLevels`
+    (:130) is also 0 at 30. `GetDestinyPointsSpentAndMax` (:2331) then gives "Max: 0" and every level 30
+    build shows its destinies overspent (in red). *Fix:* `ElseIf build.MaxLevels <= 30` → `MaxLevels - 20`.
+
+18e. **Destiny window tier 5 limits disagree at level 29.** `Forms/Build/frmDestiny2.frm:707`
+    `LoadData` shows the tier 5 label for `MaxLevels > 29` but removes the tier 5 destiny for
+    `MaxLevels < 29`, so at exactly 29 the tier 5 destiny is kept but not shown. (The Enhancements
+    window uses 11/12 consistently.) Deleting or resetting a destiny from the menu also leaves
+    `DestinyTier5` set, as #12.
+
 ## Display
 
 19. **Feats window stays widened after a change elsewhere (Confirm).** `Forms/Build/frmFeats.frm:312`
@@ -139,6 +150,10 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
 22. **Racial AP note missing until the spinner moves.** `Forms/Build/frmEnhancements.frm:1148`
     `LoadData` doesn't set `lblRacialAPreq` ("Requires N racial past lives"); only
     `usrspnRacialAP_Change` (:1236) does. *Fix:* set it in `LoadData` too.
+
+22a. **Destiny Trees list puts the tier in the wrong column.** `Forms/Build/frmDestiny2.frm:887`
+    `ShowDestinies` writes `GetMaxTier(i)` (always 5) to column 1, headed "Destiny", and nothing to
+    the Tier column. *Fix:* `SetText i, 3, ...`.
 
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
