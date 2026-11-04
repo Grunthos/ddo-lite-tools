@@ -93,6 +93,12 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         theme, choiceTexts, isSelected = { it == screen.choiceIndex }, left = 156, top = TAB_TOP + 36, width = 229, height = 237,
         drag = drag, onPress = { i, _ -> screen.clickChoice(i) }, onDoubleClick = { screen.chooseAbility() },
     )
+    val nothing = screen.nothingAvailable
+    if (nothing != null) {
+        // Kotlin only: why "Available" lists nothing, inside the empty list, clear of its scroll bar.
+        val dim = control.copy(color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM))
+        BasicText(nothing, style = dim, modifier = Modifier.offset(162.dp, (TAB_TOP + 42).dp).width((229 - 12 - SCROLL_WIDTH).dp))
+    }
 
     // Details.
     Label(screen.detailsCaption, label, 16, TAB_TOP + 281)

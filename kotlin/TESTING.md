@@ -273,6 +273,9 @@ the Kotlin output with these files and list every difference.
 - [ ] Details boxes (e.g. Destinies, bottom right): the text stays inside the box and wraps beside the
       scroll bar.
 - [ ] "(Errors)" after a heading in the main window is a link to that window (new; not in VB).
+- [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,
+      Warpriest at level 1: "Nothing in Warpriest at level 1: the earliest is level 3." (new; VB
+      leaves the list blank).
 - [ ] A file that can't be read or imported shows the error instead of closing the program.
 
 ## 8. Display

@@ -50,6 +50,10 @@ class GuideScreenState(private val session: BuilderSession) {
     var choiceIndex by mutableIntStateOf(-1)
         private set
 
+    /** Shown in the empty ability list when "Available" finds nothing (Kotlin only; VB leaves it blank). */
+    var nothingAvailable: String? by mutableStateOf(null)
+        private set
+
     /** picSelector (shown in place of the tree list) with lstGuideSub: name and selector number. */
     var selectorsShowing by mutableStateOf(false)
         private set
@@ -239,6 +243,7 @@ class GuideScreenState(private val session: BuilderSession) {
     private fun showGuideAvailable() {
         choices = emptyList()
         choiceIndex = -1
+        nothingAvailable = null
         val g = rules() ?: return
         val t = totals ?: g.totals()
         if (guideTree == 0) {
@@ -249,6 +254,9 @@ class GuideScreenState(private val session: BuilderSession) {
             return
         }
         choices = g.availableAbilities(guideTree, filter, t.level)
+        if (choices.isEmpty() && filter == GuideFilter.ALL_AVAILABLE) {
+            nothingAvailable = g.nothingAvailableMessage(guideTree, t.level)
+        }
     }
 
     // ---------------------------------------------------------------- abilities and selectors

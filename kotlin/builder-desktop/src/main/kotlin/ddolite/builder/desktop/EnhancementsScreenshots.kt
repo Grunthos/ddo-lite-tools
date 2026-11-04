@@ -4,6 +4,7 @@ import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.use
 import ddolite.builder.build.BuildPoints
+import ddolite.builder.build.GuideFilter
 import ddolite.builder.build.readBuildFile
 import ddolite.builder.ui.AbilityRowKey
 import ddolite.builder.ui.EnhancementDrag
@@ -91,6 +92,21 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
         screen.chooseTab(2)
         println("Guide: trees " + guide.trees.map { it.text } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
+        // "Available" on a Cleric tree at level 1 (the build's first Cleric level is 3).
+        val rules = prototype.rules
+        if (rules != null) {
+            for (i in guide.trees.indices) {
+                val number = guide.trees[i].number
+                if (number != 0 && rules.guideTrees[number - 1].characterClass?.name == "Cleric") {
+                    guide.chooseFilter(GuideFilter.ALL_AVAILABLE)
+                    guide.clickTree(i)
+                    println("  " + guide.trees[i].text + " Available: " + guide.nothingAvailable)
+                    shot(scene, outDir.resolve("39-guide-nothing-available.png"))
+                    guide.chooseFilter(GuideFilter.SELECTED_AVAILABLE)
+                    break
+                }
+            }
+        }
         guide.clickTree(guide.trees.indexOfFirst { it.text == "Kensei" })
         println("  Kensei offers " + guide.choices.size + ": " + guide.choices.take(4).map { it.text })
         guide.clickChoice(0)

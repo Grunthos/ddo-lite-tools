@@ -877,6 +877,31 @@ class GuideRules(private val rules: BuildRules) {
         return result
     }
 
+    /**
+     * Why "Available" lists nothing for guide tree [guide] at [guideLevel]: everything is already
+     * in the guide, or the earliest level anything left can be taken, or (when that level has been
+     * reached) that the rest need other abilities or AP spent first. Kotlin only: VB shows an empty
+     * list, which looks like a fault when, say, the build's first level is in another class.
+     */
+    fun nothingAvailableMessage(guide: Int, guideLevel: Int): String {
+        val name = guideTree(guide)?.display ?: ""
+        val left = availableAbilities(guide, GuideFilter.ALL_ENHANCEMENTS, guideLevel)
+        if (left.isEmpty()) {
+            return "Everything in $name is already in the guide."
+        }
+        var earliest = 0
+        for (c in left) {
+            val level = abilityMinLevel(guide, c.tier, c.ability, c.selector, c.rank)
+            if (level > 0 && (earliest == 0 || level < earliest)) {
+                earliest = level
+            }
+        }
+        if (earliest > guideLevel) {
+            return "Nothing in $name at level $guideLevel: the earliest is level $earliest."
+        }
+        return "Nothing in $name at level $guideLevel: the rest need other abilities, or more AP spent in the tree, first."
+    }
+
     /** "1: Abbr: Selector II". Ported from GuideBuildAbilityDisplay (:2694). */
     private fun abilityDisplay(tree: Tree, tier: Int, ability: Int, selector: Int, rank: Int): String {
         val data = tree.tiers[tier][ability]

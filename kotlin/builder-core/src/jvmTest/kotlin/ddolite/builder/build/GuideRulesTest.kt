@@ -98,6 +98,24 @@ class GuideRulesTest {
     }
 
     @Test
+    fun nothingAvailableSaysWhy() {
+        val rules = open()
+        val g = GuideRules(rules)
+        // The build's first Cleric level is 3, so a Cleric tree has nothing at levels 1 and 2.
+        var cleric = 0
+        for (t in g.treeList(false)) {
+            if (t.number != 0 && rules.guideTrees[t.number - 1].characterClass?.name == "Cleric") {
+                cleric = t.number
+                break
+            }
+        }
+        assertTrue(cleric > 0, "a Cleric tree")
+        assertTrue(g.availableAbilities(cleric, GuideFilter.ALL_AVAILABLE, 1).isEmpty())
+        val name = rules.guideTrees[cleric - 1].display
+        assertEquals("Nothing in $name at level 1: the earliest is level 3.", g.nothingAvailableMessage(cleric, 1))
+    }
+
+    @Test
     fun filters() {
         val rules = open()
         val g = GuideRules(rules)
