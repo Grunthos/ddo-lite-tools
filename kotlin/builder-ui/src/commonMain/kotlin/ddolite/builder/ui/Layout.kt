@@ -25,3 +25,6 @@ const val ITEM_GAP = 24
 /** A drop-down list box (ComboBox) and a button. */
 const val COMBO_HEIGHT = 21
 const val BUTTON_HEIGHT = 25
+
+/** Between a text area's edge and its text, all round: about half a line (the main window's output). */
+const val TEXT_INSET = 8

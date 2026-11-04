@@ -118,9 +118,9 @@ private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int, onL
     val plain = TextStyle(platformStyle = TEXT_RENDERING, fontSize = OUTPUT_FONT_SIZE)
     val indent = (measurer.measure("XXXXX", plain).size.width / density).toInt()
     val lineHeight = (measurer.measure("X", plain).size.height / density).toInt()
-    // ResizeOutput: the output starts cfg.OutputMargin spaces in.
+    // ResizeOutput: the output starts cfg.OutputMargin spaces in; Kotlin only: inside a [TEXT_INSET] all round.
     val marginWidth = if (margin > 0) (measurer.measure(" ".repeat(margin), plain).size.width / density).toInt() else 0
-    Column(modifier = Modifier.padding(start = marginWidth.dp, top = 0.dp)) {
+    Column(modifier = Modifier.padding(start = (TEXT_INSET + marginWidth).dp, top = TEXT_INSET.dp, end = TEXT_INSET.dp, bottom = TEXT_INSET.dp)) {
         for (line in lines) {
             Row(modifier = Modifier.height(lineHeight.dp)) {
                 val prefix = line.prefix

@@ -6,8 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,18 +47,34 @@ import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 import kotlin.time.TimeSource
 
-/** frmFeats' client width and the top of its footer, in pixels at 100%. */
+/** frmFeats' client area, in pixels at 100%. */
 private const val FEATS_WIDTH = 815
-private const val FEATS_FOOTER_TOP = 568
+private const val FEATS_HEIGHT = 593
 
-/** usrList's place on frmFeats. */
-private const val LIST_LEFT = 24
-private const val LIST_TOP = 40
+/*
+ * The layout, from the content corner (WindowFrame): the feat slots on the left, with their
+ * headers on the first line; to the right the feat and selector lists under their captions, and
+ * under them the details beside the filter list, both ending level with the slots.
+ */
+
+/** usrList: at the content corner. Its column headers sit on the first line, its border a line down. */
+private const val LIST_LEFT = 0
+private const val LIST_TOP = 0
 private const val LIST_WIDTH = 409
-private const val LIST_HEIGHT = 521
+private const val LIST_HEADER = LINE
+private const val LIST_HEIGHT = LIST_HEADER + 491
 
-/** usrList's column headers sit above its border, which starts 30 pixels down (mlngTop). */
-private const val LIST_HEADER = 30
+/** The feat list and the selector list beside it, under their captions. */
+private const val FEATS_LEFT = LIST_WIDTH + GAP
+private const val FEATS_LIST_WIDTH = 185
+private const val SELECTORS_LEFT = FEATS_LEFT + FEATS_LIST_WIDTH + GAP
+private const val LISTS_TOP = LINE
+private const val LISTS_HEIGHT = 282
+
+/** The details caption, then the box (under the feat list) beside the filter list (under the selectors). */
+private const val DETAILS_CAPTION_TOP = LISTS_TOP + LISTS_HEIGHT + 10
+private const val DETAILS_TOP = DETAILS_CAPTION_TOP + LINE
+private const val DETAILS_HEIGHT = LIST_HEIGHT - DETAILS_TOP
 
 /** userList's DEFAULT_MAX_ROWS: more rows than this get a scroll bar. */
 private const val MAX_ROWS = 21
@@ -90,22 +104,17 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     var pointer by remember { mutableStateOf(Offset.Zero) }
     var menuAt by remember { mutableStateOf<Offset?>(null) }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(PointerEventPass.Initial)
-                        pointer = event.changes[0].position
-                    }
+    WindowFrame(
+        theme, FEATS_WIDTH, FEATS_HEIGHT,
+        modifier = Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    pointer = event.changes[0].position
                 }
-            },
-    ) {
-        if (rules != null) {
-            FeatsBody(screen, rules, theme) { menuAt = pointer }
-        }
-        Column(modifier = Modifier.fillMaxWidth()) {
+            }
+        },
+        header = {
             // usrHeader_Click (frmFeats.frm:343): a tab, or Help.
             val captions = ArrayList<String>()
             var current = 0
@@ -131,8 +140,8 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                     }
                 },
             )
-        }
-        Box(modifier = Modifier.offset(0.dp, FEATS_FOOTER_TOP.dp).size(FEATS_WIDTH.dp, 26.dp)) {
+        },
+        footer = {
             // LoadData (:426): "Spells >" for casters, else "Enhancements >". usrFooter_Click (:350).
             var next = "Enhancements >"
             if (rules != null && rules.build.canCastSpell[1] != 0) {
@@ -146,44 +155,51 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                 isEnabled = { true },
                 onClick = { link -> onNavigate(link) },
             )
-        }
-        if (screen.hasChannels()) {
-            CheckBox(theme, "Channels", screen.channels, true, 368, 576, 113) { screen.changeChannels(!screen.channels) }
-        }
-        FeatDragGhost(screen, theme)
+        },
+        overlay = {
+            // usrchkChannels, in the footer (window coordinates).
+            if (screen.hasChannels()) {
+                CheckBox(theme, "Channels", screen.channels, true, 368, FEATS_HEIGHT - BAR_HEIGHT + 8, 113) { screen.changeChannels(!screen.channels) }
+            }
+            FeatDragGhost(screen, theme)
 
-        // The slot menu (mnuMain(0)), opened by a right-click on a slot (ContextMenu, :749).
-        val at = menuAt
-        if (at != null && screen.menuRow != 0) {
-            val items = screen.menuItems()
-            PopupMenu(items, -1, at, density, onChoose = { index ->
-                menuAt = null
-                screen.chooseMenu(items[index])
-            }, onDismiss = {
-                menuAt = null
-                screen.closeMenu()
-            }, clientWidth = FEATS_WIDTH)
+            // The slot menu (mnuMain(0)), opened by a right-click on a slot (ContextMenu, :749).
+            val at = menuAt
+            if (at != null && screen.menuRow != 0) {
+                val items = screen.menuItems()
+                PopupMenu(items, -1, at, density, onChoose = { index ->
+                    menuAt = null
+                    screen.chooseMenu(items[index])
+                }, onDismiss = {
+                    menuAt = null
+                    screen.closeMenu()
+                }, clientWidth = FEATS_WIDTH)
+            }
+        },
+    ) { area ->
+        if (rules != null) {
+            FeatsBody(screen, rules, theme, area) { menuAt = pointer }
         }
     }
 }
 
 @Composable
-private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, onMenu: () -> Unit) {
+private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
     SlotList(screen, rules, theme, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
     if (!granted) {
         // lblFeats, usrchkShowAll (moved to its right by FeatListTitle), lblSelectors.
-        Label(screen.listTitle, label, 448, 48)
-        CheckBox(theme, "Show All", screen.showAll, true, 544, 46, 89) { screen.changeShowAll(!screen.showAll) }
-        Label("Selectors", label, 648, 48)
+        Label(screen.listTitle, label, FEATS_LEFT, 0)
+        CheckBox(theme, "Show All", screen.showAll, true, FEATS_LEFT + 96, -2, FEATS_LIST_WIDTH - 96) { screen.changeShowAll(!screen.showAll) }
+        Label("Selectors", label, SELECTORS_LEFT, 0)
         val featNames = ArrayList<String>()
         for (feat in screen.feats) {
             featNames.add(screen.listCaption(feat))
         }
         ListBox(
-            theme, featNames, { i -> i == screen.featIndex }, 448, 64, 185, 282, screen,
+            theme, featNames, { i -> i == screen.featIndex }, FEATS_LEFT, LISTS_TOP, FEATS_LIST_WIDTH, LISTS_HEIGHT, screen,
             dragItem = { i -> FeatDrag.FromList(screen.feats[i]) },
             dropKey = FeatListKey,
             onPress = { i, _ -> screen.clickFeat(i) },
@@ -194,7 +210,7 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
             selectorNames.add(s.name)
         }
         ListBox(
-            theme, selectorNames, { i -> i == screen.selectorIndex }, 648, 64, 145, 282, screen,
+            theme, selectorNames, { i -> i == screen.selectorIndex }, SELECTORS_LEFT, LISTS_TOP, area.width - SELECTORS_LEFT, LISTS_HEIGHT, screen,
             dragItem = { _ ->
                 val feat = screen.feats.getOrNull(screen.featIndex)
                 if (feat == null) null else FeatDrag.FromList(feat)
@@ -206,30 +222,32 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
     // Details: lblDetails (a link that widens or restores the box), >> and <<, usrDetails.
     val details = screen.details
     val expanded = screen.detailsExpanded
-    var detailsWidth = 185
+    // Under the feat list, or widened over the filter list out to the right margin.
+    var detailsWidth = FEATS_LIST_WIDTH
     if (expanded) {
-        detailsWidth = 345
+        detailsWidth = area.width - FEATS_LEFT
     }
     BasicText(
         details.caption,
         style = label.copy(fontWeight = FontWeight.Bold),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.offset(448.dp, 356.dp).width((detailsWidth - 22).dp).clickable { screen.toggleDetails() },
+        modifier = Modifier.offset(FEATS_LEFT.dp, DETAILS_CAPTION_TOP.dp).width((detailsWidth - 22).dp).clickable { screen.toggleDetails() },
     )
     if (!granted) {
-        // lblExpand ">>" while normal size, lblRestore "<<" while widened (when shown).
+        // lblExpand ">>" while normal size, lblRestore "<<" while widened (when shown): at the box's right.
         if (!expanded) {
-            BasicText(">>", style = link, modifier = Modifier.offset(611.dp, 356.dp).clickable { screen.toggleDetails() })
+            BasicText(">>", style = link, modifier = Modifier.offset((FEATS_LEFT + detailsWidth - 22).dp, DETAILS_CAPTION_TOP.dp).clickable { screen.toggleDetails() })
         } else if (screen.restoreLinkShown) {
-            BasicText("<<", style = link, modifier = Modifier.offset(771.dp, 356.dp).clickable { screen.toggleDetails() })
+            BasicText("<<", style = link, modifier = Modifier.offset((FEATS_LEFT + detailsWidth - 22).dp, DETAILS_CAPTION_TOP.dp).clickable { screen.toggleDetails() })
         }
     }
-    DetailsBox(screen, theme, 448, 372, detailsWidth, 189)
+    DetailsBox(screen, theme, FEATS_LEFT, DETAILS_TOP, detailsWidth, DETAILS_HEIGHT)
     if (!expanded) {
-        Label("Filter", label, 648, 356)
+        // The same height as the details box (VB's runs 8 pixels lower).
+        Label("Filter", label, SELECTORS_LEFT, DETAILS_CAPTION_TOP)
         ListBox(
-            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, 648, 372, 145, 197, screen,
+            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, SELECTORS_LEFT, DETAILS_TOP, area.width - SELECTORS_LEFT, DETAILS_HEIGHT, screen,
             onPress = { i, ctrl -> screen.clickGroup(i, ctrl) },
         )
     }
