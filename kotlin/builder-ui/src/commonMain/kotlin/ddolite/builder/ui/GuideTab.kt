@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,10 +53,10 @@ private const val ROW_HEIGHT = 22
  * Tree, AP, Prog) with the totals under it. Laid out from the form's positions; the grid's
  * columns are sized as InitGrid (:3597) does, to their headers and the widest tree name.
  *
- * Kotlin layout changes: the lists are 16 pixels shorter, with the Cost, Spent in Tree and Min Level
- * labels between the details caption and the box (VB has them under the box), lined up with its
- * edges, which leaves the whole
- * bottom line for the totals, whose level caption also gives the build's classes.
+ * Kotlin layout changes: the lists are 24 pixels shorter; the details caption is bold, with the Cost,
+ * Spent in Tree and Min Level labels between it and the box (VB has them under the box), lined up
+ * with the box's edges; and the totals (whose level caption also gives the build's classes) are
+ * right-aligned under the grid.
  *
  * Not copied yet: dragging past the grid's top or bottom to scroll while selecting (tmrScroll).
  */
@@ -73,10 +74,10 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             names.add(s.text)
         }
         ListBox(
-            theme, names, isSelected = { it == screen.selectorIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 189,
+            theme, names, isSelected = { it == screen.selectorIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 181,
             drag = drag, onPress = { i, _ -> screen.clickSelector(i) }, onDoubleClick = { screen.chooseAbility() },
         )
-        GuideButton(theme, "Back to Trees", 24, TAB_TOP + 232, 109, 25) { screen.backToTrees() }
+        GuideButton(theme, "Back to Trees", 24, TAB_TOP + 224, 109, 25) { screen.backToTrees() }
     } else {
         CheckBox(theme, "Show All", screen.showAllTrees, true, 16, TAB_TOP + 16, 125) { screen.toggleShowAllTrees() }
         val names = ArrayList<String>()
@@ -84,7 +85,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             names.add(t.text)
         }
         ListBox(
-            theme, names, isSelected = { it == screen.treeIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 221,
+            theme, names, isSelected = { it == screen.treeIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 213,
             drag = drag, onPress = { i, _ -> screen.clickTree(i) },
         )
     }
@@ -95,7 +96,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         choiceTexts.add(c.text)
     }
     ListBox(
-        theme, choiceTexts, isSelected = { it == screen.choiceIndex }, left = 156, top = TAB_TOP + 36, width = 229, height = 221,
+        theme, choiceTexts, isSelected = { it == screen.choiceIndex }, left = 156, top = TAB_TOP + 36, width = 229, height = 213,
         drag = drag, onPress = { i, _ -> screen.clickChoice(i) }, onDoubleClick = { screen.chooseAbility() },
     )
     val nothing = screen.nothingAvailable
@@ -106,7 +107,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     }
 
     // Details.
-    Label(screen.detailsCaption, label, 16, TAB_TOP + 262)
+    Label(screen.detailsCaption, label.copy(fontWeight = FontWeight.Bold), 16, TAB_TOP + 262)
     DetailsBox(theme, screen.details, 16, TAB_TOP + 296, 369, 168)
     val cost = screen.costLabel
     if (cost != null) {
@@ -343,13 +344,12 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     if (totals != null) {
         val error = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
         val spentWidth = measure(totals.spentCaption())
-        // Kotlin only: Available and Spent right-aligned to the grid's outside edge, a gap apart (VB
-        // centres Available under the grid).
+        // Kotlin only: Level, Available and Spent right-aligned to the grid's outside edge, a gap apart
+        // (VB has the level at the grid's left and centres Available under it).
         val spentLeft = GRID_LEFT + GRID_WIDTH - spentWidth
         val apLeft = spentLeft - 24 - measure(totals.apCaption())
-        // Kotlin only: the level caption starts under the details box (VB's is under the grid, where
-        // the classes wouldn't fit).
-        Label(totals.levelCaption(), label, 16, TAB_TOP + 468)
+        val levelLeft = apLeft - 24 - measure(totals.levelCaption())
+        Label(totals.levelCaption(), label, levelLeft, TAB_TOP + 468)
         val apStyle = if (totals.ap < 0) label.copy(color = error) else label
         BasicText(totals.apCaption(), style = apStyle, maxLines = 1, modifier = Modifier.offset(apLeft.dp, (TAB_TOP + 468).dp))
         val spentStyle = if (totals.spentError) label.copy(color = error) else label
