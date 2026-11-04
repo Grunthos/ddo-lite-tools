@@ -5,6 +5,7 @@ Settings.txt
 spells.csv
 error.log
 crawl.txt
+.idea
 master
 *.zip
 *.tmp
