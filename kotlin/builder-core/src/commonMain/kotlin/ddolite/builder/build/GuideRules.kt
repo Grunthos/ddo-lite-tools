@@ -80,14 +80,13 @@ class GuideTotals(
     val classes: String = "",
 ) {
     /**
-     * "Cur. Level: 3", then (Kotlin only, unless [withClasses] is false) the build's classes at that
-     * level: "Cur. Level: 3 (Rog 1/Wiz 2)".
+     * VB's "Cur. Level: 3"; Kotlin only, with the build's classes at that level: "Level: 3 (Rog 1/Wiz 2)".
      */
-    fun levelCaption(withClasses: Boolean = true): String {
-        if (!withClasses || classes.isEmpty()) {
+    fun levelCaption(): String {
+        if (classes.isEmpty()) {
             return "Cur. Level: $level"
         }
-        return "Cur. Level: $level ($classes)"
+        return "Level: $level ($classes)"
     }
 
     fun apCaption(): String = "Available: $ap + ${racialAvailable}r + ${universalAvailable}u"

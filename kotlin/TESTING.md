@@ -276,9 +276,9 @@ the Kotlin output with these files and list every difference.
 - [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,
       Warpriest at level 1: "Nothing in Warpriest at level 1: the earliest is level 3." (new; VB
       leaves the list blank).
-- [ ] Leveling Guide, "Cur. Level" also gives the build's classes at that level, e.g. "Cur. Level: 3
-      (Ftr 2/Clr 1)" (new; VB shows just the level). With three classes it may not fit beside
-      "Available"; then it shows just the level.
+- [ ] Leveling Guide, bottom left: "Level: 3 (Ftr 2/Clr 1)", the build's classes at the guide's level
+      (new; VB shows "Cur. Level: 3" under the grid). Cost, Spent in Tree and Min Level are above the
+      details caption, and the lists are a little shorter to make room (VB has them under the box).
 - [ ] A file that can't be read or imported shows the error instead of closing the program.
 
 ## 8. Display
