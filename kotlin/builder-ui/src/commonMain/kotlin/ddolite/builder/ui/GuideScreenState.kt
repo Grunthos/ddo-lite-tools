@@ -54,6 +54,10 @@ class GuideScreenState(private val session: BuilderSession) {
     var nothingAvailable: String? by mutableStateOf(null)
         private set
 
+    /** "Spent in Kensei: 13 AP" for the selected tree, under the details (Kotlin only); null with none. */
+    var treeSpent: String? by mutableStateOf(null)
+        private set
+
     /** picSelector (shown in place of the tree list) with lstGuideSub: name and selector number. */
     var selectorsShowing by mutableStateOf(false)
         private set
@@ -249,6 +253,7 @@ class GuideScreenState(private val session: BuilderSession) {
         choices = emptyList()
         choiceIndex = -1
         nothingAvailable = null
+        treeSpent = null
         val g = rules() ?: return
         val t = totals ?: g.totals()
         if (guideTree == 0) {
@@ -259,6 +264,7 @@ class GuideScreenState(private val session: BuilderSession) {
             return
         }
         choices = g.availableAbilities(guideTree, filter, t.level)
+        treeSpent = g.treeSpentCaption(guideTree)
         if (choices.isEmpty() && filter == GuideFilter.ALL_AVAILABLE) {
             nothingAvailable = g.nothingAvailableMessage(guideTree, t.level)
         }
@@ -592,6 +598,7 @@ class GuideScreenState(private val session: BuilderSession) {
         choices = emptyList()
         choiceIndex = -1
         nothingAvailable = null
+        treeSpent = null
     }
 
     /**

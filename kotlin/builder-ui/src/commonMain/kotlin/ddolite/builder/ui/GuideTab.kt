@@ -160,6 +160,12 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, area: ContentArea,
         BasicText(levels, style = style, modifier = Modifier.offset(0.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
     }
 
+    // Kotlin only: what the guide spends in the selected tree, bottom left on the totals line.
+    val treeSpent = screen.treeSpent
+    if (treeSpent != null) {
+        Label(treeSpent, label, 0, TOTALS_TOP)
+    }
+
     GuideGrid(screen, theme, area.width - GRID_LEFT, onMenu)
 
     // The combo goes last so its list drops over the ability list.

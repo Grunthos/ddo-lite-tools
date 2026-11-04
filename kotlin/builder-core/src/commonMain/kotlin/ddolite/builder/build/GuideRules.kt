@@ -928,6 +928,16 @@ class GuideRules(private val rules: BuildRules) {
     }
 
     /**
+     * "Spent in Kensei: 13 AP": what the whole guide spends in guide tree [guide] (after any resets).
+     * Kotlin only: VB shows only the spend at the chosen row ("Spent in Tree").
+     */
+    fun treeSpentCaption(guide: Int): String {
+        val g = guideTree(guide) ?: return ""
+        val spent = enhancements.spentInTree(g.tree, g.guideBuildTree).total
+        return "Spent in " + g.display + ": " + spent + " AP"
+    }
+
+    /**
      * Why "Available" lists nothing for guide tree [guide] at [guideLevel]: everything is already
      * in the guide, or the earliest level anything left can be taken, or (when that level has been
      * reached) that the rest need other abilities or AP spent first. Kotlin only: VB shows an empty
