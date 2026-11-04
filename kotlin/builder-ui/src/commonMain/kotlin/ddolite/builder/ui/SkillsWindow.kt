@@ -3,6 +3,7 @@ package ddolite.builder.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -240,11 +241,50 @@ internal fun PopupMenu(
             height += 22
         }
     }
-    var left = (at.x / density).toInt()
-    if (left + width > clientWidth) {
-        left = clientWidth - width
+    // Inside the window, as Windows places a menu: leftward from the pointer if it would pass the
+    // right edge, upward if it would pass the bottom (the window's size when known, else clientWidth).
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        var windowWidth = clientWidth
+        if (constraints.hasBoundedWidth) {
+            windowWidth = (constraints.maxWidth / density).toInt()
+        }
+        var windowHeight = Int.MAX_VALUE
+        if (constraints.hasBoundedHeight) {
+            windowHeight = (constraints.maxHeight / density).toInt()
+        }
+        val x = (at.x / density).toInt()
+        val y = (at.y / density).toInt()
+        var left = x
+        if (left + width > windowWidth) {
+            left = x - width
+        }
+        if (left < 0) {
+            left = 0
+        }
+        var top = y
+        if (top + height > windowHeight) {
+            top = y - height
+        }
+        if (top < 0) {
+            top = 0
+        }
+        MenuBody(items, checked, left, top, width, height, onChoose, onDismiss, enabled)
     }
-    val top = (at.y / density).toInt()
+}
+
+/** The [PopupMenu] at [left], [top]: the press-catcher behind it, and the items. */
+@Composable
+private fun MenuBody(
+    items: List<String>,
+    checked: Int,
+    left: Int,
+    top: Int,
+    width: Int,
+    height: Int,
+    onChoose: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    enabled: (Int) -> Boolean,
+) {
     var hover by remember { mutableIntStateOf(-1) }
     // A press outside the menu closes it, and goes no further (as a Windows menu).
     Box(

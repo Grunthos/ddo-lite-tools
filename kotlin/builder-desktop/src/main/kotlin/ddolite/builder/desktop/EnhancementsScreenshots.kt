@@ -1,6 +1,10 @@
 package ddolite.builder.desktop
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.use
 import ddolite.builder.build.BuildPoints
@@ -84,6 +88,7 @@ fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: P
  * a guide built from the lists (the Kensei core, then the first few offered, a bank and a reset),
  * rows selected, and the row menu.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
     val file = repoRoot.resolve("Save").resolve("Kensei Warpriest.build")
     prototype.openBuild(readBuildFile(Files.readAllBytes(file), prototype.data, BuildPoints.ADVENTURER))
@@ -157,6 +162,14 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
         }
         println("  " + guide.rows().size + " rows, first shown " + guide.scroll)
         shot(scene, outDir.resolve("43-guide-scrolling.png"))
+        // Right-click the bottom row's Ability cell: the menu opens upward, inside the window.
+        scene.render()
+        val bottomRow = Offset(500f, 56f + 19 * 22f + 11f)
+        scene.sendPointerEvent(PointerEventType.Move, bottomRow)
+        scene.sendPointerEvent(PointerEventType.Press, bottomRow, buttons = PointerButtons(isSecondaryPressed = true), button = androidx.compose.ui.input.pointer.PointerButton.Secondary)
+        scene.sendPointerEvent(PointerEventType.Release, bottomRow, buttons = PointerButtons(), button = androidx.compose.ui.input.pointer.PointerButton.Secondary)
+        println("  menu at the bottom row: " + guide.menuItems().map { it.caption })
+        shot(scene, outDir.resolve("44-guide-menu-bottom.png"))
     }
 }
 

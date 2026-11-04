@@ -275,6 +275,8 @@ the Kotlin output with these files and list every difference.
 - [ ] "(Errors)" after a heading in the main window is a link to that window (new; not in VB).
 - [ ] Leveling Guide grid: past 20 rows its scroll bar comes on (it stayed greyed before); the arrows
       and the track move a row, and the thumb drags.
+- [ ] Right-click menus near the bottom or right edge open upward or leftward, inside the window
+      (e.g. the bottom row of the Leveling Guide grid); they were cut off.
 - [ ] Text is crisp (ClearType-style smoothing and hinting), and the menu bar, message boxes and
       file dialogs look like Windows' own (they were Swing's bold "Metal" style).
 - [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,
