@@ -1,11 +1,30 @@
 # Manual checks: Kotlin against VB
 
-Things to compare by hand when there's time. Run the Kotlin version with
-`./gradlew :builder-desktop:run` (from `kotlin/`), and the VB Character Builder Lite next to it
-on the same build. Tick items off, or note what differs under the item.
+Things to compare by hand. Run the Kotlin version with `./gradlew :builder-desktop:run` (from
+`kotlin/`), or the portable app (`./gradlew :builder-desktop:portableZip`, then
+`builder-desktop/build/portable/CharacterBuilderLiteNG/CharacterBuilderLiteNG.exe`), and VB's Character
+Builder Lite 4.15 next to it on the same build. Tick items off, or note what differs under the item.
 
 The most useful first pass: open each file in `Save/` in both, then go through the windows in order and
 look for anything different.
+
+## 0. Capturing VB's output (golden files, PLAN.md §6)
+
+With the 4.15 exe, VB's exports can be saved once and compared by the tests every time, which is
+far more thorough than comparing by eye. For each build in `Save/` (and any others worth keeping):
+
+- [ ] Open it in VB 4.15 (or start `CharacterBuilderLite.exe "<file>"`).
+- [ ] File › Export › to Forums: for each format (DDO Forums, Code Tags, Plain Text, Reddit, and any
+      other `.bbcodes` in Settings), Section "All Sections", Save to File as
+      `kotlin/golden/snapshot-4.15/builds/<build name>/forum-<format>.txt`.
+- [ ] File › Export › to DDO Builder → `ddobuilder.ddocp` in the same folder (to Ron's Planner fails
+      in VB, VB-BUGS 6a). File › Export › Leveling Guide › csv and txt → `guide.csv`, `guide.txt`
+      (builds with a guide only).
+- [ ] Once: start VB with "Show Error Log on startup" on and copy its `Error.log` to
+      `kotlin/golden/snapshot-4.15/error.log`.
+
+Put a copy of the `.build` beside its exports as `input.build`. I'll then write the tests that compare
+the Kotlin output with these files and list every difference.
 
 ## 1. Questions only VB can answer
 
@@ -53,7 +72,8 @@ look for anything different.
 - [ ] Tomes: Supreme raises every stat to at least its value; the cap by max level and its note.
 - [ ] Templates for the main class; the class link switches classes; warnings show for 5 seconds.
 - [ ] Applied templates give the same stats and level-ups as VB (e.g. Fighter THF).
-- [ ] Clear Stats asks "Keep tomes?" (or "Clear stats and levelups?" with no tomes) and does the same.
+- [ ] Clear Stats asks "Keep tomes?" (or "Clear stats and levelups?" with no tomes) and does the same;
+      afterwards the preferred column is the Default Build Points from Options (fixed 2026-11-05).
 - [ ] Schedule tab: every number against VB for a few builds.
 
 ## 5. Skills
@@ -231,6 +251,29 @@ look for anything different.
 - [ ] Main window: drag the output with the mouse when it has scroll bars (hand cursor).
 - [ ] Window menu: Cascade Windows (from the screen's top-left, as VB), the open windows in VB's order
       with the active one ticked. **VB bug to confirm:** the Destinies window is never listed (22i).
+
+## 7j. Undo and Redo (new: VB has none)
+
+- [ ] Edit › Undo / Redo, and Ctrl+Z / Ctrl+Y in the build windows (not in a text box, which undoes its
+      own typing): each change goes back one step at a time, in every window, and Redo brings it back.
+- [ ] Typing a build name or notes undoes as one step; each spinner click or rank arrow is a step.
+- [ ] Undoing back to the saved or opened state clears the `*`; a new change after an undo drops Redo.
+- [ ] Opening, New and Import start the history again.
+
+## 7k. Re-check: fixed after the first comparison (2026-11-04)
+
+- [ ] Lists, details boxes and the main window have scroll bars (the lists and details boxes always,
+      greyed when not needed; the main window and slot lists only when needed).
+- [ ] The main window stays the size you leave it when other windows open (it re-maximized before).
+- [ ] "Next >" / "< Back" open the next window where the last one was.
+- [ ] The Edit windows can't be resized (Fixed Dialogs, as VB's).
+- [ ] At 125% or 150% Windows scaling, the Feats, Trees and Destinies slot lists keep their size, and 7
+      enhancement trees fit without scrolling.
+- [ ] Rank arrows work on an ability just added (they didn't until the list was redrawn).
+- [ ] Details boxes (e.g. Destinies, bottom right): the text stays inside the box and wraps beside the
+      scroll bar.
+- [ ] "(Errors)" after a heading in the main window is a link to that window (new; not in VB).
+- [ ] A file that can't be read or imported shows the error instead of closing the program.
 
 ## 8. Display
 
