@@ -135,7 +135,7 @@ fun main(args: Array<String>) {
         prototype.export.chooseFormat("DDO Forums")
     }
     prototype.export.close()
-    ImageComposeScene(width = 474, height = 428, density = Density(1f)) { ddolite.builder.ui.OptionsWindowContent(prototype) }.use { scene ->
+    ImageComposeScene(width = ddolite.builder.ui.OPTIONS_WIDTH, height = ddolite.builder.ui.OPTIONS_HEIGHT, density = Density(1f)) { ddolite.builder.ui.OptionsWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("7e-options.png"))
     }
     // The Help window (Help on the Leveling Guide tab, then a help link) and About.

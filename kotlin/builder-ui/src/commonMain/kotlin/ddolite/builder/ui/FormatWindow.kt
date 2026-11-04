@@ -150,45 +150,60 @@ class FormatScreenState(private val session: BuilderSession) {
 /**
  * The format editor (frmFormat, "Output Format"): Load, Save As, Apply Changes and Help along the top;
  * Text Colors, Use Dots, Reddit and BBCodes; and in the BBCodes frame each kind of tag with its
- * open and close text. Laid out from the form: the client area is 368 x 436 at 100%.
+ * open and close text. In a [WindowFrame] (no footer), the links in its header bar; the client area
+ * is 368 x 436 at 100%. Controls are placed from the content corner, the tags from the BBCodes
+ * frame's corner (VB's positions are in frmFormat.frm).
  */
+/** frmFormat's client area, pixels at 100%. */
+private const val FORMAT_WIDTH = 368
+private const val FORMAT_HEIGHT = 436
+
 @Composable
 fun FormatWindowContent(state: BuilderSession) {
     val screen = state.format
     val theme = state.skills.theme
     val f = screen.format
-    val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
-    val dimLink = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_DIM))
     val tags = screen.tagsEnabled
     val labelColor = theme.color(ColorGroup.WORKSPACE, if (tags) ColorValue.TEXT else ColorValue.TEXT_DIM)
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = labelColor)
 
-    Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        // shpNav and the links.
-        Box(modifier = Modifier.size(368.dp, 26.dp).background(theme.color(ColorGroup.NAVIGATION, ColorValue.BACKGROUND)))
-        BasicText("Load", style = link, modifier = Modifier.offset(18.dp, 6.dp).clickable { screen.load() })
-        BasicText("Save As", style = link, modifier = Modifier.offset(87.dp, 6.dp).clickable { screen.saveAs() })
-        var apply = Modifier.offset(178.dp, 6.dp)
-        if (screen.dirty) {
-            apply = apply.clickable { screen.apply() }
-        }
-        BasicText("Apply Changes", style = if (screen.dirty) link else dimLink, modifier = apply)
-        BasicText("Help", style = link, modifier = Modifier.offset(322.dp, 6.dp).clickable { state.help.show("Output Format") })
+    WindowFrame(
+        theme, FORMAT_WIDTH, FORMAT_HEIGHT,
+        header = {
+            // shpNav and the links; Apply Changes only with something to apply.
+            HeaderBar(
+                theme,
+                listOf("Load", "Save As", "Apply Changes"),
+                null,
+                listOf("Help"),
+                isEnabled = { item -> item != "Apply Changes" || screen.dirty },
+                onClick = { item ->
+                    when (item) {
+                        "Load" -> screen.load()
+                        "Save As" -> screen.saveAs()
+                        "Apply Changes" -> screen.apply()
+                        "Help" -> state.help.show("Output Format")
+                    }
+                },
+            )
+        },
+        footer = null,
+    ) { area ->
+        CheckBox(theme, "Text Colors", f.textColors, true, 8, 12, 121) { screen.change(f.copy(textColors = !f.textColors)) }
+        CheckBox(theme, "Use Dots", f.dots, screen.styleEnabled, 8, 36, 121) { screen.change(f.copy(dots = !f.dots)) }
+        CheckBox(theme, "Reddit", f.reddit, true, 224, 12, 105) { screen.change(f.copy(reddit = !f.reddit)) }
 
-        CheckBox(theme, "Text Colors", f.textColors, true, 28, 44, 121) { screen.change(f.copy(textColors = !f.textColors)) }
-        CheckBox(theme, "Use Dots", f.dots, screen.styleEnabled, 28, 68, 121) { screen.change(f.copy(dots = !f.dots)) }
-        CheckBox(theme, "Reddit", f.reddit, true, 244, 44, 105) { screen.change(f.copy(reddit = !f.reddit)) }
-
-        // fraFormat at (20, 92): Shape1 is its border, from 8 down; the BBCodes check box sits on it as its caption.
+        // fraFormat: Shape1 is its border, from 8 down, out to the right margin; the BBCodes check box
+        // sits on it as its caption. The tags are placed from its corner.
+        val x = 0
+        val y = 60
         Box(
-            modifier = Modifier.offset(20.dp, 100.dp).size(329.dp, 317.dp)
+            modifier = Modifier.offset(x.dp, (y + 8).dp).size(area.width.dp, 317.dp)
                 .border(1.dp, theme.color(ColorGroup.WORKSPACE, ColorValue.BORDER_EXTERIOR)),
         )
-        Box(modifier = Modifier.offset(28.dp, 92.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
+        Box(modifier = Modifier.offset((x + 8).dp, y.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
             CheckBox(theme, "BBCodes", f.codes, screen.styleEnabled, 0, 0, 81) { screen.change(f.copy(codes = !f.codes)) }
         }
-        val x = 20
-        val y = 92
         CenteredLabel("Open", label, x + 124, y + 24, 97)
         CenteredLabel("Close", label, x + 228, y + 24, 73)
         TagRow(theme, "Bold", f.bold, tags, x, y + 40) { screen.change(f.copy(bold = it)) }

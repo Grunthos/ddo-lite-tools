@@ -36,17 +36,38 @@ import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 import kotlinx.coroutines.delay
 
-/** userStats' left edges on frmStats, one per point-buy column (usrStats(0..3)). */
-private val COLUMN_LEFTS = listOf(40, 168, 296, 424)
+/** frmStats' client area, in pixels at 100%. */
+private const val STATS_WIDTH = 815
+private const val STATS_HEIGHT = 549
 
-/** chkTemplate(0..3) and lblTemplate(0..3) tops. */
-private val TEMPLATE_TOPS = listOf(348, 384, 420, 456)
+/*
+ * The Stats tab's layout, from the content corner (WindowFrame): two rows of captioned frames. Base
+ * Stats and Levelups on top, Tomes and Templates under them; the right-hand frames end at the right
+ * margin. Controls are placed from their frame's corner.
+ */
+private const val BASE_WIDTH = 529
+private const val BASE_HEIGHT = 249
+private const val LEVELUPS_LEFT = BASE_WIDTH + GAP
+private const val LEVELUPS_HEIGHT = 281
+private const val ROW2_TOP = 280
+private const val ROW2_HEIGHT = 185
+private const val TOMES_WIDTH = 233
+private const val TEMPLATES_LEFT = TOMES_WIDTH + GAP
+
+/** userStats' left edges in Base Stats, one per point-buy column (usrStats(0..3)), and their top. */
+private const val COLUMNS_LEFT = 24
+private const val COLUMN_STEP = 128
+private const val COLUMNS_TOP = 72
+
+/** chkTemplate(0..3): the first one's top in Templates, and the step between them. */
+private const val TEMPLATE_TOP = 28
+private const val TEMPLATE_STEP = 36
 
 /**
  * The Stats window: header (Stats;Schedule | Help), the four groups (Base Stats with the four
  * point-buy columns, Levelups, Tomes, Templates) or the Schedule, and the footer
- * (< Overview, Clear Stats, Skills >). Laid out from frmStats.frm's control positions
- * (tools/form-layout's frmStats.md); the window's client area is 815 x 549 at 100%.
+ * (< Overview, Clear Stats, Skills >), in a [WindowFrame]; the client area is 815 x 549 at 100%.
+ * VB's positions are in tools/form-layout's frmStats.md.
  *
  * [onNavigate] gets the footer's "< Overview" and "Skills >".
  */
@@ -57,15 +78,9 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     @Suppress("UNUSED_VARIABLE")
     val revision = state.revision // read so this redraws when the build changes
     val rules = screen.rules
-    Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        if (rules != null) {
-            if (screen.scheduleTab) {
-                Schedule(rules, theme, 8, 32, 797, 477)
-            } else {
-                StatsGroups(screen, rules, theme)
-            }
-        }
-        Column(modifier = Modifier.fillMaxWidth()) {
+    WindowFrame(
+        theme, STATS_WIDTH, STATS_HEIGHT,
+        header = {
             HeaderBar(
                 theme,
                 listOf("Stats", "Schedule"),
@@ -80,8 +95,8 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                     }
                 },
             )
-        }
-        Box(modifier = Modifier.offset(0.dp, 520.dp).size(815.dp, 26.dp)) {
+        },
+        footer = {
             // usrFooter_Click (:1003).
             HeaderBar(
                 theme,
@@ -98,6 +113,14 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                 },
                 centerLink = "Clear Stats",
             )
+        },
+    ) { area ->
+        if (rules != null) {
+            if (screen.scheduleTab) {
+                Schedule(rules, theme, 0, 0, area.width, area.height)
+            } else {
+                StatsGroups(screen, rules, theme, area)
+            }
         }
     }
     // tmrWarning (Interval 5000): a template's warning shows for five seconds.
@@ -111,96 +134,104 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 }
 
 @Composable
-private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme) {
+private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme, area: ContentArea) {
     val build = rules.build
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var openList by remember { mutableStateOf("") }
 
     // ---- Base Stats (fraGroup(0))
-    GroupFrame(theme, "Base Stats", 16, 40, 529, 249)
-    Label("Preferred Build Points:", label, 40, 74)
-    ComboBox(theme, control, build.buildPoints.displayName, 184, 72, 105, 21) { openList = if (openList == "points") "" else "points" }
-    Label(rules.pointsLabel(), label, 296, 74)
+    GroupFrame(theme, "Base Stats", 0, 0, BASE_WIDTH, BASE_HEIGHT)
+    Label("Preferred Build Points:", label, 24, 34)
+    ComboBox(theme, control, build.buildPoints.displayName, 168, 32, 105, 21) { openList = if (openList == "points") "" else "points" }
+    Label(rules.pointsLabel(), label, 280, 34)
     for (column in BuildPoints.entries) {
-        StatsColumn(screen, rules, theme, column, COLUMN_LEFTS[column.ordinal], 112)
+        StatsColumn(screen, rules, theme, column, COLUMNS_LEFT + column.ordinal * COLUMN_STEP, COLUMNS_TOP)
     }
 
-    // ---- Levelups (fraGroup(1))
-    GroupFrame(theme, "Levelups", 560, 40, 233, 281)
+    // ---- Levelups (fraGroup(1)), out to the right margin.
+    GroupFrame(theme, "Levelups", LEVELUPS_LEFT, 0, area.width - LEVELUPS_LEFT, LEVELUPS_HEIGHT)
     for (i in 0..MAX_LEVELUPS) {
         if (!rules.levelupShown(i)) {
             continue
         }
-        val top = 72 + i * 24
+        val top = 32 + i * 24
         var caption = "All Levels:"
         if (i > 0) {
             caption = "Level " + (i * 4) + ":"
         }
-        Label(caption, label, 576, top + 2)
-        ComboBox(theme, control, build.levelups[i]?.displayName ?: "", 640, top, 129, 22) {
+        Label(caption, label, LEVELUPS_LEFT + 16, top + 2)
+        ComboBox(theme, control, build.levelups[i]?.displayName ?: "", LEVELUPS_LEFT + 80, top, 129, 22) {
             openList = if (openList == "levelup$i") "" else "levelup$i"
         }
     }
 
     // ---- Tomes (fraGroup(2)); hidden while no tome can be used yet.
-    GroupFrame(theme, "Tomes", 16, 320, 233, 185)
+    GroupFrame(theme, "Tomes", 0, ROW2_TOP, TOMES_WIDTH, ROW2_HEIGHT)
     val tomeMax = rules.tomeMax()
     if (tomeMax > 0) {
-        Label("Supreme", label, 40, 352)
+        Label("Supreme", label, 24, ROW2_TOP + 32)
         Spinner(
             value = build.tomeAll,
             min = 0,
             max = tomeMax,
             theme = theme,
             onValueChange = { screen.setTome(null, it) },
-            modifier = Modifier.offset(144.dp, 352.dp).size(65.dp, 17.dp),
+            modifier = Modifier.offset(128.dp, (ROW2_TOP + 32).dp).size(65.dp, 17.dp),
         )
         for (stat in Stat.entries) {
-            val top = 384 + stat.ordinal * 16
-            Label(stat.displayName, label, 40, top)
+            val top = ROW2_TOP + 64 + stat.ordinal * 16
+            Label(stat.displayName, label, 24, top)
             Spinner(
                 value = build.tomes[stat.ordinal],
                 min = 0,
                 max = tomeMax,
                 theme = theme,
                 onValueChange = { screen.setTome(stat, it) },
-                modifier = Modifier.offset(144.dp, top.dp).size(65.dp, 17.dp),
+                modifier = Modifier.offset(128.dp, top.dp).size(65.dp, 17.dp),
             )
         }
     }
     if (rules.tomesLimitedByLevel()) {
-        Label("Tomes locked to max level", label.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)), 40, 487)
+        Label("Tomes locked to max level", label.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)), 24, ROW2_TOP + 167)
     }
 
-    // ---- Templates (fraGroup(3))
-    Frame(theme, 264, 328, 529, 177)
+    // ---- Templates (fraGroup(3)): a frame whose caption is the class link, out to the right margin.
+    val templatesWidth = area.width - TEMPLATES_LEFT
+    val templatesRight = TEMPLATES_LEFT + templatesWidth
+    Frame(theme, TEMPLATES_LEFT, ROW2_TOP + 8, templatesWidth, ROW2_HEIGHT - 8)
     val templates = screen.templates()
     val templateClass = screen.templateClass
     if (templates.isNotEmpty() && templateClass != null) {
         // lnkTemplate drops down the list of classes (mnuTemplate).
-        LinkLabel(theme, templateClass.name + " Templates", 272, 320) { openList = if (openList == "class") "" else "class" }
+        LinkLabel(theme, templateClass.name + " Templates", TEMPLATES_LEFT + 8, ROW2_TOP) { openList = if (openList == "class") "" else "class" }
     }
-    // lnkCustomize drops down mnuCustomize (lnkCustomize_MouseDown, :1429).
+    // lnkCustomize drops down mnuCustomize (lnkCustomize_MouseDown, :1429), at the frame's right.
     @Suppress("UNUSED_VARIABLE")
     val templatesRevision = screen.templatesRevision
-    LinkLabel(theme, "Customize", 718, 320) { openList = if (openList == "customize") "" else "customize" }
+    val customizeLeft = templatesRight - 75
+    LinkLabel(theme, "Customize", customizeLeft, ROW2_TOP) { openList = if (openList == "customize") "" else "customize" }
     for (i in templates.indices) {
         val template = templates[i]
-        TemplateButton(theme, template.caption, 292, TEMPLATE_TOPS[i]) { screen.applyTemplate(i) }
+        val top = ROW2_TOP + TEMPLATE_TOP + i * TEMPLATE_STEP
+        TemplateButton(theme, template.caption, TEMPLATES_LEFT + 28, top) { screen.applyTemplate(i) }
         var text = template.description
         var color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
         if (screen.warningIndex == i) {
             text = template.warning
             color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
         }
-        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color), modifier = Modifier.offset(392.dp, (TEMPLATE_TOPS[i] + 8).dp).size(393.dp, 34.dp))
+        BasicText(
+            text,
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color),
+            modifier = Modifier.offset((TEMPLATES_LEFT + 128).dp, (top + 8).dp).size((templatesWidth - 136).dp, 34.dp),
+        )
     }
 
     // ---- Open lists, drawn last so they're on top.
     if (openList == "points") {
         val choices = rules.preferredChoices()
-        DropList(theme, control, choices.map { it.displayName }, 184, 93, 105) { index ->
+        DropList(theme, control, choices.map { it.displayName }, 168, 53, 105) { index ->
             openList = ""
             screen.choosePreferred(choices[index])
         }
@@ -211,20 +242,23 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
         for (stat in Stat.entries) {
             names.add(stat.displayName)
         }
-        DropList(theme, control, names, 640, 72 + index * 24 + 22, 129) { chosen ->
+        DropList(theme, control, names, LEVELUPS_LEFT + 80, 32 + index * 24 + 22, 129) { chosen ->
             openList = ""
             screen.chooseLevelup(index, if (chosen == 0) null else Stat.entries[chosen - 1])
         }
     } else if (openList == "customize") {
+        // Under the link (the menu is drawn in the content area, so in its pixels).
         val density = LocalDensity.current.density
+        val menuX = customizeLeft * density
+        val menuY = (ROW2_TOP + 16) * density
         PopupMenu(
-            screen.customizeItems, -1, Offset(718 * density, 336 * density), density,
+            screen.customizeItems, -1, Offset(menuX, menuY), density,
             onChoose = { index ->
                 openList = ""
                 screen.customize(index)
             },
             onDismiss = { openList = "" },
-            clientWidth = 815,
+            clientWidth = STATS_WIDTH,
             enabled = { screen.customizeEnabled(it) },
         )
     } else if (openList == "class") {
@@ -234,7 +268,7 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
         for (c in classes) {
             names.add(if (c == templateClass) "✓ " + c.name else "   " + c.name)
         }
-        DropList(theme, control, names, 272, 336, 180) { chosen ->
+        DropList(theme, control, names, TEMPLATES_LEFT + 8, ROW2_TOP + 16, 180) { chosen ->
             openList = ""
             screen.chooseTemplateClass(classes[chosen])
         }

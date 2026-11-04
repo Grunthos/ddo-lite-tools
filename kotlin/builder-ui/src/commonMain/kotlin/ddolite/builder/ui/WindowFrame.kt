@@ -19,13 +19,13 @@ const val BAR_HEIGHT = 26
 const val CONTENT_LEFT = MARGIN
 const val CONTENT_TOP = BAR_HEIGHT + 6
 
-/** The content area of a window [width] x [height]: its size, with its top-left at (0, 0). */
-class ContentArea(windowWidth: Int, windowHeight: Int) {
+/** The content area of a window [windowWidth] x [windowHeight]: its size, with its top-left at (0, 0). */
+class ContentArea(windowWidth: Int, windowHeight: Int, hasFooter: Boolean = true) {
     /** The width, ending [MARGIN] in from the window's right. */
     val width = windowWidth - CONTENT_LEFT - MARGIN
 
-    /** The height, ending just above the footer. */
-    val height = windowHeight - BAR_HEIGHT - TIGHT - CONTENT_TOP
+    /** The height, ending just above the footer, or [MARGIN] above the window's bottom without one. */
+    val height = windowHeight - CONTENT_TOP - (if (hasFooter) BAR_HEIGHT + TIGHT else MARGIN)
 }
 
 /**
@@ -48,7 +48,7 @@ fun WindowFrame(
     overlay: @Composable () -> Unit = {},
     content: @Composable (ContentArea) -> Unit,
 ) {
-    val area = ContentArea(width, height)
+    val area = ContentArea(width, height, footer != null)
     Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)).then(modifier)) {
         Box(modifier = Modifier.offset(CONTENT_LEFT.dp, CONTENT_TOP.dp).size(area.width.dp, area.height.dp)) {
             content(area)

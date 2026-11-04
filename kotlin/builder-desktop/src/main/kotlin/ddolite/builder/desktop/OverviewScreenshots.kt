@@ -15,6 +15,7 @@ import ddolite.builder.ui.BuildSlotKey
 import ddolite.builder.ui.MainWindowContent
 import ddolite.builder.ui.OverviewDrag
 import ddolite.builder.ui.OverviewWindowContent
+import ddolite.builder.ui.OVERVIEW_WIDTH
 import ddolite.builder.ui.BuilderSession
 import org.jetbrains.skia.EncodedImageFormat
 import java.nio.file.Files
@@ -53,7 +54,7 @@ fun overviewScreenshots(prototype: BuilderSession, kensei: ByteArray, repoRoot: 
     println("Class icons: " + icons.size)
     val data = prototype.data
     prototype.openBuild(readBuildFile(kensei, data, BuildPoints.ADVENTURER))
-    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
+    ImageComposeScene(width = OVERVIEW_WIDTH, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
         saveScene(scene, outDir.resolve("10-overview-opened.png"))
         prototype.overview.showTab(notes = true)
         saveScene(scene, outDir.resolve("10b-overview-notes.png"))
@@ -62,7 +63,7 @@ fun overviewScreenshots(prototype: BuilderSession, kensei: ByteArray, repoRoot: 
 
     prototype.newBuild(BuildPoints.ADVENTURER)
     val overview = prototype.overview
-    ImageComposeScene(width = 866, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
+    ImageComposeScene(width = OVERVIEW_WIDTH, height = 609, density = Density(1f)) { OverviewWindowContent(prototype, icons) {} }.use { scene ->
         saveScene(scene, outDir.resolve("11-overview-new.png"))
         overview.toggleRaceList()
         saveScene(scene, outDir.resolve("12-overview-race-list.png"))
@@ -76,8 +77,8 @@ fun overviewScreenshots(prototype: BuilderSession, kensei: ByteArray, repoRoot: 
         overview.dropped(OverviewDrag.ClassIcon(data.findClass("Fighter")!!), BuildSlotKey(0))
         overview.dropped(OverviewDrag.ClassIcon(data.findClass("Cleric")!!), BuildSlotKey(1))
         scene.render()
-        // Click level 3 in the second build class column (the grid starts at 540, 36).
-        val levelThree = Offset(540f + 220f, 36f + 115f)
+        // Click level 3 in the second build class column (the grid starts at 548, 36 in the window).
+        val levelThree = Offset(548f + 220f, 36f + 115f)
         scene.sendPointerEvent(PointerEventType.Move, levelThree)
         scene.sendPointerEvent(PointerEventType.Press, levelThree, buttons = PointerButtons(isPrimaryPressed = true), button = PointerButton.Primary)
         scene.sendPointerEvent(PointerEventType.Release, levelThree, buttons = PointerButtons(), button = PointerButton.Primary)

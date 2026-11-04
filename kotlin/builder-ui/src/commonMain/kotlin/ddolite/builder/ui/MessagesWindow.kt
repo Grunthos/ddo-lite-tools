@@ -20,6 +20,23 @@ import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
+/** frmDeprecate's client area, pixels at 100%. */
+private const val MESSAGES_WIDTH = 815
+private const val MESSAGES_HEIGHT = 517
+
+/*
+ * The layout, from the content corner (WindowFrame): the caption and the messages list across the
+ * window; under it three columns a gap apart (the details, the best guesses, the selectors), each
+ * with its caption and button above its box. The boxes are all the same height.
+ */
+private const val MESSAGES_LIST_TOP = LINE + TIGHT
+private const val MESSAGES_LIST_HEIGHT = 156
+private const val COLUMN_BUTTON_TOP = MESSAGES_LIST_TOP + MESSAGES_LIST_HEIGHT + 24
+private const val COLUMN_LABEL_TOP = COLUMN_BUTTON_TOP + 10
+private const val COLUMN_BOX_TOP = COLUMN_BUTTON_TOP + 28
+private const val COLUMN_BOX_HEIGHT = 218
+private const val PUSH_BUTTON_WIDTH = 89
+
 /**
  * The Messages window (Source/Forms/Build/frmDeprecate.frm): what the opened build file had that
  * the current data doesn't. Each missing feat can be replaced: Best Guess offers the nearest
@@ -27,8 +44,8 @@ import ddolite.common.theme.Theme
  * it in the slot; Ignore leaves the slot empty. Notices (renamed feats, missing enhancements, a
  * cut-short leveling guide) only have OK.
  *
- * Laid out from the form's positions: the client area is 815 x 517 at 100%. The Help link isn't
- * active yet.
+ * In a [WindowFrame] (no footer); the client area is 815 x 517 at 100%. VB's positions are in
+ * frmDeprecate.frm; here the three columns share the width.
  */
 @Composable
 fun MessagesWindowContent(state: BuilderSession) {
@@ -38,56 +55,62 @@ fun MessagesWindowContent(state: BuilderSession) {
     val workspace = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
     val dim = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)
 
-    Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        Label(screen.label, TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = workspace), 32, 40)
+    WindowFrame(
+        theme, MESSAGES_WIDTH, MESSAGES_HEIGHT,
+        header = {
+            // usrHeader_Click (:229): Help only.
+            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Messages") })
+        },
+        footer = null,
+    ) { area ->
+        val columnWidth = (area.width - 2 * GAP) / 3
+        val guessLeft = columnWidth + GAP
+        val selectorLeft = 2 * (columnWidth + GAP)
+
+        Label(screen.label, TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = workspace), 0, 0)
         val texts = ArrayList<String>()
         for (message in screen.messages) {
             texts.add(message.text)
         }
         ListBox(
-            theme, texts, isSelected = { it == screen.messageIndex }, left = 28, top = 60, width = 761, height = 156,
+            theme, texts, isSelected = { it == screen.messageIndex }, left = 0, top = MESSAGES_LIST_TOP, width = area.width, height = MESSAGES_LIST_HEIGHT,
             drag = drag, onPress = { i, _ -> screen.clickMessage(i) },
         )
 
         // lblDetails (EnableLabel dims it with no message chosen), chkIgnore, the details.
-        Label("Details", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.detailsLabelEnabled) workspace else dim), 32, 250)
-        PushButton(theme, screen.ignoreCaption, screen.ignoreEnabled, 180, 240) { screen.ignore() }
-        DetailsBox(theme, screen.details, 28, 268, 241, 218)
+        Label("Details", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.detailsLabelEnabled) workspace else dim), 0, COLUMN_LABEL_TOP)
+        PushButton(theme, screen.ignoreCaption, screen.ignoreEnabled, columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.ignore() }
+        DetailsBox(theme, screen.details, 0, COLUMN_BOX_TOP, columnWidth, COLUMN_BOX_HEIGHT)
 
         // usrchkGuess, chkChoose and lstGuess.
         if (screen.bestGuessVisible) {
-            CheckBox(theme, "Best Guess", screen.bestGuess, screen.bestGuessEnabled, 292, 248, 137) { screen.toggleBestGuess() }
+            CheckBox(theme, "Best Guess", screen.bestGuess, screen.bestGuessEnabled, guessLeft, COLUMN_LABEL_TOP - 2, 137) { screen.toggleBestGuess() }
         }
         if (screen.chooseVisible) {
-            PushButton(theme, "Choose", screen.chooseEnabled, 440, 240) { screen.choose() }
+            PushButton(theme, "Choose", screen.chooseEnabled, guessLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.choose() }
         }
         val names = ArrayList<String>()
         for (feat in screen.guesses) {
             names.add(feat.name)
         }
         ListBox(
-            theme, names, isSelected = { it == screen.guessIndex }, left = 288, top = 268, width = 241, height = 212,
+            theme, names, isSelected = { it == screen.guessIndex }, left = guessLeft, top = COLUMN_BOX_TOP, width = columnWidth, height = COLUMN_BOX_HEIGHT,
             drag = drag, onPress = { i, _ -> screen.clickGuess(i) }, enabled = screen.guessListEnabled,
         )
 
         // lblSelectors, chkSelector, and lstSelector over usrInfo (which only binary builds' War Soul uses).
         if (screen.selectorsLabelVisible) {
-            Label("Selectors", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.selectorsLabelEnabled) workspace else dim), 552, 250)
+            Label("Selectors", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.selectorsLabelEnabled) workspace else dim), selectorLeft, COLUMN_LABEL_TOP)
         }
         if (screen.selectorButtonVisible) {
-            PushButton(theme, "Choose", screen.selectorButtonEnabled, 700, 240) { screen.chooseSelector() }
+            PushButton(theme, "Choose", screen.selectorButtonEnabled, selectorLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.chooseSelector() }
         }
-        DetailsBox(theme, emptyList(), 548, 268, 241, 218)
+        DetailsBox(theme, emptyList(), selectorLeft, COLUMN_BOX_TOP, columnWidth, COLUMN_BOX_HEIGHT)
         if (screen.selectorListVisible) {
             ListBox(
-                theme, screen.selectors, isSelected = { it == screen.selectorIndex }, left = 548, top = 268, width = 241, height = 212,
+                theme, screen.selectors, isSelected = { it == screen.selectorIndex }, left = selectorLeft, top = COLUMN_BOX_TOP, width = columnWidth, height = COLUMN_BOX_HEIGHT,
                 drag = drag, onPress = { i, _ -> screen.clickSelector(i) }, enabled = screen.selectorListEnabled,
             )
-        }
-
-        Column(modifier = Modifier.fillMaxWidth()) {
-            // usrHeader_Click (:229): Help only.
-            HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Messages") })
         }
     }
 }

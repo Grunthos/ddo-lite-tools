@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
@@ -110,7 +111,8 @@ fun ExportWindowContent(state: BuilderSession, onCopy: (String) -> Unit, onSave:
                 onValueChange = { screen.text = it },
                 textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, fontFamily = FontFamily.Monospace, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
                 cursorBrush = SolidColor(theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
-                modifier = Modifier.offset(2.dp, 2.dp),
+                // Kotlin only: the text a [TEXT_INSET] in from the box all round, as the main window's output.
+                modifier = Modifier.padding(TEXT_INSET.dp),
             )
         }
 

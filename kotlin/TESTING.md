@@ -277,11 +277,13 @@ the Kotlin output with these files and list every difference.
       and the track move a row, and the thumb drags.
 - [ ] Right-click menus near the bottom or right edge open upward or leftward, inside the window
       (e.g. the bottom row of the Leveling Guide grid); they were cut off.
-- [ ] Enhancements, Feats, Spells and Destinies windows (every tab): content starts at the same corner
-      under the header bar,      captions and column headers on the first line, boxes a line below, right edges at the same
+- [ ] Every window (Overview, Stats, Skills, Feats, Spells, Enhancements, Destinies, Messages, Options,
+      Output Format): content starts at the same corner      under the header bar,      captions and column headers on the first line, boxes a line below, right edges at the same
       margin; drag and drop, right-click menus and drop-downs still land in the right place.
 - [ ] Feats: the Filter list is the same height as the details box. Main window: the output is inset
       a little all round.
+- [ ] Overview is 890 wide (VB 866) and Options 437 tall (VB 428), to fit inside the margins; Help,
+      Export and Import text is inset like the main window's.
 - [ ] Text is crisp (ClearType-style smoothing and hinting), and the menu bar, message boxes and
       file dialogs look like Windows' own (they were Swing's bold "Metal" style).
 - [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,

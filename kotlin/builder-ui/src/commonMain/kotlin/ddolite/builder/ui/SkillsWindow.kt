@@ -33,23 +33,26 @@ import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
-/** frmSkills' client width, the bottom of usrHeader and the top of usrFooter, in pixels at 100%. */
-private const val CLIENT_WIDTH = 870
-private const val HEADER_HEIGHT = 26
-private const val FOOTER_TOP = 492
+/** frmSkills' client area, in pixels at 100%. */
+private const val SKILLS_WIDTH = 870
+private const val SKILLS_HEIGHT = 517
 
-/** One frame on the Skill Tomes tab (fraSkills(0..5)): its caption, where it is, and its skills from the top. */
-private class TomeFrame(val caption: String, val left: Int, val top: Int, val skills: List<Skill>)
+/** One frame on the Skill Tomes tab (fraSkills(0..5)): its caption, its column and row (from 0), and its skills from the top. */
+private class TomeFrame(val caption: String, val column: Int, val row: Int, val skills: List<Skill>)
 
-/** The Skill Tomes frames, from frmSkills.frm's positions (tools/form-layout's frmSkills.md). */
+/** The Skill Tomes frames, two across and three down, as frmSkills.frm has them (tools/form-layout's frmSkills.md). */
 private val TOME_FRAMES = listOf(
-    TomeFrame("Athletics", 156, 64, listOf(Skill.BALANCE, Skill.JUMP, Skill.SWIM, Skill.TUMBLE)),
-    TomeFrame("Spellcasting", 400, 64, listOf(Skill.CONCENTRATION, Skill.SPELLCRAFT, Skill.HEAL, Skill.REPAIR)),
-    TomeFrame("Social", 156, 196, listOf(Skill.BLUFF, Skill.DIPLOMACY, Skill.INTIMIDATE)),
-    TomeFrame("Trapping", 400, 196, listOf(Skill.SEARCH, Skill.SPOT, Skill.DISABLE_DEVICE, Skill.OPEN_LOCK)),
-    TomeFrame("Miscellaneous", 156, 328, listOf(Skill.UMD, Skill.PERFORM, Skill.HAGGLE, Skill.LISTEN)),
-    TomeFrame("Stealth", 400, 328, listOf(Skill.HIDE, Skill.MOVE_SILENTLY)),
+    TomeFrame("Athletics", 0, 0, listOf(Skill.BALANCE, Skill.JUMP, Skill.SWIM, Skill.TUMBLE)),
+    TomeFrame("Spellcasting", 1, 0, listOf(Skill.CONCENTRATION, Skill.SPELLCRAFT, Skill.HEAL, Skill.REPAIR)),
+    TomeFrame("Social", 0, 1, listOf(Skill.BLUFF, Skill.DIPLOMACY, Skill.INTIMIDATE)),
+    TomeFrame("Trapping", 1, 1, listOf(Skill.SEARCH, Skill.SPOT, Skill.DISABLE_DEVICE, Skill.OPEN_LOCK)),
+    TomeFrame("Miscellaneous", 0, 2, listOf(Skill.UMD, Skill.PERFORM, Skill.HAGGLE, Skill.LISTEN)),
+    TomeFrame("Stealth", 1, 2, listOf(Skill.HIDE, Skill.MOVE_SILENTLY)),
 )
+
+/** A Skill Tomes frame's size; the frames are a [GAP] apart. */
+private const val TOME_FRAME_WIDTH = 225
+private const val TOME_FRAME_HEIGHT = 105
 
 /** The Contrast menu (mnuContrast(0..3)), in [Contrast] order. */
 private val CONTRAST_ITEMS = listOf("None", "Low", "Medium", "High")
@@ -57,8 +60,9 @@ private val CONTRAST_ITEMS = listOf("None", "Low", "Medium", "High")
 /**
  * The Skills window (Source/Forms/Build/frmSkills.frm): the header (tabs "Skill Ranks" and
  * "Skill Tomes"; "Contrast" and "Help"), the skills grid or the skill tome spinners, and the
- * footer ("< Stats", "Clear Skills" or "Clear Tomes", "Feats >"). The client area is 870 x 517
- * at 100%.
+ * footer ("< Stats", "Clear Skills" or "Clear Tomes", "Feats >"), in a [WindowFrame]. The client
+ * area is 870 x 517 at 100%. Kotlin layout: the grid and the tome frames start at the content
+ * corner (VB centres them in the window).
  *
  * [classIcons] are drawn above the levels when the build has more than one class (VB's default,
  * `cfg.UseIcons And cfg.IconSkills`); without them, as on Android, the classes' initials are.
@@ -76,37 +80,17 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
     var contrastMenuAt by remember { mutableStateOf<Offset?>(null) }
     var skillMenuAt by remember { mutableStateOf<Offset?>(null) }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(PointerEventPass.Initial)
-                        pointer = event.changes[0].position
-                    }
+    WindowFrame(
+        theme, SKILLS_WIDTH, SKILLS_HEIGHT,
+        modifier = Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    pointer = event.changes[0].position
                 }
-            },
-    ) {
-        if (state.opened != null && skills.hasLevels()) {
-            if (skills.tomesTab) {
-                SkillTomes(skills, theme)
-            } else {
-                val textMeasurer = rememberTextMeasurer()
-                val classRow = skills.isMulticlass()
-                val icons = classIcons.isNotEmpty()
-                val place = remember(textMeasurer, classRow, icons, density) {
-                    windowGridLayout(textMeasurer, classRow, icons, CLIENT_WIDTH * density, HEADER_HEIGHT * density, FOOTER_TOP * density)
-                }
-                SkillsGrid(
-                    skills,
-                    place.layout,
-                    classIcons,
-                    Modifier.offset((place.left / density).dp, (place.top / density).dp),
-                ) { at -> skillMenuAt = Offset(place.left + at.x, place.top + at.y) }
             }
-        }
-        Column(modifier = Modifier.fillMaxWidth()) {
+        },
+        header = {
             // usrHeader_Click (frmSkills.frm:1186).
             var tab = 0
             if (skills.tomesTab) {
@@ -130,8 +114,8 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
                     }
                 },
             )
-        }
-        Box(modifier = Modifier.offset(0.dp, FOOTER_TOP.dp).size(CLIENT_WIDTH.dp, HEADER_HEIGHT.dp)) {
+        },
+        footer = {
             // usrFooter_Click (:1203). VB clears the tomes from a timer so the spinners lose focus first.
             var center = "Clear Skills"
             if (skills.tomesTab) {
@@ -158,26 +142,45 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
                 },
                 centerLink = center,
             )
-        }
-
-        // ---- Pop-up menus, over everything.
-        val skillAt = skillMenuAt
-        if (skillAt != null && skills.menuRow != 0) {
-            PopupMenu(skills.menuItems, -1, skillAt, density, onChoose = { index ->
-                skillMenuAt = null
-                skills.chooseMenu(index)
-            }, onDismiss = {
-                skillMenuAt = null
-                skills.menuRow = 0
-            })
-        }
-        val contrastAt = contrastMenuAt
-        if (contrastAt != null) {
-            // ContrastMenu (:1237) ticks the current setting; mnuContrast_Click (:1246) redraws.
-            PopupMenu(CONTRAST_ITEMS, skills.contrast.ordinal, contrastAt, density, onChoose = { index ->
-                contrastMenuAt = null
-                skills.contrast = Contrast.entries[index]
-            }, onDismiss = { contrastMenuAt = null })
+        },
+        overlay = {
+            // ---- Pop-up menus, over everything (window pixels).
+            val skillAt = skillMenuAt
+            if (skillAt != null && skills.menuRow != 0) {
+                PopupMenu(skills.menuItems, -1, skillAt, density, onChoose = { index ->
+                    skillMenuAt = null
+                    skills.chooseMenu(index)
+                }, onDismiss = {
+                    skillMenuAt = null
+                    skills.menuRow = 0
+                })
+            }
+            val contrastAt = contrastMenuAt
+            if (contrastAt != null) {
+                // ContrastMenu (:1237) ticks the current setting; mnuContrast_Click (:1246) redraws.
+                PopupMenu(CONTRAST_ITEMS, skills.contrast.ordinal, contrastAt, density, onChoose = { index ->
+                    contrastMenuAt = null
+                    skills.contrast = Contrast.entries[index]
+                }, onDismiss = { contrastMenuAt = null })
+            }
+        },
+    ) { area ->
+        if (state.opened != null && skills.hasLevels()) {
+            if (skills.tomesTab) {
+                SkillTomes(skills, theme)
+            } else {
+                // The grid sized to the content area (InitGrid), at its corner.
+                val textMeasurer = rememberTextMeasurer()
+                val classRow = skills.isMulticlass()
+                val icons = classIcons.isNotEmpty()
+                val place = remember(textMeasurer, classRow, icons, density, area.width, area.height) {
+                    windowGridLayout(textMeasurer, classRow, icons, area.width * density, 0f, area.height * density)
+                }
+                // The grid reports a right-click in its own pixels; the menu wants the window's.
+                val cornerX = CONTENT_LEFT * density
+                val cornerY = CONTENT_TOP * density
+                SkillsGrid(skills, place.layout, classIcons, Modifier) { at -> skillMenuAt = Offset(cornerX + at.x, cornerY + at.y) }
+            }
         }
     }
 }
@@ -192,19 +195,21 @@ private fun SkillTomes(skills: SkillsScreenState, theme: Theme) {
     val revision = skills.revision // the tomes are in the build, not Compose state
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT), textAlign = TextAlign.End)
     for (frame in TOME_FRAMES) {
-        GroupFrame(theme, frame.caption, frame.left, frame.top, 225, 105)
+        val left = frame.column * (TOME_FRAME_WIDTH + GAP)
+        val frameTop = frame.row * (TOME_FRAME_HEIGHT + GAP)
+        GroupFrame(theme, frame.caption, left, frameTop, TOME_FRAME_WIDTH, TOME_FRAME_HEIGHT)
         for (i in frame.skills.indices) {
             val skill = frame.skills[i]
-            val top = frame.top + 24 + i * 16
+            val top = frameTop + 24 + i * 16
             // lblSkill: right-aligned, ending 11 pixels before the spinner.
-            BasicText(skill.displayName, style = label, modifier = Modifier.offset((frame.left + 8).dp, (top + 1).dp).size(121.dp, 16.dp))
+            BasicText(skill.displayName, style = label, modifier = Modifier.offset((left + 8).dp, (top + 1).dp).size(121.dp, 16.dp))
             Spinner(
                 value = skills.tome(skill),
                 min = 0,
                 max = skills.tomeMax,
                 theme = theme,
                 onValueChange = { skills.setTome(skill, it) },
-                modifier = Modifier.offset((frame.left + 140).dp, top.dp).size(65.dp, 17.dp),
+                modifier = Modifier.offset((left + 140).dp, top.dp).size(65.dp, 17.dp),
             )
         }
     }
@@ -229,7 +234,7 @@ internal fun PopupMenu(
     density: Float,
     onChoose: (Int) -> Unit,
     onDismiss: () -> Unit,
-    clientWidth: Int = CLIENT_WIDTH,
+    clientWidth: Int = 815, // only when the window's width isn't known (most windows are 815 wide)
     enabled: (Int) -> Boolean = { true },
 ) {
     val width = 190

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
@@ -148,9 +149,10 @@ fun HelpWindowContent(state: BuilderSession) {
     fun width(s: String, st: TextStyle): Int = (measurer.measure(s, st).size.width / density).toInt()
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        // picContainer: a scroll bar's width in from each side.
-        val scrollWidth = 17
-        val pageWidth = maxWidth.value.toInt() - scrollWidth * 2
+        // picContainer: VB's is a scroll bar's width in from each side; here the windows' [MARGIN], and
+        // (Kotlin only) a [TEXT_INSET] from the top.
+        val side = MARGIN
+        val pageWidth = maxWidth.value.toInt() - side * 2
         val plain = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
         val lineHeight = (measurer.measure("X", plain).size.height / density).toInt()
         val space = width(" ", plain)
@@ -172,8 +174,8 @@ fun HelpWindowContent(state: BuilderSession) {
             x = 0
             y += lineHeight
         }
-        Box(modifier = Modifier.offset(scrollWidth.dp, 0.dp).size(pageWidth.dp, maxHeight).verticalScroll(rememberScrollState())) {
-            Box(modifier = Modifier.size(pageWidth.dp, maxOf(y, 1).dp)) {
+        Box(modifier = Modifier.offset(side.dp, 0.dp).size(pageWidth.dp, maxHeight).verticalScroll(rememberScrollState())) {
+            Box(modifier = Modifier.padding(top = TEXT_INSET.dp, bottom = TEXT_INSET.dp).size(pageWidth.dp, maxOf(y, 1).dp)) {
                 for (pw in placed) {
                     var modifier = Modifier.offset(pw.x.dp, pw.y.dp)
                     val code = pw.word.code
@@ -191,7 +193,7 @@ fun HelpWindowContent(state: BuilderSession) {
             BasicText(
                 " < Back  ",
                 style = backStyle,
-                modifier = Modifier.offset((maxWidth.value.toInt() - scrollWidth - backWidth).dp, 0.dp)
+                modifier = Modifier.offset((maxWidth.value.toInt() - side - backWidth).dp, 0.dp)
                     .background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))
                     .clickable { screen.back() },
             )

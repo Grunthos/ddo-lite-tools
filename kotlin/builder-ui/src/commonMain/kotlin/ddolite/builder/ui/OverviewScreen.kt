@@ -66,7 +66,29 @@ internal val FONT_SIZE = 12.sp
 /** VB's MAX_CLASS_NAME (basCONST.bas:25): the class column is as wide as this name. */
 private const val MAX_CLASS_NAME = "Arcane Trickster"
 
-/** Where VB's form puts a class icon (picClass) and its caption (lblClass), in pixels at 100%. */
+/** frmOverview's client area, pixels at 100%: VB's 866 wide, widened to fit the panels inside the frame's margins. */
+const val OVERVIEW_WIDTH = 890
+private const val OVERVIEW_HEIGHT = 609
+
+/*
+ * The layout, from the content corner (WindowFrame): the left panel (name, race, alignment, max
+ * levels, notes, class icons) and the right panel (the level grid) side by side, as VB's shpLeft and
+ * shpRight, with the right one out to the right margin.
+ */
+private const val PANEL_HEIGHT = 541
+private const val LEFT_PANEL_WIDTH = 521
+private const val RIGHT_PANEL_LEFT = LEFT_PANEL_WIDTH + 7
+private const val RIGHT_PANEL_HEIGHT = 437
+
+/** The captions, and the fields beside them. */
+private const val LABEL_LEFT = 20
+private const val FIELD_LEFT = 112
+
+/** Where the content corner is on VB's form: the icon table below is in the form's pixels. */
+private const val FORM_LEFT = 8
+private const val FORM_TOP = 32
+
+/** Where VB's form puts a class icon (picClass) and its caption (lblClass), in the form's pixels at 100%. */
 private class IconPlace(val left: Int, val top: Int, val labelLeft: Int, val labelTop: Int, val labelWidth: Int, val caption: String)
 
 /**
@@ -121,7 +143,8 @@ private fun greyMatrix(): ColorMatrix {
 /**
  * The Overview window: header (Overview;Notes | Help), the build's name, race, alignment and max
  * levels, the class icons, the level grid with the three build class slots, and the footer.
- * Laid out from frmOverview.frm's control positions (see tools/form-layout's frmOverview.md).
+ * Laid out from frmOverview.frm's control positions (see tools/form-layout's frmOverview.md), in a
+ * [WindowFrame].
  *
  * [onNavigate] gets the footer's "Stats >". [classIcons] holds the icons by resource name (see [classResourceId]); the platform reads them
  * from CharacterBuilderLite.RES.
@@ -133,12 +156,10 @@ fun OverviewWindowContent(state: BuilderSession, classIcons: Map<String, ImageBi
     val rules = state.rules
     @Suppress("UNUSED_VARIABLE")
     val revision = state.revision // read so this redraws when the build changes
-    val workspace = theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)
-    Box(modifier = Modifier.fillMaxSize().background(workspace).dropTarget(overview.drag, OverviewWindowKey)) {
-        if (rules != null) {
-            OverviewBody(state, OverviewRules(rules), theme, classIcons)
-        }
-        Column(modifier = Modifier.fillMaxWidth()) {
+    WindowFrame(
+        theme, OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
+        modifier = Modifier.dropTarget(overview.drag, OverviewWindowKey),
+        header = {
             HeaderBar(
                 theme,
                 listOf("Overview", "Notes"),
@@ -153,12 +174,16 @@ fun OverviewWindowContent(state: BuilderSession, classIcons: Map<String, ImageBi
                     }
                 },
             )
-        }
-        Box(modifier = Modifier.offset(8.dp, 584.dp).size(858.dp, 26.dp)) {
-            // usrFooter: "Stats >" (usrFooter_Click :1407).
+        },
+        footer = {
+            // usrFooter: "Stats >" (usrFooter_Click :1407). Full width here; VB's is inset 8 pixels.
             HeaderBar(theme, emptyList(), null, listOf("Stats >"), isEnabled = { true }, onClick = onNavigate)
+        },
+        overlay = { OverviewDragGhost(overview.drag, classIcons, rules) },
+    ) { area ->
+        if (rules != null) {
+            OverviewBody(state, OverviewRules(rules), theme, classIcons, area)
         }
-        OverviewDragGhost(overview.drag, classIcons, rules)
     }
 }
 
@@ -166,7 +191,7 @@ fun OverviewWindowContent(state: BuilderSession, classIcons: Map<String, ImageBi
 object OverviewWindowKey
 
 @Composable
-private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: Theme, classIcons: Map<String, ImageBitmap>) {
+private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: Theme, classIcons: Map<String, ImageBitmap>, area: ContentArea) {
     val overview = state.overview
     val build = rules.build
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
@@ -175,51 +200,53 @@ private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: The
 
     if (overview.notesTab) {
         // ShowControls (:1334): the notes fill both panels.
-        TextBox(theme, build.notes, { overview.setNotes(it) }, 8, 32, 857, 541, singleLine = false)
+        TextBox(theme, build.notes, { overview.setNotes(it) }, 0, 0, area.width, PANEL_HEIGHT, singleLine = false)
         return
     }
 
-    Frame(theme, 8, 32, 521, 541) // shpLeft
-    Frame(theme, 536, 32, 329, 437) // shpRight
+    val rightPanelWidth = area.width - RIGHT_PANEL_LEFT
+    Frame(theme, 0, 0, LEFT_PANEL_WIDTH, PANEL_HEIGHT) // shpLeft
+    Frame(theme, RIGHT_PANEL_LEFT, 0, rightPanelWidth, RIGHT_PANEL_HEIGHT) // shpRight
 
-    Label("Name", label, 28, 46)
-    TextBox(theme, build.buildName, { overview.setName(it) }, 120, 44, 237, 22, singleLine = true)
+    Label("Name", label, LABEL_LEFT, 14)
+    TextBox(theme, build.buildName, { overview.setName(it) }, FIELD_LEFT, 12, 237, 22, singleLine = true)
 
-    Label("Race", label, 28, 71)
-    RaceBox(overview, theme, control, build.race?.name ?: "", 120, 68, 161, 22)
+    Label("Race", label, LABEL_LEFT, 39)
+    RaceBox(overview, theme, control, build.race?.name ?: "", FIELD_LEFT, 36, 161, 22)
     if (rules.parentRace() != null) {
         val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline)
         BasicText(
             "Sub-Race",
             style = link,
-            modifier = Modifier.offset(292.dp, 71.dp).clickable { overview.showSubRaceNotice() },
+            modifier = Modifier.offset((FIELD_LEFT + 172).dp, 39.dp).clickable { overview.showSubRaceNotice() },
         )
     }
 
-    Label("Alignment", label, 28, 95)
+    Label("Alignment", label, LABEL_LEFT, 63)
     var alignmentText = ""
     val alignment = build.alignment
     if (alignment != null) {
         alignmentText = alignment.displayName
     }
-    ComboBox(theme, control, alignmentText, 120, 92, 161, 22) { alignmentListOpen = !alignmentListOpen }
+    ComboBox(theme, control, alignmentText, FIELD_LEFT, 60, 161, 22) { alignmentListOpen = !alignmentListOpen }
 
-    Label("Max Levels", label, 28, 130)
+    Label("Max Levels", label, LABEL_LEFT, 98)
     Spinner(
         value = build.maxLevels,
         min = 1,
         max = MAX_LEVEL,
         theme = theme,
         onValueChange = { overview.setMaxLevels(it) },
-        modifier = Modifier.offset(120.dp, 128.dp).size(65.dp, 20.dp),
+        modifier = Modifier.offset(FIELD_LEFT.dp, 96.dp).size(65.dp, 20.dp),
     )
 
     // Icon layout (ShowControls :1340): "Notes" sits where "Main Class" would be.
-    Label("Notes", label, 28, 167)
-    TextBox(theme, build.notes, { overview.setNotes(it) }, 120, 164, 237, 70, singleLine = false)
+    Label("Notes", label, LABEL_LEFT, 135)
+    TextBox(theme, build.notes, { overview.setNotes(it) }, FIELD_LEFT, 132, 237, 70, singleLine = false)
 
     ClassIcons(overview, rules, theme, classIcons)
-    LevelGrid(overview, rules, theme, classIcons, 540, 36, 309, 417)
+    // In the right panel, 4 pixels in, as wide as it less 20.
+    LevelGrid(overview, rules, theme, classIcons, RIGHT_PANEL_LEFT + 4, 4, rightPanelWidth - 20, 417)
 
     // Drop-down lists go last so they're drawn over everything else.
     if (alignmentListOpen) {
@@ -227,13 +254,13 @@ private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: The
         for (a in overview.choices.alignments) {
             items.add(a?.displayName ?: "")
         }
-        DropList(theme, control, items, 120, 92 + 22, 161) { index ->
+        DropList(theme, control, items, FIELD_LEFT, 60 + 22, 161) { index ->
             alignmentListOpen = false
             overview.chooseAlignment(overview.choices.alignments[index])
         }
     }
     if (overview.raceListOpen) {
-        RaceList(overview, theme, 120, 68 + 22 + 1)
+        RaceList(overview, theme, FIELD_LEFT, 36 + 22 + 1)
     }
 }
 
@@ -508,7 +535,7 @@ private fun RaceList(overview: OverviewScreenState, theme: Theme, left: Int, top
 @Composable
 private fun ClassIcons(overview: OverviewScreenState, rules: OverviewRules, theme: Theme, classIcons: Map<String, ImageBitmap>) {
     // The icon area takes build class slots dragged back to it.
-    Box(modifier = Modifier.offset(16.dp, 248.dp).size(505.dp, 329.dp).dropTarget(overview.drag, ClassIconsKey))
+    Box(modifier = Modifier.offset((16 - FORM_LEFT).dp, (248 - FORM_TOP).dp).size(505.dp, 329.dp).dropTarget(overview.drag, ClassIconsKey))
     val choices = overview.choices
     for (c in rules.rules.data.classes) {
         if (c.vbIndex < 1 || c.vbIndex > ICON_PLACES.size) {
@@ -520,7 +547,7 @@ private fun ClassIcons(overview: OverviewScreenState, rules: OverviewRules, them
         if (state == ClassIconState.EMPTY) {
             icon = classIcons[classResourceId(null)]
         }
-        var modifier = Modifier.offset(place.left.dp, place.top.dp).size(42.dp, 42.dp)
+        var modifier = Modifier.offset((place.left - FORM_LEFT).dp, (place.top - FORM_TOP).dp).size(42.dp, 42.dp)
         if (state == ClassIconState.NORMAL) {
             modifier = modifier.dragSource(overview.drag, OverviewDrag.ClassIcon(c)) { item, target -> overview.dropped(item, target) }
         }
@@ -538,7 +565,7 @@ private fun ClassIcons(overview: OverviewScreenState, rules: OverviewRules, them
             place.caption,
             style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = captionColor, textAlign = TextAlign.Center),
             softWrap = false,
-            modifier = Modifier.offset((place.labelLeft + place.labelWidth / 2 - 50).dp, place.labelTop.dp).size(100.dp, 32.dp),
+            modifier = Modifier.offset((place.labelLeft + place.labelWidth / 2 - 50 - FORM_LEFT).dp, (place.labelTop - FORM_TOP).dp).size(100.dp, 32.dp),
         )
     }
 }

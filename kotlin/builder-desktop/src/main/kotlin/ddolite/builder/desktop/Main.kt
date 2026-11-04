@@ -568,8 +568,9 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
     }
 
     if (windows.isOpen(BuildScreen.OVERVIEW)) {
-        // The form's client area is 866 x 609 at 100%; the window adds its frame and title bar.
-        ScreenWindow(windows, state, BuildScreen.OVERVIEW, "Overview", 520, 40, 884, 652) {
+        // The client area is 890 x 609 at 100% (VB's 866, widened for the frame's margins); the window adds
+        // its frame and title bar.
+        ScreenWindow(windows, state, BuildScreen.OVERVIEW, "Overview", 520, 40, 908, 652) {
             OverviewWindowContent(state, if (state.settings.useIcons && state.settings.iconOverview) icons else emptyMap()) { link -> footerLink(link, BuildScreen.OVERVIEW, state, windows) }
         }
     }
@@ -656,7 +657,8 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
         }
     }
     if (optionsOpen) {
-        // frmOptions: the client area is 474 x 428 at 100%; closing saves the settings (Form_Unload).
+        // frmOptions: the client area is 474 x 437 at 100% (VB's 428, taller for the frame's bottom margin);
+        // closing saves the settings (Form_Unload).
         Window(
             onCloseRequest = {
                 val w = optionsWindow[0]
@@ -668,7 +670,7 @@ private fun ApplicationScope.BuilderWindows(state: BuilderSession, files: BuildF
             },
             title = "Options",
             resizable = false,
-            state = rememberWindowState(position = optionsPosition(state.settings), width = 490.dp, height = 471.dp),
+            state = rememberWindowState(position = optionsPosition(state.settings), width = 490.dp, height = 480.dp),
         ) {
             optionsWindow[0] = window
             OptionsWindowContent(state)
