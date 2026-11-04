@@ -164,7 +164,7 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
         shot(scene, outDir.resolve("43-guide-scrolling.png"))
         // Right-click the bottom row's Ability cell: the menu opens upward, inside the window.
         scene.render()
-        val bottomRow = Offset(500f, 56f + 19 * 22f + 11f)
+        val bottomRow = Offset(500f, 49f + 19 * 22f + 11f) // the grid starts at 49 (content top 32, a line under its header)
         scene.sendPointerEvent(PointerEventType.Move, bottomRow)
         scene.sendPointerEvent(PointerEventType.Press, bottomRow, buttons = PointerButtons(isSecondaryPressed = true), button = androidx.compose.ui.input.pointer.PointerButton.Secondary)
         scene.sendPointerEvent(PointerEventType.Release, bottomRow, buttons = PointerButtons(), button = androidx.compose.ui.input.pointer.PointerButton.Secondary)

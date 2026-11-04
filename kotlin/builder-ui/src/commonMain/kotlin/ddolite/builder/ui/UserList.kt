@@ -75,6 +75,9 @@ class DoubleClickTimer {
  * press calls [onPress] (VB raises SlotClick on mouse down), a quick second press [onDoubleClick],
  * a left drag [dragItem] (refused if [onStartDrag] says no), and the rank arrows [onRankChange].
  * Rows are numbered from 1.
+ *
+ * [headerHeight] is the space above the box for the column headers, whose text sits at its bottom: VB's
+ * 30 pixels, or one label line ([LINE]) to put the headers on a window's first line (WindowFrame).
  */
 @Composable
 fun <T> UserList(
@@ -100,6 +103,7 @@ fun <T> UserList(
     onHover: (Int) -> Unit,
     onRankChange: (Int, Int) -> Unit = { _, _ -> },
     fitRows: Int = 0,
+    headerHeight: Int = 30,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
@@ -110,7 +114,7 @@ fun <T> UserList(
     var slotHeight = textHeight * 4 / 3
     var marginY = slotHeight / 4
     val marginX = (textMeasurer.measure("  ", normal).size.width / scale).toInt()
-    val headerSpace = 30
+    val headerSpace = headerHeight
     // New: [fitRows] rows always fit without scrolling (VB's Verdana rows are shorter than this font's,
     // so VB fits them in the same height). The slots and gaps shrink, keeping their 4:1 proportion.
     if (fitRows > 0) {

@@ -277,6 +277,9 @@ the Kotlin output with these files and list every difference.
       and the track move a row, and the thumb drags.
 - [ ] Right-click menus near the bottom or right edge open upward or leftward, inside the window
       (e.g. the bottom row of the Leveling Guide grid); they were cut off.
+- [ ] Enhancements window (all three tabs): content starts at the same corner under the header bar,
+      captions and column headers on the first line, boxes a line below, right edges at the same
+      margin; drag and drop, right-click menus and drop-downs still land in the right place.
 - [ ] Text is crisp (ClearType-style smoothing and hinting), and the menu bar, message boxes and
       file dialogs look like Windows' own (they were Swing's bold "Metal" style).
 - [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,
