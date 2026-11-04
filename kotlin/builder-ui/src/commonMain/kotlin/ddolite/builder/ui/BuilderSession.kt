@@ -123,7 +123,7 @@ class BuilderSession(
     /** The Help window (frmHelp). */
     val help = HelpScreenState(this)
 
-    /** A link in the main window'"'"'s output was clicked: the section name ("Feats", "Skills", …); the app opens its window. */
+    /** A link in the main window's output was clicked: the section name ("Feats", "Skills", …); the app opens its window. */
     var onOutputLink: (String) -> Unit = {}
 
     /** The template files (Stats › Customize); the app sets this. */
@@ -235,7 +235,7 @@ class BuilderSession(
 
     /**
      * After every change to the build: its state goes into the undo history. The Skills grid keeps
-     * its own copy of the points, so they'"'"'re copied back first.
+     * its own copy of the points, so they're copied back first.
      */
     private fun recordChange(mergeKey: String? = null) {
         val result = opened ?: return
@@ -256,7 +256,7 @@ class BuilderSession(
 
     /**
      * Shows a state from the history in every window, as if just opened (selections are cleared and
-     * windows that no longer apply close). It'"'"'s unsaved unless it'"'"'s the state last saved.
+     * windows that no longer apply close). It's unsaved unless it's the state last saved.
      */
     private fun showHistory(state: BuildRules?) {
         if (state == null) {

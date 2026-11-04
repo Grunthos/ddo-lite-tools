@@ -121,6 +121,51 @@ class ScreenStateTest {
     }
 
     @Test
+    fun guideListFollowsADeletedRow() {
+        val session = TestSession.open("Kensei Warpriest.build")
+        val enhancements = session.enhancements
+        enhancements.opened()
+        enhancements.chooseTab(2)
+        val guide = enhancements.guide
+        var kensei = -1
+        for (i in guide.trees.indices) {
+            if (guide.trees[i].text == "Kensei") {
+                kensei = i
+            }
+        }
+        assertTrue(kensei >= 0)
+        guide.clickTree(kensei)
+        // Add the first offered ability that needs no selector.
+        var text = ""
+        for (i in guide.choices.indices) {
+            guide.clickChoice(i)
+            if (!guide.selectorsShowing) {
+                text = guide.choices[i].text
+                guide.chooseAbility()
+                break
+            }
+        }
+        assertTrue(text.isNotEmpty(), "an ability without selectors")
+        assertEquals(1, guide.rows().size)
+        assertFalse(guide.choices.any { it.text == text }, "taken, so no longer offered")
+
+        // Right-click the row and delete it: the list offers it again, with Kensei still selected.
+        guide.pressRow(1, right = true, ctrl = false, shift = false)
+        var delete = -1
+        val items = guide.menuItems()
+        for (i in items.indices) {
+            if (items[i].caption.startsWith("Delete Row")) {
+                delete = i
+            }
+        }
+        assertTrue(delete >= 0, "a Delete Rows item")
+        guide.chooseMenu(delete)
+        assertEquals(0, guide.rows().size)
+        assertEquals(kensei, guide.treeIndex)
+        assertTrue(guide.choices.any { it.text == text }, "offered again after the delete")
+    }
+
+    @Test
     fun spellsClearAndChooseASpell() {
         val session = TestSession.open("Kensei Warpriest.build")
         val screen = session.spells

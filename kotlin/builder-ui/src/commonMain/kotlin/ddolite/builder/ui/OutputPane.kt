@@ -134,7 +134,7 @@ private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int, onL
                     if (run.link.isEmpty()) {
                         BasicText(run.text, style = runStyle(run, theme), maxLines = 1, softWrap = false)
                     } else {
-                        // A heading'"'"'s "(Errors)": underlined, and a click opens that section'"'"'s window.
+                        // A heading's "(Errors)": underlined, and a click opens that section's window.
                         BasicText(
                             run.text, style = runStyle(run, theme).copy(textDecoration = TextDecoration.Underline), maxLines = 1, softWrap = false,
                             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable { onLink(run.link) },

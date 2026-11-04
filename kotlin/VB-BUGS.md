@@ -274,6 +274,14 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     lists "frmDestiny", the old destiny form, so `tmrWindowMenu_Timer` never finds frmDestiny2. *Fix:*
     caption the menu item "frmDestiny2".
 
+22j. **Leveling Guide: after deleting, moving or inserting rows, the ability list is out of date.**
+    `Forms/Build/frmEnhancements.frm:3430` `RefreshGuide` calls `InitGuide`, whose `LoadGuideTrees`
+    (:2570) clears the tree list without raising its Click, so `lstGuideAbility` keeps the abilities
+    as they were: a deleted ability isn't offered again until a tree is clicked, and one still
+    listed can be taken twice. The same on showing the tab again. **The Kotlin version fixes this**:
+    the tree showing stays selected and its list is rebuilt. *Fix:* in `RefreshGuide`, reselect
+    `mlngGuideTree`'s entry (or call `ShowGuideAvailable`) after `InitGuide`.
+
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
 

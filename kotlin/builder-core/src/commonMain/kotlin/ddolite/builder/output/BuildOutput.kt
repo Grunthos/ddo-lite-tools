@@ -60,7 +60,7 @@ class OutputSettings(
 /** A piece of text on the screen in one style. */
 /**
  * A piece of a screen output line in one style. [link] names the section whose window it opens (a
- * heading'"'"'s "(Errors)"; new, VB'"'"'s output has no links), or "" for plain text.
+ * heading's "(Errors)"; new, VB's output has no links), or "" for plain text.
  */
 class DisplayRun(val text: String, val color: OutputColor, val courier: Boolean, val bold: Boolean, val underline: Boolean, val link: String = "")
 
@@ -2149,7 +2149,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
                 outputText(" $extra", newLine = false)
             }
             if (error.isNotEmpty()) {
-                // New: on screen the error mark is a link to the section'"'"'s window.
+                // New: on screen the error mark is a link to the section's window.
                 outputText(" $error", newLine = false, color = OutputColor.TEXT_ERROR, link = text)
             }
             blankLine()

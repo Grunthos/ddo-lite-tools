@@ -168,9 +168,14 @@ class GuideScreenState(private val session: BuilderSession) {
         filter = GuideFilter.SELECTED_AVAILABLE
     }
 
-    /** ShowTab for the Leveling Guide (:1134): InitGuide (:2494), then ClearSelection. */
+    /**
+     * ShowTab for the Leveling Guide (:1134): InitGuide (:2494), then ClearSelection. Also after Undo
+     * and Redo. The tree showing stays selected, its list rebuilt (Kotlin only, VB-BUGS 22j).
+     */
     fun show() {
+        val wasShowing = treeIndex != -1
         initGuide()
+        reselectTree(wasShowing)
         clearSelection()
         changed()
     }
@@ -568,11 +573,34 @@ class GuideScreenState(private val session: BuilderSession) {
     }
 
     /**
+     * After the tree list is reloaded: select the tree (or "(Commands)") that was showing again and
+     * rebuild its list, so it matches the guide. Kotlin only: VB's RefreshGuide leaves the list as it
+     * was, with no tree selected, still offering the abilities as they were before the change
+     * (VB-BUGS 22j). If no tree was selected, or it's no longer listed, the list is emptied.
+     */
+    private fun reselectTree(wasShowing: Boolean) {
+        if (wasShowing) {
+            for (i in trees.indices) {
+                if (trees[i].number == guideTree) {
+                    treeIndex = i
+                    showGuideAvailable()
+                    return
+                }
+            }
+        }
+        guideTree = 0
+        choices = emptyList()
+        choiceIndex = -1
+        nothingAvailable = null
+    }
+
+    /**
      * RefreshGuide (:3430): rebuild the guide, select the rows just moved (when more than one),
      * keep the scroll position, and SetDirty.
      */
     private fun refreshGuide(first: Int, count: Int) {
         val keep = scroll
+        val wasShowing = treeIndex != -1
         lastRowSelected = 0
         moveRows = false
         clearGuideDetails(clearLabel = true)
@@ -588,6 +616,7 @@ class GuideScreenState(private val session: BuilderSession) {
             selected = list
         }
         initGuide()
+        reselectTree(wasShowing)
         borderRow = if (count == 1) first else 0
         val max = maxOf(0, rows().size - GUIDE_ROWS)
         scroll = keep.coerceIn(0, max)
