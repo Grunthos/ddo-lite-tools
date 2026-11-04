@@ -374,7 +374,8 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             }
         }
     }
-    GuideScrollBar(screen, theme, GRID_LEFT + gridWidth, GRID_TOP, GRID_HEIGHT)
+    // scrollVertical: the arrows and the track move a row (VB's LargeChange is 1).
+    RowScrollBar(theme, screen.scroll, rows.size, GUIDE_ROWS, GRID_LEFT + gridWidth, GRID_TOP, GRID_HEIGHT, page = 1) { screen.scrollBy(it) }
 
     // The totals: lblGuideLevel, lblGuideAP (red when negative), lblGuideSpent (red past 4 AP a heroic level).
     val totals = screen.totals
@@ -406,27 +407,4 @@ private fun fitDisplay(name: String, rank: String, width: Int, measure: (String)
         } while (measure(check) > width && length > 0)
     }
     return check
-}
-
-/** scrollVertical: enabled with more than 20 rows; the arrows and the track move a row (VB's LargeChange is 1). */
-@Composable
-private fun GuideScrollBar(screen: GuideScreenState, theme: Theme, left: Int, top: Int, height: Int) {
-    val count = screen.rows().size
-    val enabled = count > GUIDE_ROWS
-    val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
-    val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
-    val arrow = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
-    Box(modifier = Modifier.offset(left.dp, top.dp).size(SCROLL_BAR.dp, height.dp).background(back).border(1.dp, border)) {
-        BasicText("▴", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, 0.dp).clickable(enabled = enabled) { screen.scrollBy(-1) })
-        if (enabled) {
-            val track = height - SCROLL_BAR * 2
-            val thumb = maxOf(12, track * GUIDE_ROWS / count)
-            val max = count - GUIDE_ROWS
-            val thumbTop = SCROLL_BAR + (track - thumb) * screen.scroll / max
-            Box(modifier = Modifier.offset(2.dp, SCROLL_BAR.dp).size((SCROLL_BAR - 4).dp, (thumbTop - SCROLL_BAR).dp).clickable { screen.scrollBy(-1) })
-            Box(modifier = Modifier.offset(2.dp, thumbTop.dp).size((SCROLL_BAR - 4).dp, thumb.dp).background(border))
-            Box(modifier = Modifier.offset(2.dp, (thumbTop + thumb).dp).size((SCROLL_BAR - 4).dp, (height - SCROLL_BAR - thumbTop - thumb).dp).clickable { screen.scrollBy(1) })
-        }
-        BasicText("▾", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, (height - SCROLL_BAR).dp).clickable(enabled = enabled) { screen.scrollBy(1) })
-    }
 }

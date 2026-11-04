@@ -11,6 +11,7 @@ import ddolite.builder.ui.EnhancementDrag
 import ddolite.builder.ui.EnhancementsWindowContent
 import ddolite.builder.ui.PointerButton
 import ddolite.builder.ui.BuilderSession
+import ddolite.builder.ui.GUIDE_ROWS
 import org.jetbrains.skia.EncodedImageFormat
 import java.nio.file.Files
 import java.nio.file.Path
@@ -148,6 +149,14 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
         guide.chooseMenu(0) // Insert Rows Here
         println("  after moving rows 2-5 before row 9: " + guide.rows().map { it.display + it.rankText })
         shot(scene, outDir.resolve("42-guide-moved.png"))
+        // Past 20 rows (a bank a level): the grid's scroll bar comes on, scrolled to the end.
+        guide.clickTree(guide.trees.indexOfFirst { it.number == 0 })
+        while (guide.rows().size <= GUIDE_ROWS + 3) {
+            guide.clickChoice(0)
+            guide.chooseAbility()
+        }
+        println("  " + guide.rows().size + " rows, first shown " + guide.scroll)
+        shot(scene, outDir.resolve("43-guide-scrolling.png"))
     }
 }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -92,6 +93,92 @@ fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int
                     }
                 },
         )
+    }
+}
+
+/**
+ * A vertical scroll bar for a list drawn a row at a time (VB's VScrollBar beside a hand-drawn grid):
+ * [first] is the first row shown (0-based) of [count], with [visible] rows fitting. The arrows move a
+ * row, the track either side of the thumb [page] rows, and the thumb is dragged; each asks
+ * [onScroll] to move by a number of rows (the caller keeps it in range). With everything fitting
+ * it's drawn greyed with no thumb.
+ *
+ * Unlike [ScrollBar], it takes the row numbers as plain values, so it's redrawn whenever they
+ * change (the guide grid's own bar wasn't, and stayed greyed as rows were added).
+ */
+@Composable
+fun RowScrollBar(
+    theme: Theme, first: Int, count: Int, visible: Int, left: Int, top: Int, length: Int,
+    page: Int = visible, onScroll: (Int) -> Unit,
+) {
+    if (count <= visible) {
+        DisabledScrollBar(theme, left, top, length, vertical = true)
+        return
+    }
+    val scrollBy = rememberUpdatedState(onScroll)
+    val density = LocalDensity.current.density
+    val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
+    val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
+    val arrowStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val max = count - visible
+    val track = length - SCROLL_BAR * 2
+    var thumb = track * visible / count
+    if (thumb < 12) {
+        thumb = 12
+    }
+    var start = first
+    if (start > max) {
+        start = max
+    }
+    val thumbStart = SCROLL_BAR + (track - thumb) * start / max
+    // Pixels of thumb travel per row.
+    val pixelsPerRow = (track - thumb).toFloat() / max
+    val thumbAt = rememberUpdatedState(thumbStart)
+
+    // The thumb is dragged through the bar, which stays put while the thumb moves: the drag counts
+    // when it starts on the thumb, and is added up and turned into whole rows as it goes.
+    val drag = Modifier.pointerInput(pixelsPerRow, thumb) {
+        var dragging = false
+        var dragged = 0f
+        detectDragGestures(
+            onDragStart = { at ->
+                val y = at.y / density
+                dragging = y >= thumbAt.value && y < thumbAt.value + thumb
+                dragged = 0f
+            },
+        ) { change, amount ->
+            if (dragging) {
+                change.consume()
+                dragged += amount.y / density
+                val rows = (dragged / pixelsPerRow).toInt()
+                if (rows != 0) {
+                    dragged -= rows * pixelsPerRow
+                    scrollBy.value(rows)
+                }
+            }
+        }
+    }
+
+    Box(modifier = Modifier.offset(left.dp, top.dp).size(SCROLL_BAR.dp, length.dp).background(back).border(1.dp, border).then(drag)) {
+        Box(modifier = Modifier.size(SCROLL_BAR.dp, SCROLL_BAR.dp).pointerInput(Unit) { detectTapGestures { scrollBy.value(-1) } }) {
+            BasicText("▴", style = arrowStyle, modifier = Modifier.offset(5.dp, 0.dp))
+        }
+        Box(
+            modifier = Modifier.offset(0.dp, (length - SCROLL_BAR).dp).size(SCROLL_BAR.dp, SCROLL_BAR.dp)
+                .pointerInput(Unit) { detectTapGestures { scrollBy.value(1) } },
+        ) {
+            BasicText("▾", style = arrowStyle, modifier = Modifier.offset(5.dp, 0.dp))
+        }
+        Box(
+            modifier = Modifier.offset(0.dp, SCROLL_BAR.dp).size(SCROLL_BAR.dp, (thumbStart - SCROLL_BAR).dp)
+                .pointerInput(page) { detectTapGestures { scrollBy.value(-page) } },
+        )
+        Box(
+            modifier = Modifier.offset(0.dp, (thumbStart + thumb).dp).size(SCROLL_BAR.dp, (length - SCROLL_BAR - thumbStart - thumb).dp)
+                .pointerInput(page) { detectTapGestures { scrollBy.value(page) } },
+        )
+        // The thumb (dragged through the bar, above).
+        Box(modifier = Modifier.offset(2.dp, thumbStart.dp).size((SCROLL_BAR - 4).dp, thumb.dp).background(border))
     }
 }
 
