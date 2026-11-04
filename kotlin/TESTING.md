@@ -277,8 +277,9 @@ the Kotlin output with these files and list every difference.
       Warpriest at level 1: "Nothing in Warpriest at level 1: the earliest is level 3." (new; VB
       leaves the list blank).
 - [ ] Leveling Guide, bottom left: "Level: 3 (Ftr 2/Clr 1)", the build's classes at the guide's level
-      (new; VB shows "Cur. Level: 3" under the grid). Cost, Spent in Tree and Min Level are above the
-      details caption, and the lists are a little shorter to make room (VB has them under the box).
+      (new; VB shows "Cur. Level: 3" under the grid). Cost, Spent in Tree and Min Level are between the
+      details caption and the box, lined up with its edges, and the lists are a little shorter to make
+      room (VB has them under the box). Available and Spent are right-aligned under the grid.
 - [ ] A file that can't be read or imported shows the error instead of closing the program.
 
 ## 8. Display

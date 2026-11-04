@@ -53,7 +53,8 @@ private const val ROW_HEIGHT = 22
  * columns are sized as InitGrid (:3597) does, to their headers and the widest tree name.
  *
  * Kotlin layout changes: the lists are 16 pixels shorter, with the Cost, Spent in Tree and Min Level
- * labels above the details caption (VB has them under the details box), which leaves the whole
+ * labels between the details caption and the box (VB has them under the box), lined up with its
+ * edges, which leaves the whole
  * bottom line for the totals, whose level caption also gives the build's classes.
  *
  * Not copied yet: dragging past the grid's top or bottom to scroll while selecting (tmrScroll).
@@ -105,15 +106,15 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     }
 
     // Details.
-    Label(screen.detailsCaption, label, 16, TAB_TOP + 281)
+    Label(screen.detailsCaption, label, 16, TAB_TOP + 262)
     DetailsBox(theme, screen.details, 16, TAB_TOP + 296, 369, 168)
     val cost = screen.costLabel
     if (cost != null) {
-        Label(cost, label, 24, TAB_TOP + 263)
+        Label(cost, label, 16, TAB_TOP + 279)
     }
     val spent = screen.spentLabel
     if (spent != null) {
-        BasicText(spent, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset(150.dp, (TAB_TOP + 263).dp).width(114.dp))
+        BasicText(spent, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset(16.dp, (TAB_TOP + 279).dp).width(369.dp))
     }
     val levels = screen.levelsLabel
     if (levels != null) {
@@ -121,7 +122,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         if (screen.levelsError) {
             style = style.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR))
         }
-        BasicText(levels, style = style, modifier = Modifier.offset(268.dp, (TAB_TOP + 263).dp).width(102.dp))
+        BasicText(levels, style = style, modifier = Modifier.offset(16.dp, (TAB_TOP + 279).dp).width(369.dp))
     }
 
     GuideGrid(screen, theme, onMenu)
@@ -342,12 +343,15 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     if (totals != null) {
         val error = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
         val spentWidth = measure(totals.spentCaption())
-        val spentLeft = GRID_LEFT + columns[5].right - spentWidth
+        // Kotlin only: Available and Spent right-aligned to the grid's outside edge, a gap apart (VB
+        // centres Available under the grid).
+        val spentLeft = GRID_LEFT + GRID_WIDTH - spentWidth
+        val apLeft = spentLeft - 24 - measure(totals.apCaption())
         // Kotlin only: the level caption starts under the details box (VB's is under the grid, where
         // the classes wouldn't fit).
         Label(totals.levelCaption(), label, 16, TAB_TOP + 468)
         val apStyle = if (totals.ap < 0) label.copy(color = error) else label
-        BasicText(totals.apCaption(), style = apStyle.copy(textAlign = TextAlign.Center), maxLines = 1, modifier = Modifier.offset(484.dp, (TAB_TOP + 468).dp).width(169.dp))
+        BasicText(totals.apCaption(), style = apStyle, maxLines = 1, modifier = Modifier.offset(apLeft.dp, (TAB_TOP + 468).dp))
         val spentStyle = if (totals.spentError) label.copy(color = error) else label
         BasicText(totals.spentCaption(), style = spentStyle, maxLines = 1, modifier = Modifier.offset(spentLeft.dp, (TAB_TOP + 468).dp))
     }
