@@ -39,7 +39,7 @@ fun MessagesWindowContent(state: BuilderSession) {
     val dim = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)
 
     Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
-        Label(screen.label, TextStyle(fontSize = FONT_SIZE, color = workspace), 32, 40)
+        Label(screen.label, TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = workspace), 32, 40)
         val texts = ArrayList<String>()
         for (message in screen.messages) {
             texts.add(message.text)
@@ -50,7 +50,7 @@ fun MessagesWindowContent(state: BuilderSession) {
         )
 
         // lblDetails (EnableLabel dims it with no message chosen), chkIgnore, the details.
-        Label("Details", TextStyle(fontSize = FONT_SIZE, color = if (screen.detailsLabelEnabled) workspace else dim), 32, 250)
+        Label("Details", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.detailsLabelEnabled) workspace else dim), 32, 250)
         PushButton(theme, screen.ignoreCaption, screen.ignoreEnabled, 180, 240) { screen.ignore() }
         DetailsBox(theme, screen.details, 28, 268, 241, 218)
 
@@ -72,7 +72,7 @@ fun MessagesWindowContent(state: BuilderSession) {
 
         // lblSelectors, chkSelector, and lstSelector over usrInfo (which only binary builds' War Soul uses).
         if (screen.selectorsLabelVisible) {
-            Label("Selectors", TextStyle(fontSize = FONT_SIZE, color = if (screen.selectorsLabelEnabled) workspace else dim), 552, 250)
+            Label("Selectors", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.selectorsLabelEnabled) workspace else dim), 552, 250)
         }
         if (screen.selectorButtonVisible) {
             PushButton(theme, "Choose", screen.selectorButtonEnabled, 700, 240) { screen.chooseSelector() }
@@ -108,7 +108,7 @@ private fun PushButton(theme: Theme, caption: String, enabled: Boolean, left: In
     Box(modifier = modifier) {
         BasicText(
             caption,
-            style = TextStyle(fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth().offset(0.dp, 6.dp),
         )
     }

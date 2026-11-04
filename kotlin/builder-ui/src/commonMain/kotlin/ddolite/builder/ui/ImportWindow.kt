@@ -90,7 +90,7 @@ class ImportScreenState(private val session: BuilderSession) {
 fun ImportWindowContent(state: BuilderSession, onPaste: () -> String?) {
     val screen = state.imports
     val theme = state.skills.theme
-    val link = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
+    val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
     // Form_Resize: the text starts under the bar, half a bar lower when the bar and box are the same colour.
     val sameColour = theme.get(ColorGroup.NAVIGATION, ColorValue.BACKGROUND) == theme.get(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val textTop = if (sameColour) 39 else 26
@@ -112,7 +112,7 @@ fun ImportWindowContent(state: BuilderSession, onPaste: () -> String?) {
             BasicTextField(
                 value = screen.text,
                 onValueChange = { screen.text = it },
-                textStyle = TextStyle(fontSize = FONT_SIZE, fontFamily = FontFamily.Monospace, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
+                textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, fontFamily = FontFamily.Monospace, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
                 cursorBrush = SolidColor(theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
                 modifier = Modifier.offset(2.dp, 2.dp),
             )

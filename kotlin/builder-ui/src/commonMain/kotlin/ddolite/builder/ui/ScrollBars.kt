@@ -42,7 +42,7 @@ fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int
     val density = LocalDensity.current.density
     val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
-    val arrowStyle = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val arrowStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     val viewport = state.viewportSize.toFloat()
     val content = viewport + state.maxValue
     val track = length - SCROLL_BAR * 2
@@ -103,7 +103,7 @@ fun canScroll(state: ScrollState): Boolean = state.maxValue in 1 until Int.MAX_V
 private fun DisabledScrollBar(theme: Theme, left: Int, top: Int, length: Int, vertical: Boolean) {
     val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
-    val dim = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM))
+    val dim = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM))
     val size = if (vertical) Modifier.size(SCROLL_BAR.dp, length.dp) else Modifier.size(length.dp, SCROLL_BAR.dp)
     Box(modifier = Modifier.offset(left.dp, top.dp).then(size).background(back).border(1.dp, border)) {
         BasicText(if (vertical) "▴" else "◂", style = dim, modifier = Modifier.offset(5.dp, 0.dp))

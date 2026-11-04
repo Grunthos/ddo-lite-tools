@@ -169,8 +169,8 @@ object OverviewWindowKey
 private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: Theme, classIcons: Map<String, ImageBitmap>) {
     val overview = state.overview
     val build = rules.build
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var alignmentListOpen by remember { mutableStateOf(false) }
 
     if (overview.notesTab) {
@@ -188,7 +188,7 @@ private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: The
     Label("Race", label, 28, 71)
     RaceBox(overview, theme, control, build.race?.name ?: "", 120, 68, 161, 22)
     if (rules.parentRace() != null) {
-        val link = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline)
+        val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline)
         BasicText(
             "Sub-Race",
             style = link,
@@ -256,7 +256,7 @@ internal fun Frame(theme: Theme, left: Int, top: Int, width: Int, height: Int) {
 /** A TextBox in the controls colours. */
 @Composable
 internal fun TextBox(theme: Theme, value: String, onChange: (String) -> Unit, left: Int, top: Int, width: Int, height: Int, singleLine: Boolean) {
-    val style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     BasicTextField(
         value = value,
         onValueChange = onChange,
@@ -383,7 +383,7 @@ private fun RaceBox(overview: OverviewScreenState, theme: Theme, style: TextStyl
 private fun RaceList(overview: OverviewScreenState, theme: Theme, left: Int, top: Int) {
     val rows = overview.raceRows
     val measurer = rememberTextMeasurer()
-    val style = TextStyle(fontSize = FONT_SIZE)
+    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
     fun width(text: String): Int = measurer.measure(text, style).size.width
     val marginX = width("  ")
     val textHeight = measurer.measure("Q", style).size.height + 1
@@ -536,7 +536,7 @@ private fun ClassIcons(overview: OverviewScreenState, rules: OverviewRules, them
         // Centred on the label's box from the form; wider text spills evenly both sides.
         BasicText(
             place.caption,
-            style = TextStyle(fontSize = FONT_SIZE, color = captionColor, textAlign = TextAlign.Center),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = captionColor, textAlign = TextAlign.Center),
             softWrap = false,
             modifier = Modifier.offset((place.labelLeft + place.labelWidth / 2 - 50).dp, place.labelTop.dp).size(100.dp, 32.dp),
         )
@@ -656,7 +656,7 @@ private fun LevelGrid(
     height: Int,
 ) {
     val measurer = rememberTextMeasurer()
-    val normal = TextStyle(fontSize = FONT_SIZE)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
     val bold = normal.copy(fontWeight = FontWeight.Bold)
     var size by remember { mutableStateOf(IntSize(width, height)) }
     val geometry = remember(size, measurer) { GridGeometry(measurer, normal, bold, size.width, size.height) }

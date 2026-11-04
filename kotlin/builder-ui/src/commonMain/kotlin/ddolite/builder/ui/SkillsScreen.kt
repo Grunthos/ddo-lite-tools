@@ -40,7 +40,7 @@ fun SkillsScreen(state: SkillsScreenState) {
     val theme = state.theme
     val wrkBackground = theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)
     val wrkText = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    val label = TextStyle(fontSize = 13.sp, color = wrkText)
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = wrkText)
 
     Column(
         modifier = Modifier
@@ -127,6 +127,6 @@ internal fun ChoiceButton(theme: Theme, text: String, selected: Boolean, onClick
             .clickable(onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
-        BasicText(text, style = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT)))
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT)))
     }
 }

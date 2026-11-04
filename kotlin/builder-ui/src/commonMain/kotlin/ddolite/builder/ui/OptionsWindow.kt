@@ -42,8 +42,8 @@ fun OptionsWindowContent(state: BuilderSession) {
     val revision = state.settingsRevision
     val s = state.settings
     var open by remember { mutableStateOf("") }
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     val windowItems = listOf("Maximized", "Fill Desktop", "Last Position")
     val pointsItems = listOf("Adventurer", "Champion", "Hero", "Legend")
     val skillScreenItems = listOf("Alphabetical", "Native First")
@@ -189,6 +189,6 @@ private fun OptionsButton(theme: Theme, caption: String, enabled: Boolean, left:
         modifier = modifier.clickable(onClick = onClick)
     }
     Box(modifier = modifier) {
-        BasicText(caption, style = TextStyle(fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp))
+        BasicText(caption, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp))
     }
 }

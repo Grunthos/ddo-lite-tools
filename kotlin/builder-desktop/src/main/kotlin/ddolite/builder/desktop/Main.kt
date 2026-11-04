@@ -82,6 +82,7 @@ import java.nio.file.Path
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
+import javax.swing.UIManager
 
 /**
  * The Character Builder desktop app, arranged like the VB Builder (PLAN.md §8.0): a main window with
@@ -93,6 +94,13 @@ import javax.imageio.ImageIO
  * `./gradlew :builder-desktop:portableZip`.
  */
 fun main(args: Array<String>) {
+    // The menu bar, message boxes and file dialogs are Swing: look like the platform's own (Swing's
+    // default, "Metal", draws menus in bold). If that fails, Swing's default is still usable.
+    try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+    } catch (e: Exception) {
+        println("Look and feel: " + e)
+    }
     // VB's Command: a build to open (CheckCommandLine); a folder argument is the app's folder (new code).
     val command = commandArgument(args)
     val repoRoot = findAppRoot(args)

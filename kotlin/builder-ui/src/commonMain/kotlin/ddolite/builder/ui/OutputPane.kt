@@ -115,7 +115,7 @@ private val OUTPUT_FONT_SIZE = 12.sp
 private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int, onLink: (String) -> Unit) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current.density
-    val plain = TextStyle(fontSize = OUTPUT_FONT_SIZE)
+    val plain = TextStyle(platformStyle = TEXT_RENDERING, fontSize = OUTPUT_FONT_SIZE)
     val indent = (measurer.measure("XXXXX", plain).size.width / density).toInt()
     val lineHeight = (measurer.measure("X", plain).size.height / density).toInt()
     // ResizeOutput: the output starts cfg.OutputMargin spaces in.
@@ -147,7 +147,7 @@ private fun OutputLines(lines: List<DisplayLine>, theme: Theme, margin: Int, onL
 }
 
 private fun runStyle(run: DisplayRun, theme: Theme): TextStyle {
-    var style = TextStyle(
+    var style = TextStyle(platformStyle = TEXT_RENDERING,
         fontSize = OUTPUT_FONT_SIZE,
         color = theme.color(ColorGroup.OUTPUT, outputColorValue(run.color)),
     )

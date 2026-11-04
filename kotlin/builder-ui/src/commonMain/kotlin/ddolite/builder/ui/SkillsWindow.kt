@@ -189,7 +189,7 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
 private fun SkillTomes(skills: SkillsScreenState, theme: Theme) {
     @Suppress("UNUSED_VARIABLE")
     val revision = skills.revision // the tomes are in the build, not Compose state
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT), textAlign = TextAlign.End)
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT), textAlign = TextAlign.End)
     for (frame in TOME_FRAMES) {
         GroupFrame(theme, frame.caption, frame.left, frame.top, 225, 105)
         for (i in frame.skills.indices) {
@@ -274,7 +274,7 @@ internal fun PopupMenu(
                 continue
             }
             val itemEnabled = enabled(i)
-            var style = TextStyle(fontSize = FONT_SIZE, color = if (itemEnabled) Color.Black else MENU_DISABLED)
+            var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (itemEnabled) Color.Black else MENU_DISABLED)
             var back = Color.Transparent
             if (i == hover && itemEnabled) {
                 style = style.copy(color = HIGHLIGHT_TEXT)

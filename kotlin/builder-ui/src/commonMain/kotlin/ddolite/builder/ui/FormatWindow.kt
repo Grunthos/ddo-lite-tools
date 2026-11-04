@@ -157,11 +157,11 @@ fun FormatWindowContent(state: BuilderSession) {
     val screen = state.format
     val theme = state.skills.theme
     val f = screen.format
-    val link = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
-    val dimLink = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_DIM))
+    val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
+    val dimLink = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_DIM))
     val tags = screen.tagsEnabled
     val labelColor = theme.color(ColorGroup.WORKSPACE, if (tags) ColorValue.TEXT else ColorValue.TEXT_DIM)
-    val label = TextStyle(fontSize = FONT_SIZE, color = labelColor)
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = labelColor)
 
     Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
         // shpNav and the links.
@@ -228,7 +228,7 @@ private fun TagText(theme: Theme, value: String, enabled: Boolean, left: Int, to
         onValueChange = onChange,
         readOnly = !enabled,
         singleLine = true,
-        textStyle = TextStyle(fontSize = FONT_SIZE, color = color),
+        textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color),
         cursorBrush = SolidColor(color),
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, 22.dp)
             .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))

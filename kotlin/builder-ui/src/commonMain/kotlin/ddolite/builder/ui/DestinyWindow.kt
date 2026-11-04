@@ -104,7 +104,7 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                         .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
                         .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
                 ) {
-                    BasicText(text, style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
+                    BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
                 }
             }
         }
@@ -132,7 +132,7 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 /** The Destiny Trees tab (picTab(0)): the build's destinies, the destinies it could add, the AP line and the permanent destiny points. */
 @Composable
 private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val rows = screen.treeRows()
     UserList(
         theme,
@@ -186,7 +186,7 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, onMenu: ()
     if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
+    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
 
     // fraDestinyAP: lblPermDestinyPoints over shpPermDestinyPoints (which starts 16 pixels lower).
     Frame(theme, 427, 308, 333, 149)
@@ -213,8 +213,8 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, onMenu: ()
 /** The Destinies tab (picTab(1)): the chosen destiny's abilities, lists, details and totals. */
 @Composable
 private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var comboOpen by remember { mutableStateOf(false) }
     val rows = screen.slotRows()
     UserList(
@@ -307,7 +307,7 @@ private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, onMenu: () ->
     if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 468.dp))
+    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 468.dp))
     Label(screen.spentCaption(), label, 288, 468)
     if (details != null) {
         Label(details.ranks, label, 480, 468)

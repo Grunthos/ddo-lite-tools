@@ -106,7 +106,7 @@ private fun NotInPrototype(theme: Theme, message: String) {
     BasicText(
         message,
         modifier = Modifier.padding(16.dp),
-        style = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)),
+        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)),
     )
 }
 /**
@@ -126,9 +126,9 @@ fun MainWindowContent(state: BuilderSession) {
 @Composable
 fun TreeSlotsScreen(state: TreeSlotsState, skills: SkillsScreenState) {
     val theme = skills.theme
-    val text = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val text = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val dim = text.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM))
-    val ctlText = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val ctlText = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
 
     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         BasicText("Build: " + skills.buildTitle(), style = text)
@@ -224,7 +224,7 @@ private fun TreeSlot(state: TreeSlotsState, skills: SkillsScreenState, index: In
             }
             color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
         }
-        BasicText(label, style = TextStyle(fontSize = 13.sp, color = color))
+        BasicText(label, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = color))
     }
 }
 
@@ -244,7 +244,7 @@ private fun DragGhost(drag: DragDropState<TreeDrag>, skills: SkillsScreenState) 
             .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_HIGHLIGHT))
             .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
-        BasicText(item.treeName, style = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)))
+        BasicText(item.treeName, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)))
     }
 }
 

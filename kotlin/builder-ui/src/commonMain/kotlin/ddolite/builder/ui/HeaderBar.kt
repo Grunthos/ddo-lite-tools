@@ -95,6 +95,6 @@ private fun HeaderLink(theme: Theme, text: String, current: Boolean, enabled: Bo
         modifier = modifier.clickable { onClick(text) }
     }
     Box(modifier = modifier) {
-        BasicText(text, style = TextStyle(fontSize = 13.sp, color = color, textDecoration = decoration))
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = color, textDecoration = decoration))
     }
 }

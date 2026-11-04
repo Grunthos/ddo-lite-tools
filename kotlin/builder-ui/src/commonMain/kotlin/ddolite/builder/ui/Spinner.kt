@@ -52,7 +52,7 @@ fun Spinner(
     val currentValue by rememberUpdatedState(value)
     val currentOnChange by rememberUpdatedState(onValueChange)
 
-    val style = TextStyle(fontSize = 13.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 13.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     val background = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
     val separator = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_INTERIOR)

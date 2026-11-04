@@ -156,7 +156,7 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
 /** The Trees tab (picTab(0)): the build's trees, the trees it could add, the AP line, and the racial and universal AP. */
 @Composable
 private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     val rows = screen.treeRows()
     UserList(
         theme,
@@ -217,7 +217,7 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -
     if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
+    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(296.dp, 264.dp))
 
     // fraRacialAP
     GroupFrame(theme, "Racial Past Life AP", 80, 292, 333, 157)
@@ -255,8 +255,8 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -
 /** The Enhancements tab (picTab(1)): the chosen tree's abilities, the tree, ability and selector lists, details and totals. */
 @Composable
 private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var comboOpen by remember { mutableStateOf(false) }
     val rows = screen.slotRows()
     UserList(
@@ -349,7 +349,7 @@ private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, onMenu: 
     if (ap.error) {
         apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
     }
-    BasicText(ap.text, style = TextStyle(fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 508.dp))
+    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(32.dp, 508.dp))
     Label(screen.spentCaption(), label, 304, 508)
     if (details != null) {
         Label(details.ranks, label, 464, 508)
@@ -387,6 +387,6 @@ private fun EnhancementDragGhost(screen: EnhancementsScreenState, theme: Theme) 
             .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        BasicText(text, style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
     }
 }

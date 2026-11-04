@@ -129,9 +129,9 @@ fun HelpWindowContent(state: BuilderSession) {
     val error = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
 
     fun style(w: HelpWord): TextStyle {
-        var s = TextStyle(fontSize = FONT_SIZE, color = if (w.error) error else text)
+        var s = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (w.error) error else text)
         if (w.code.isNotEmpty()) {
-            return TextStyle(fontSize = FONT_SIZE, color = link, fontWeight = FontWeight.Bold)
+            return TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = link, fontWeight = FontWeight.Bold)
         }
         if (w.bold) {
             s = s.copy(fontWeight = FontWeight.Bold)
@@ -151,7 +151,7 @@ fun HelpWindowContent(state: BuilderSession) {
         // picContainer: a scroll bar's width in from each side.
         val scrollWidth = 17
         val pageWidth = maxWidth.value.toInt() - scrollWidth * 2
-        val plain = TextStyle(fontSize = FONT_SIZE)
+        val plain = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
         val lineHeight = (measurer.measure("X", plain).size.height / density).toInt()
         val space = width(" ", plain)
         val margins = intArrayOf(0, width(" - ", plain), width("   - ", plain))
@@ -186,7 +186,7 @@ fun HelpWindowContent(state: BuilderSession) {
         }
         if (screen.stackSize > 0) {
             // picBack: " < Back  " at the top right.
-            val backStyle = TextStyle(fontSize = FONT_SIZE, color = link, fontWeight = FontWeight.Bold)
+            val backStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = link, fontWeight = FontWeight.Bold)
             val backWidth = width(" < Back  ", backStyle)
             BasicText(
                 " < Back  ",

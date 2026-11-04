@@ -62,8 +62,8 @@ private const val ROW_HEIGHT = 22
  */
 @Composable
 internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var comboOpen by remember { mutableStateOf(false) }
     val drag = remember { DragDropState<Int>() }
 
@@ -153,7 +153,7 @@ private fun GuideButton(theme: Theme, caption: String, left: Int, top: Int, widt
     ) {
         BasicText(
             caption,
-            style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp),
         )
     }
@@ -172,7 +172,7 @@ private class GuideColumn(val header: String, val left: Int, val width: Int, val
 @Composable
 private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit) {
     val measurer = rememberTextMeasurer()
-    val textStyle = TextStyle(fontSize = FONT_SIZE)
+    val textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
     // The measurer works in pixels; the grid is laid out in dp.
     val scale = LocalDensity.current.density
     fun measure(text: String): Int = (measurer.measure(text, textStyle).size.width / scale).toInt()
@@ -196,7 +196,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         x += widths[i]
     }
 
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     for (c in columns) {
         BasicText(c.header, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset((GRID_LEFT + c.left).dp, (TAB_TOP + 8).dp).width(c.width.dp))
     }
@@ -305,7 +305,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
                     } else {
                         Modifier.fillMaxWidth().offset(0.dp, 3.dp)
                     }
-                    BasicText(display, style = TextStyle(fontSize = FONT_SIZE, color = color, textAlign = align), maxLines = 1, modifier = modifier)
+                    BasicText(display, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = align), maxLines = 1, modifier = modifier)
                 }
             }
         }
@@ -380,7 +380,7 @@ private fun GuideScrollBar(screen: GuideScreenState, theme: Theme, left: Int, to
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
     val arrow = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
     Box(modifier = Modifier.offset(left.dp, top.dp).size(SCROLL_WIDTH.dp, height.dp).background(back).border(1.dp, border)) {
-        BasicText("▴", style = TextStyle(fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, 0.dp).clickable(enabled = enabled) { screen.scrollBy(-1) })
+        BasicText("▴", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, 0.dp).clickable(enabled = enabled) { screen.scrollBy(-1) })
         if (enabled) {
             val track = height - SCROLL_WIDTH * 2
             val thumb = maxOf(12, track * GUIDE_ROWS / count)
@@ -390,6 +390,6 @@ private fun GuideScrollBar(screen: GuideScreenState, theme: Theme, left: Int, to
             Box(modifier = Modifier.offset(2.dp, thumbTop.dp).size((SCROLL_WIDTH - 4).dp, thumb.dp).background(border))
             Box(modifier = Modifier.offset(2.dp, (thumbTop + thumb).dp).size((SCROLL_WIDTH - 4).dp, (height - SCROLL_WIDTH - thumbTop - thumb).dp).clickable { screen.scrollBy(1) })
         }
-        BasicText("▾", style = TextStyle(fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, (height - SCROLL_WIDTH).dp).clickable(enabled = enabled) { screen.scrollBy(1) })
+        BasicText("▾", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, (height - SCROLL_WIDTH).dp).clickable(enabled = enabled) { screen.scrollBy(1) })
     }
 }

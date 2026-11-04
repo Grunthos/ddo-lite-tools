@@ -113,8 +113,8 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 @Composable
 private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme) {
     val build = rules.build
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
     var openList by remember { mutableStateOf("") }
 
     // ---- Base Stats (fraGroup(0))
@@ -194,7 +194,7 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
             text = template.warning
             color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
         }
-        BasicText(text, style = TextStyle(fontSize = FONT_SIZE, color = color), modifier = Modifier.offset(392.dp, (TEMPLATE_TOPS[i] + 8).dp).size(393.dp, 34.dp))
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color), modifier = Modifier.offset(392.dp, (TEMPLATE_TOPS[i] + 8).dp).size(393.dp, 34.dp))
     }
 
     // ---- Open lists, drawn last so they're on top.
@@ -254,8 +254,8 @@ private fun StatsColumn(screen: StatsScreenState, rules: StatRules, theme: Theme
     if (!included) {
         return
     }
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val cost = TextStyle(fontSize = 10.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM), textAlign = TextAlign.Center)
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val cost = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 10.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM), textAlign = TextAlign.Center)
     for (stat in Stat.entries) {
         val rowTop = top + 24 + stat.ordinal * 16
         Label(stat.abbreviation, label, left, rowTop)
@@ -279,7 +279,7 @@ private fun StatsColumn(screen: StatsScreenState, rules: StatRules, theme: Theme
     ) {
         BasicText(
             build.statTotals[column.ordinal].toString(),
-            style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -291,7 +291,7 @@ internal fun GroupFrame(theme: Theme, caption: String, left: Int, top: Int, widt
     Frame(theme, left, top + 8, width, height - 8)
     BasicText(
         caption,
-        style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)),
+        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)),
         modifier = Modifier.offset((left + 8).dp, top.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)),
     )
 }
@@ -301,7 +301,7 @@ internal fun GroupFrame(theme: Theme, caption: String, left: Int, top: Int, widt
 private fun LinkLabel(theme: Theme, text: String, left: Int, top: Int, onClick: () -> Unit) {
     BasicText(
         text,
-        style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline),
+        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline),
         modifier = Modifier.offset(left.dp, top.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)).clickable(onClick = onClick),
     )
 }
@@ -317,7 +317,7 @@ private fun TemplateButton(theme: Theme, caption: String, left: Int, top: Int, o
     ) {
         BasicText(
             caption,
-            style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth().offset(0.dp, 6.dp),
         )
     }
@@ -341,10 +341,10 @@ internal fun CheckBox(theme: Theme, caption: String, checked: Boolean, enabled: 
                 .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
         ) {
             if (checked) {
-                BasicText("✓", style = TextStyle(fontSize = 11.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)), modifier = Modifier.offset(1.dp, (-2).dp))
+                BasicText("✓", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 11.sp, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)), modifier = Modifier.offset(1.dp, (-2).dp))
             }
         }
-        BasicText(caption, style = TextStyle(fontSize = FONT_SIZE, color = textColor), modifier = Modifier.offset(18.dp, 0.dp))
+        BasicText(caption, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = textColor), modifier = Modifier.offset(18.dp, 0.dp))
     }
 }
 
@@ -362,7 +362,7 @@ private fun Schedule(rules: StatRules, theme: Theme, left: Int, top: Int, width:
     val measurer = rememberTextMeasurer()
     val text = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
     val dim = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM)
-    val style = TextStyle(fontSize = FONT_SIZE)
+    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
     val build = rules.build
     Canvas(modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)) {
         fun textWidth(value: String): Int = measurer.measure(value, style).size.width

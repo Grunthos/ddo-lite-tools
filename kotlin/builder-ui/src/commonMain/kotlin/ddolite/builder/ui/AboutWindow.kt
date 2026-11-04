@@ -28,7 +28,7 @@ const val APP_VERSION = "v4.15"
 @Composable
 fun AboutWindowContent(state: BuilderSession) {
     val theme = state.skills.theme
-    val style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT), textAlign = TextAlign.Center)
+    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT), textAlign = TextAlign.Center)
     Box(modifier = Modifier.fillMaxSize().background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND))) {
         BasicText(APP_NAME, style = style, modifier = Modifier.offset(0.dp, 24.dp).width(265.dp))
         BasicText(APP_VERSION, style = style, modifier = Modifier.offset(0.dp, 48.dp).width(265.dp))

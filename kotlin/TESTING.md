@@ -273,6 +273,8 @@ the Kotlin output with these files and list every difference.
 - [ ] Details boxes (e.g. Destinies, bottom right): the text stays inside the box and wraps beside the
       scroll bar.
 - [ ] "(Errors)" after a heading in the main window is a link to that window (new; not in VB).
+- [ ] Text is crisp (ClearType-style smoothing and hinting), and the menu bar, message boxes and
+      file dialogs look like Windows' own (they were Swing's bold "Metal" style).
 - [ ] Leveling Guide, "Available" with nothing to list says why in the list, e.g. Kensei Warpriest,
       Warpriest at level 1: "Nothing in Warpriest at level 1: the earliest is level 3." (new; VB
       leaves the list blank).

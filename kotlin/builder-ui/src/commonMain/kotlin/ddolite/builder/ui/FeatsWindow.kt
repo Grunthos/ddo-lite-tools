@@ -169,8 +169,8 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
 @Composable
 private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, onMenu: () -> Unit) {
-    val label = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val link = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
+    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
     SlotList(screen, rules, theme, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
     if (!granted) {
@@ -257,7 +257,7 @@ private fun DetailsBox(screen: FeatsScreenState, theme: Theme, left: Int, top: I
                     color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_ERROR)
                 }
                 // Lines starting with a space are indented when they wrap (ProcessLine's blnIndent).
-                var style = TextStyle(fontSize = FONT_SIZE, color = color)
+                var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color)
                 if (line.text.startsWith(" ")) {
                     style = style.copy(textIndent = TextIndent(restLine = 14.sp))
                 }
@@ -294,8 +294,8 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     val rows = screen.rows()
     val granted = screen.tab == FeatTab.GRANTED
     val textMeasurer = rememberTextMeasurer()
-    val normal = TextStyle(fontSize = FONT_SIZE)
-    val bold = TextStyle(fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
+    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
     // The measurer works in pixels; the layout below is in dp.
     val scale = LocalDensity.current.density
     // userList.UserControl_Initialize: slot height 4/3 of the text, a quarter of that between slots,
@@ -341,7 +341,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     }
     widths[slotColumn] = right - lefts[slotColumn]
 
-    val textStyle = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     // DrawColumnHeaders: a header may be wider than its column; right-aligned ones then reach left.
     for (i in headers.indices) {
         val headerWidth = (textMeasurer.measure(headers[i], normal).size.width / scale).toInt()
@@ -377,7 +377,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
                     val top = (slotHeight + marginY) * r + marginY
                     val texts = rowTexts(entry, rules, granted)
                     val hover = screen.hoverRow == row
-                    var style = TextStyle(fontSize = FONT_SIZE, color = controlText)
+                    var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = controlText)
                     if (hover) {
                         style = style.copy(fontWeight = FontWeight.Bold)
                     }
@@ -474,7 +474,7 @@ private fun FeatSlot(screen: FeatsScreenState, theme: Theme, entry: FeatListEntr
     ) {
         BasicText(
             entry.display,
-            style = TextStyle(fontSize = FONT_SIZE, color = textColor),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = textColor),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.offset(4.dp, ((height - 15) / 2).dp).width((width - 8).dp),
@@ -569,7 +569,7 @@ private fun ListBox(
                 Box(modifier = itemModifier) {
                     BasicText(
                         items[i],
-                        style = TextStyle(fontSize = FONT_SIZE, color = color),
+                        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color),
                         maxLines = 1,
                         modifier = Modifier.offset(2.dp, 0.dp),
                     )
@@ -600,6 +600,6 @@ private fun FeatDragGhost(screen: FeatsScreenState, theme: Theme) {
             .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
             .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
     ) {
-        BasicText(text, style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
     }
 }

@@ -125,8 +125,8 @@ fun windowGridLayout(
     headerHeight: Float,
     footerTop: Float,
 ): WindowGrid {
-    val normal = TextStyle(fontSize = GRID_FONT_SIZE)
-    val bold = TextStyle(fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = GRID_FONT_SIZE)
+    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
     var nameWidth = textMeasurer.measure("Use Magic Device  ", bold).size.width.toFloat()
     val cellWidth = textMeasurer.measure("10½", normal).size.width.toFloat()
     val fudge = (textMeasurer.measure("½", normal).size.width / 4).toFloat()
@@ -161,8 +161,8 @@ fun windowGridLayout(
  * fitting it to a window (no icons; initials when there's more than one class).
  */
 fun compactGridLayout(textMeasurer: TextMeasurer, classRow: Boolean): GridLayout {
-    val normal = TextStyle(fontSize = GRID_FONT_SIZE)
-    val bold = TextStyle(fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = GRID_FONT_SIZE)
+    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = GRID_FONT_SIZE, fontWeight = FontWeight.Bold)
     val nameWidth = textMeasurer.measure("Use Magic Device  ", bold).size.width.toFloat()
     val cellWidth = textMeasurer.measure("10½", normal).size.width * 1.35f
     val rowHeight = textMeasurer.measure("Xg", normal).size.height * 1.45f
@@ -188,8 +188,8 @@ fun SkillsGrid(
     val scope = rememberCoroutineScope()
     val theme = state.theme
     val fontSize = GRID_FONT_SIZE
-    val normal = TextStyle(fontSize = fontSize, color = Color.Unspecified)
-    val bold = TextStyle(fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.Unspecified)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = fontSize, color = Color.Unspecified)
+    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.Unspecified)
     val density = LocalDensity.current
     val currentOnMenu by rememberUpdatedState(onMenu)
 

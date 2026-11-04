@@ -102,8 +102,8 @@ fun <T> UserList(
     fitRows: Int = 0,
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val normal = TextStyle(fontSize = FONT_SIZE)
-    val bold = TextStyle(fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
+    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
+    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
     // The measurer works in pixels; the layout below is in dp.
     val scale = LocalDensity.current.density
     val textHeight = (textMeasurer.measure("X", normal).size.height / scale).toInt()
@@ -148,7 +148,7 @@ fun <T> UserList(
     widths[slotColumn] = right - lefts[slotColumn]
 
     // DrawColumnHeaders: headers may be wider than their columns.
-    val headerStyle = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val headerStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     for (i in columns.indices) {
         val headerWidth = (textMeasurer.measure(columns[i].header, normal).size.width / scale).toInt()
         var hx = lefts[i]
@@ -170,7 +170,7 @@ fun <T> UserList(
                 for (r in 0 until rowCount) {
                     val row = r + 1
                     val rowTop = (slotHeight + marginY) * r + marginY
-                    var style = TextStyle(fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+                    var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
                     if (hoverRow == row) {
                         style = style.copy(fontWeight = FontWeight.Bold)
                     }
@@ -300,7 +300,7 @@ private fun <T> SlotBox(
         }
         BasicText(
             text,
-            style = TextStyle(fontSize = FONT_SIZE, color = textColor),
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = textColor),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.offset(4.dp, ((height - 15) / 2).dp).width(textWidth.dp),
@@ -402,7 +402,7 @@ fun <T> ListBox(
                 Box(modifier = itemModifier) {
                     val text = items[i]
                     val tab = text.indexOf('\t')
-                    val style = TextStyle(fontSize = FONT_SIZE, color = color)
+                    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color)
                     if (tab >= 0 && itemColumn > 0) {
                         BasicText(text.substring(0, tab), style = style, maxLines = 1, modifier = Modifier.offset(2.dp, 0.dp).width((itemColumn - 4).dp))
                         BasicText(text.substring(tab + 1), style = style, maxLines = 1, modifier = Modifier.offset(itemColumn.dp, 0.dp))
@@ -437,7 +437,7 @@ fun DetailsBox(theme: Theme, lines: List<DetailLine>, left: Int, top: Int, width
                 if (line.error) {
                     color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_ERROR)
                 }
-                var style = TextStyle(fontSize = FONT_SIZE, color = color)
+                var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color)
                 if (line.text.startsWith(" ")) {
                     style = style.copy(textIndent = TextIndent(restLine = 14.sp))
                 }
