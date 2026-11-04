@@ -337,12 +337,28 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     val totals = screen.totals
     if (totals != null) {
         val error = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
-        Label(totals.levelCaption(), label, 388, TAB_TOP + 468)
-        val apStyle = if (totals.ap < 0) label.copy(color = error) else label
-        BasicText(totals.apCaption(), style = apStyle.copy(textAlign = TextAlign.Center), maxLines = 1, modifier = Modifier.offset(484.dp, (TAB_TOP + 468).dp).width(169.dp))
-        val spentStyle = if (totals.spentError) label.copy(color = error) else label
         val spentWidth = measure(totals.spentCaption())
-        BasicText(totals.spentCaption(), style = spentStyle, maxLines = 1, modifier = Modifier.offset((GRID_LEFT + columns[5].right - spentWidth).dp, (TAB_TOP + 468).dp))
+        val spentLeft = GRID_LEFT + columns[5].right - spentWidth
+        // The AP caption is centred under the grid as in VB, unless the level caption (with the
+        // classes, Kotlin only) reaches it: then it follows that caption, and if even that won't fit
+        // before the spent caption, the classes are left off.
+        val gap = 8
+        val apWidth = measure(totals.apCaption())
+        var levelCaption = totals.levelCaption()
+        var apLeft = 484 + (169 - apWidth) / 2
+        val levelRight = 388 + measure(levelCaption) + gap
+        if (levelRight > apLeft) {
+            apLeft = levelRight
+            if (apLeft + apWidth + gap > spentLeft) {
+                levelCaption = totals.levelCaption(withClasses = false)
+                apLeft = 484 + (169 - apWidth) / 2
+            }
+        }
+        Label(levelCaption, label, 388, TAB_TOP + 468)
+        val apStyle = if (totals.ap < 0) label.copy(color = error) else label
+        BasicText(totals.apCaption(), style = apStyle, maxLines = 1, modifier = Modifier.offset(apLeft.dp, (TAB_TOP + 468).dp))
+        val spentStyle = if (totals.spentError) label.copy(color = error) else label
+        BasicText(totals.spentCaption(), style = spentStyle, maxLines = 1, modifier = Modifier.offset(spentLeft.dp, (TAB_TOP + 468).dp))
     }
 }
 

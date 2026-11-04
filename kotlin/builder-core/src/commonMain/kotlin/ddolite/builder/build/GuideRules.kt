@@ -77,8 +77,18 @@ class GuideTotals(
     val racialSpent: Int,
     val universalSpent: Int,
     val spentError: Boolean,
+    val classes: String = "",
 ) {
-    fun levelCaption(): String = "Cur. Level: $level"
+    /**
+     * "Cur. Level: 3", then (Kotlin only, unless [withClasses] is false) the build's classes at that
+     * level: "Cur. Level: 3 (Rog 1/Wiz 2)".
+     */
+    fun levelCaption(withClasses: Boolean = true): String {
+        if (!withClasses || classes.isEmpty()) {
+            return "Cur. Level: $level"
+        }
+        return "Cur. Level: $level ($classes)"
+    }
 
     fun apCaption(): String = "Available: $ap + ${racialAvailable}r + ${universalAvailable}u"
 
@@ -780,8 +790,40 @@ class GuideRules(private val rules: BuildRules) {
         }
         return GuideTotals(
             level, ap, build.racialAP - racialSpent, build.universalAP - universalSpent,
-            spent, racialSpent, universalSpent, spent > rules.heroicLevels() * 4,
+            spent, racialSpent, universalSpent, spent > rules.heroicLevels() * 4, classesAt(level),
         )
+    }
+
+    /**
+     * The build's classes up to [level] (heroic levels only), in the order first taken: "Rog 1/Wiz 2".
+     * Kotlin only: VB's label shows just the level.
+     */
+    fun classesAt(level: Int): String {
+        val classes = ArrayList<CharacterClass>()
+        val counts = ArrayList<Int>()
+        val last = if (level > HEROIC_LEVELS) HEROIC_LEVELS else level
+        for (i in 1..last) {
+            val c = build.levelClass(i) ?: continue
+            val index = classes.indexOf(c)
+            if (index == -1) {
+                classes.add(c)
+                counts.add(1)
+            } else {
+                counts[index] = counts[index] + 1
+            }
+        }
+        val text = StringBuilder()
+        for (i in classes.indices) {
+            if (i > 0) {
+                text.append('/')
+            }
+            var name = initial3(classes[i])
+            if (name.isEmpty()) {
+                name = classes[i].abbreviation
+            }
+            text.append(name).append(' ').append(counts[i])
+        }
+        return text.toString()
     }
 
     /**
