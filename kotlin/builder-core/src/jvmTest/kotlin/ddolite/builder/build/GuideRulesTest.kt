@@ -100,6 +100,43 @@ class GuideRulesTest {
     }
 
     @Test
+    fun laterRanksKeepTheFirstRanksSelector() {
+        val rules = open()
+        val g = GuideRules(rules)
+        val kensei = guideTree(g, "Kensei")
+        val tree = rules.guideTrees[kensei - 1].tree!!
+        // The first ability with more than one rank and a choice of selectors.
+        var tier = -1
+        var ability = -1
+        for (t in tree.tiers.indices) {
+            for (a in tree.tiers[t].indices) {
+                val data = tree.tiers[t][a]
+                if (tier == -1 && data.ranks > 1 && data.selectors.size > 1 && g.needsSelector(kensei, t, a)) {
+                    tier = t
+                    ability = a
+                }
+            }
+        }
+        assertTrue(tier >= 0, "a multi-rank ability with selectors")
+        // Before rank I is taken, rank II asks for a selector as VB does.
+        for (c in g.availableAbilities(kensei, GuideFilter.ALL_ENHANCEMENTS, 20)) {
+            if (c.tier == tier && c.ability == ability) {
+                assertEquals(0, c.selector)
+            }
+        }
+        g.addAbility(kensei, tier, ability, 2, 1)
+        var later = 0
+        for (c in g.availableAbilities(kensei, GuideFilter.ALL_ENHANCEMENTS, 20)) {
+            if (c.tier == tier && c.ability == ability) {
+                assertTrue(c.rank > 1)
+                assertEquals(2, c.selector, "rank " + c.rank + " keeps rank I's selector")
+                later++
+            }
+        }
+        assertTrue(later > 0, "the later ranks are offered")
+    }
+
+    @Test
     fun nothingAvailableSaysWhy() {
         val rules = open()
         val g = GuideRules(rules)

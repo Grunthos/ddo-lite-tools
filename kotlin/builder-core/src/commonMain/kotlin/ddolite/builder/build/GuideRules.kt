@@ -876,6 +876,9 @@ class GuideRules(private val rules: BuildRules) {
      * ShowGuideAvailable (:2648), with GuideAbilityTaken (:2715), GuideSelected (:2736) and
      * CheckGuideAvailable (:2760).
      *
+     * Ranks after the first keep the selector the guide took the first with (Kotlin only, see
+     * [guideSelector]).
+     *
      * VB quirks kept: "Selected and Available" (the default) lists the same as "Show All": every
      * rank not yet in the guide; only "Available" checks levels and requirements, and an ability
      * that can never be taken (minimum level 0) still passes the level check.
@@ -899,9 +902,15 @@ class GuideRules(private val rules: BuildRules) {
                     if (abilityTaken(g, tier, ability, rank)) {
                         continue
                     }
-                    val selector = selectedSelector(g, filter, tier, ability, rank)
+                    var selector = selectedSelector(g, filter, tier, ability, rank)
                     if (selector < 0) {
                         continue
+                    }
+                    if (rank > 1) {
+                        val earlier = guideSelector(g, tier, ability)
+                        if (earlier != 0) {
+                            selector = earlier
+                        }
                     }
                     if (filter == GuideFilter.ALL_AVAILABLE || filter == null) {
                         if (abilityMinLevel(guide, tier, ability, selector, rank) > guideLevel) {
@@ -941,6 +950,21 @@ class GuideRules(private val rules: BuildRules) {
             return "Nothing in $name at level $guideLevel: the earliest is level $earliest."
         }
         return "Nothing in $name at level $guideLevel: the rest need other abilities, or more AP spent in the tree, first."
+    }
+
+    /**
+     * The selector the guide already took this ability with (an earlier rank, not reset since), or 0.
+     * Kotlin only: VB offers every selector again for ranks II and III (VB-BUGS 22k), so a guide
+     * could take Efficient Metamagic I as Maximize and II as Empower; here the later ranks keep
+     * the first rank's choice.
+     */
+    private fun guideSelector(g: GuideTree, tier: Int, ability: Int): Int {
+        for (a in g.guideBuildTree.abilities) {
+            if (a.tier == tier && a.ability == ability && a.selector != 0) {
+                return a.selector
+            }
+        }
+        return 0
     }
 
     /** "1: Abbr: Selector II". Ported from GuideBuildAbilityDisplay (:2694). */

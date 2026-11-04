@@ -282,6 +282,13 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
     the tree showing stays selected and its list is rebuilt. *Fix:* in `RefreshGuide`, reselect
     `mlngGuideTree`'s entry (or call `ShowGuideAvailable`) after `InitGuide`.
 
+22k. **Leveling Guide: later ranks of an ability can take a different selector.**
+    `Forms/Build/frmEnhancements.frm:2938` `GetGuideSelectors` offers every selector of a root
+    selector ability for each rank, so a guide can take Efficient Metamagic I as Maximize and II as
+    Empower, which the game doesn't allow. **The Kotlin version fixes this**: ranks after the first
+    are offered with the first rank's selector, with no choice to make. *Fix:* in
+    `ShowGuideAvailable`, for a rank over 1, take the selector from the guide tree's `BuildTree`.
+
 23. **"MaxLevels:" is written twice.** `Modules/Build/basFormatLite.bas:165-166`. Harmless (the
     second is read over the first). *Fix:* delete line 166.
 
