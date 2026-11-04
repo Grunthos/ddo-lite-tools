@@ -37,15 +37,50 @@ import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
-/** picTab(2)'s top in the window, and picContainer's place in it (pixels at 100%). */
+/*
+ * The tab's layout (pixels at 100%), each control placed from the one before it with the shared
+ * spacing in Layout.kt: two columns on the left (the trees, the abilities) over the details, and
+ * the grid on the right.
+ */
+
+/** picTab(2)'s top in the window. */
 private const val TAB_TOP = 32
-private const val GRID_LEFT = 400
+
+/** The tree list (or the selectors) and the ability list beside it; the details span both. */
+private const val TREE_WIDTH = 125
+private const val ABILITY_LEFT = MARGIN + TREE_WIDTH + GAP
+private const val ABILITY_WIDTH = 229
+private const val PANEL_RIGHT = ABILITY_LEFT + ABILITY_WIDTH
+private const val PANEL_WIDTH = PANEL_RIGHT - MARGIN
+
+/** The filter drop-down, then the lists under it. */
+private const val COMBO_TOP = TAB_TOP + 12
+private const val LIST_TOP = COMBO_TOP + COMBO_HEIGHT + TIGHT
+private const val LIST_HEIGHT = 213
+private const val LIST_BOTTOM = LIST_TOP + LIST_HEIGHT
+
+/** "Back to Trees" ends level with the lists, a little below the selector list. */
+private const val BACK_TOP = LIST_BOTTOM - BUTTON_HEIGHT
+private const val BACK_WIDTH = 109
+private const val SELECTOR_HEIGHT = BACK_TOP - 7 - LIST_TOP
+
+/** The details: caption, the Cost / Spent in Tree / Min Level line, then the box, down to the grid's bottom. */
+private const val CAPTION_TOP = LIST_BOTTOM + 13
+private const val INFO_TOP = CAPTION_TOP + LINE
+private const val DETAILS_TOP = INFO_TOP + LINE
+
+/** picContainer: the grid, one gap right of the left panel, under its header line. */
+private const val GRID_LEFT = PANEL_RIGHT + GAP
 private const val GRID_TOP = TAB_TOP + 24
 private const val GRID_WIDTH = 398
-private const val SCROLL_WIDTH = 17
 
 /** mlngHeight: picContainer's 441 pixels shared by 20 rows. */
 private const val ROW_HEIGHT = 22
+private const val GRID_HEIGHT = ROW_HEIGHT * GUIDE_ROWS + 1
+private const val GRID_BOTTOM = GRID_TOP + GRID_HEIGHT
+
+/** The totals line, under the grid. */
+private const val TOTALS_TOP = GRID_BOTTOM + TIGHT
 
 /**
  * The Leveling Guide tab (picTab(2) of frmEnhancements): the tree list (or the chosen ability's
@@ -74,18 +109,20 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             names.add(s.text)
         }
         ListBox(
-            theme, names, isSelected = { it == screen.selectorIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 181,
+            theme, names, isSelected = { it == screen.selectorIndex }, left = MARGIN, top = LIST_TOP, width = TREE_WIDTH, height = SELECTOR_HEIGHT,
             drag = drag, onPress = { i, _ -> screen.clickSelector(i) }, onDoubleClick = { screen.chooseAbility() },
         )
-        GuideButton(theme, "Back to Trees", 24, TAB_TOP + 224, 109, 25) { screen.backToTrees() }
+        // Centred under the selector list.
+        GuideButton(theme, "Back to Trees", MARGIN + (TREE_WIDTH - BACK_WIDTH) / 2, BACK_TOP, BACK_WIDTH, BUTTON_HEIGHT) { screen.backToTrees() }
     } else {
-        CheckBox(theme, "Show All", screen.showAllTrees, true, 16, TAB_TOP + 16, 125) { screen.toggleShowAllTrees() }
+        // Its caption level with the drop-down's text.
+        CheckBox(theme, "Show All", screen.showAllTrees, true, MARGIN, COMBO_TOP + 4, TREE_WIDTH) { screen.toggleShowAllTrees() }
         val names = ArrayList<String>()
         for (t in screen.trees) {
             names.add(t.text)
         }
         ListBox(
-            theme, names, isSelected = { it == screen.treeIndex }, left = 16, top = TAB_TOP + 36, width = 125, height = 213,
+            theme, names, isSelected = { it == screen.treeIndex }, left = MARGIN, top = LIST_TOP, width = TREE_WIDTH, height = LIST_HEIGHT,
             drag = drag, onPress = { i, _ -> screen.clickTree(i) },
         )
     }
@@ -96,26 +133,26 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         choiceTexts.add(c.text)
     }
     ListBox(
-        theme, choiceTexts, isSelected = { it == screen.choiceIndex }, left = 156, top = TAB_TOP + 36, width = 229, height = 213,
+        theme, choiceTexts, isSelected = { it == screen.choiceIndex }, left = ABILITY_LEFT, top = LIST_TOP, width = ABILITY_WIDTH, height = LIST_HEIGHT,
         drag = drag, onPress = { i, _ -> screen.clickChoice(i) }, onDoubleClick = { screen.chooseAbility() },
     )
     val nothing = screen.nothingAvailable
     if (nothing != null) {
-        // Kotlin only: why "Available" lists nothing, inside the empty list, clear of its scroll bar.
+        // Kotlin only: why "Available" lists nothing, inside the empty list (6 pixels in), clear of its scroll bar.
         val dim = control.copy(color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM))
-        BasicText(nothing, style = dim, modifier = Modifier.offset(162.dp, (TAB_TOP + 42).dp).width((229 - 12 - SCROLL_WIDTH).dp))
+        BasicText(nothing, style = dim, modifier = Modifier.offset((ABILITY_LEFT + 6).dp, (LIST_TOP + 6).dp).width((ABILITY_WIDTH - 12 - SCROLL_BAR).dp))
     }
 
     // Details.
-    Label(screen.detailsCaption, label.copy(fontWeight = FontWeight.Bold), 16, TAB_TOP + 262)
-    DetailsBox(theme, screen.details, 16, TAB_TOP + 296, 369, 168)
+    Label(screen.detailsCaption, label.copy(fontWeight = FontWeight.Bold), MARGIN, CAPTION_TOP)
+    DetailsBox(theme, screen.details, MARGIN, DETAILS_TOP, PANEL_WIDTH, GRID_BOTTOM - DETAILS_TOP)
     val cost = screen.costLabel
     if (cost != null) {
-        Label(cost, label, 16, TAB_TOP + 279)
+        Label(cost, label, MARGIN, INFO_TOP)
     }
     val spent = screen.spentLabel
     if (spent != null) {
-        BasicText(spent, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset(16.dp, (TAB_TOP + 279).dp).width(369.dp))
+        BasicText(spent, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset(MARGIN.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
     }
     val levels = screen.levelsLabel
     if (levels != null) {
@@ -123,19 +160,19 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         if (screen.levelsError) {
             style = style.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR))
         }
-        BasicText(levels, style = style, modifier = Modifier.offset(16.dp, (TAB_TOP + 279).dp).width(369.dp))
+        BasicText(levels, style = style, modifier = Modifier.offset(MARGIN.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
     }
 
     GuideGrid(screen, theme, onMenu)
 
     // The combo goes last so its list drops over the ability list.
-    ComboBox(theme, control, screen.filter.caption, 156, TAB_TOP + 12, 229, 21) { comboOpen = !comboOpen }
+    ComboBox(theme, control, screen.filter.caption, ABILITY_LEFT, COMBO_TOP, ABILITY_WIDTH, COMBO_HEIGHT) { comboOpen = !comboOpen }
     if (comboOpen) {
         val captions = ArrayList<String>()
         for (f in GuideFilter.entries) {
             captions.add(f.caption)
         }
-        DropList(theme, control, captions, 156, TAB_TOP + 33, 229) { index ->
+        DropList(theme, control, captions, ABILITY_LEFT, COMBO_TOP + COMBO_HEIGHT, ABILITY_WIDTH) { index ->
             comboOpen = false
             screen.chooseFilter(GuideFilter.entries[index])
         }
@@ -177,7 +214,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     val scale = LocalDensity.current.density
     fun measure(text: String): Int = (measurer.measure(text, textStyle).size.width / scale).toInt()
     val space = measure(" ")
-    val gridWidth = GRID_WIDTH - SCROLL_WIDTH
+    val gridWidth = GRID_WIDTH - SCROLL_BAR
 
     // InitGrid: every column but Ability fits its header (or sample text); Ability takes the rest.
     val widths = IntArray(6)
@@ -198,7 +235,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
 
     val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
     for (c in columns) {
-        BasicText(c.header, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset((GRID_LEFT + c.left).dp, (TAB_TOP + 8).dp).width(c.width.dp))
+        BasicText(c.header, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset((GRID_LEFT + c.left).dp, (GRID_TOP - 16).dp).width(c.width.dp))
     }
 
     val rows = screen.rows()
@@ -221,7 +258,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
     }
 
     Box(
-        modifier = Modifier.offset(GRID_LEFT.dp, GRID_TOP.dp).size(gridWidth.dp, (ROW_HEIGHT * GUIDE_ROWS + 1).dp)
+        modifier = Modifier.offset(GRID_LEFT.dp, GRID_TOP.dp).size(gridWidth.dp, GRID_HEIGHT.dp)
             .background(back)
             .pointerInput(rows.size, screen.scroll, columns[1].left, columns[1].right) {
                 awaitPointerEventScope {
@@ -310,7 +347,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             }
         }
         // DrawBorders: interior lines round every cell, exterior lines on the outside and between levels.
-        Canvas(modifier = Modifier.size(gridWidth.dp, (ROW_HEIGHT * GUIDE_ROWS + 1).dp)) {
+        Canvas(modifier = Modifier.size(gridWidth.dp, GRID_HEIGHT.dp)) {
             val d = density
             for (line in 0 until GUIDE_ROWS) {
                 val row = screen.scroll + line + 1
@@ -337,7 +374,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
             }
         }
     }
-    GuideScrollBar(screen, theme, GRID_LEFT + gridWidth, GRID_TOP, ROW_HEIGHT * GUIDE_ROWS + 1)
+    GuideScrollBar(screen, theme, GRID_LEFT + gridWidth, GRID_TOP, GRID_HEIGHT)
 
     // The totals: lblGuideLevel, lblGuideAP (red when negative), lblGuideSpent (red past 4 AP a heroic level).
     val totals = screen.totals
@@ -347,13 +384,13 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, onMenu: () -> Unit
         // Kotlin only: Level, Available and Spent right-aligned to the grid's outside edge, a gap apart
         // (VB has the level at the grid's left and centres Available under it).
         val spentLeft = GRID_LEFT + GRID_WIDTH - spentWidth
-        val apLeft = spentLeft - 24 - measure(totals.apCaption())
-        val levelLeft = apLeft - 24 - measure(totals.levelCaption())
-        Label(totals.levelCaption(), label, levelLeft, TAB_TOP + 468)
+        val apLeft = spentLeft - ITEM_GAP - measure(totals.apCaption())
+        val levelLeft = apLeft - ITEM_GAP - measure(totals.levelCaption())
+        Label(totals.levelCaption(), label, levelLeft, TOTALS_TOP)
         val apStyle = if (totals.ap < 0) label.copy(color = error) else label
-        BasicText(totals.apCaption(), style = apStyle, maxLines = 1, modifier = Modifier.offset(apLeft.dp, (TAB_TOP + 468).dp))
+        BasicText(totals.apCaption(), style = apStyle, maxLines = 1, modifier = Modifier.offset(apLeft.dp, TOTALS_TOP.dp))
         val spentStyle = if (totals.spentError) label.copy(color = error) else label
-        BasicText(totals.spentCaption(), style = spentStyle, maxLines = 1, modifier = Modifier.offset(spentLeft.dp, (TAB_TOP + 468).dp))
+        BasicText(totals.spentCaption(), style = spentStyle, maxLines = 1, modifier = Modifier.offset(spentLeft.dp, TOTALS_TOP.dp))
     }
 }
 
@@ -379,17 +416,17 @@ private fun GuideScrollBar(screen: GuideScreenState, theme: Theme, left: Int, to
     val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
     val arrow = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
-    Box(modifier = Modifier.offset(left.dp, top.dp).size(SCROLL_WIDTH.dp, height.dp).background(back).border(1.dp, border)) {
+    Box(modifier = Modifier.offset(left.dp, top.dp).size(SCROLL_BAR.dp, height.dp).background(back).border(1.dp, border)) {
         BasicText("▴", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, 0.dp).clickable(enabled = enabled) { screen.scrollBy(-1) })
         if (enabled) {
-            val track = height - SCROLL_WIDTH * 2
+            val track = height - SCROLL_BAR * 2
             val thumb = maxOf(12, track * GUIDE_ROWS / count)
             val max = count - GUIDE_ROWS
-            val thumbTop = SCROLL_WIDTH + (track - thumb) * screen.scroll / max
-            Box(modifier = Modifier.offset(2.dp, SCROLL_WIDTH.dp).size((SCROLL_WIDTH - 4).dp, (thumbTop - SCROLL_WIDTH).dp).clickable { screen.scrollBy(-1) })
-            Box(modifier = Modifier.offset(2.dp, thumbTop.dp).size((SCROLL_WIDTH - 4).dp, thumb.dp).background(border))
-            Box(modifier = Modifier.offset(2.dp, (thumbTop + thumb).dp).size((SCROLL_WIDTH - 4).dp, (height - SCROLL_WIDTH - thumbTop - thumb).dp).clickable { screen.scrollBy(1) })
+            val thumbTop = SCROLL_BAR + (track - thumb) * screen.scroll / max
+            Box(modifier = Modifier.offset(2.dp, SCROLL_BAR.dp).size((SCROLL_BAR - 4).dp, (thumbTop - SCROLL_BAR).dp).clickable { screen.scrollBy(-1) })
+            Box(modifier = Modifier.offset(2.dp, thumbTop.dp).size((SCROLL_BAR - 4).dp, thumb.dp).background(border))
+            Box(modifier = Modifier.offset(2.dp, (thumbTop + thumb).dp).size((SCROLL_BAR - 4).dp, (height - SCROLL_BAR - thumbTop - thumb).dp).clickable { screen.scrollBy(1) })
         }
-        BasicText("▾", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, (height - SCROLL_WIDTH).dp).clickable(enabled = enabled) { screen.scrollBy(1) })
+        BasicText("▾", style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = arrow), modifier = Modifier.offset(4.dp, (height - SCROLL_BAR).dp).clickable(enabled = enabled) { screen.scrollBy(1) })
     }
 }
