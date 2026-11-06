@@ -129,7 +129,14 @@ class BuildRoundTripTest {
                     assertEquals("-", line, "$name: unexpected difference") // a blank line around the removed guide
                 }
             }
-            assertEquals(deprecations.enhancements.size + deprecations.destinies.size, removedAbilities, "$name abilities")
+            // Abilities kept as placeholder slots are saved back; only the others leave the file.
+            var droppedAbilities = deprecations.destinies.size
+            for (e in deprecations.enhancements) {
+                if (!e.kept) {
+                    droppedAbilities++
+                }
+            }
+            assertEquals(droppedAbilities, removedAbilities, "$name abilities")
             assertEquals(deprecations.reducedRanks.size, reduced, "$name reduced ranks")
             // A renamed feat is written back under its new name in the same slot.
             assertEquals(deprecations.feats.size + deprecations.nameChanges.size, removedFeats, "$name feats")
@@ -171,7 +178,10 @@ class BuildRoundTripTest {
             val reloaded = readBuildFile(first, data, BuildPoints.ADVENTURER)
             assertEquals(emptyList(), reloaded.problems, name)
             val d = reloaded.deprecations
-            assertTrue(d.feats.isEmpty() && d.nameChanges.isEmpty() && d.enhancements.isEmpty() && d.destinies.isEmpty(), "$name: ${d.feats} ${d.enhancements}")
+            assertTrue(d.feats.isEmpty() && d.nameChanges.isEmpty() && d.destinies.isEmpty(), "$name: ${d.feats}")
+            for (e in d.enhancements) {
+                assertTrue(e.kept, "$name: $e") // placeholders come back as placeholders
+            }
             for (g in d.guide) {
                 assertTrue(g.kept, "$name: ${g.text}")
             }

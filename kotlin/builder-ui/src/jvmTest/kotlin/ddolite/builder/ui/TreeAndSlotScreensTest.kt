@@ -255,6 +255,34 @@ class TreeAndSlotScreensTest {
         assertTrue(session.rules!!.build.trees[row - 1].abilities.isEmpty())
     }
 
+    @Test
+    fun placeholderSlotsShowExplainAndClear() {
+        // Kensei Warpriest's Kensei tree has four "Weapon Group Specialization: Axes" lines the data
+        // no longer has: red placeholder slots after the abilities.
+        val session = TestSession.open("Kensei Warpriest.build")
+        val screen = session.enhancements
+        screen.opened()
+        screen.chooseTab(1)
+        screen.chooseComboTree("Kensei")
+        val bt = session.rules!!.findBuildTree("Kensei").let { session.rules!!.build.trees[it - 1] }
+        val abilities = bt.abilities.size
+        val rows = screen.slotRows()
+        assertEquals(abilities + bt.missing.size, rows.size)
+        val first = rows[abilities]
+        assertEquals("Weapon Group Specialization: Axes", first.caption)
+        assertTrue(first.error)
+        assertEquals("?", first.cost)
+        // Clicking it explains; double-clicking removes it (undoably).
+        screen.clickSlot(abilities + 1, PointerButton.PRIMARY)
+        assertEquals("Not in the current data", screen.details?.caption)
+        val count = bt.missing.size
+        screen.doubleClickSlot(abilities + 1)
+        assertEquals(count - 1, bt.missing.size)
+        assertEquals(abilities, bt.abilities.size)
+        session.undo()
+        assertEquals(count, session.rules!!.build.trees[session.rules!!.findBuildTree("Kensei") - 1].missing.size)
+    }
+
     // ---------------------------------------------------------------- Feats slots
 
     /** The first row with a feat whose slot is the given kind, or 0. */

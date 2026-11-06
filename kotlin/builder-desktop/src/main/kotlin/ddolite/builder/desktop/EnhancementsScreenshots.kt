@@ -96,6 +96,13 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
     screen.opened()
     val guide = screen.guide
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
+        // Kensei's tree: the lines the data no longer has as red placeholders, one selected.
+        screen.chooseTab(1)
+        screen.chooseComboTree("Kensei")
+        val kenseiRows = screen.slotRows()
+        screen.clickSlot(kenseiRows.size, ddolite.builder.ui.PointerButton.PRIMARY)
+        scene.render() // a first frame, so the slot list knows it overflows (its scroll bar)
+        shot(scene, outDir.resolve("37-enh-placeholders.png"))
         screen.chooseTab(2)
         println("Guide: trees " + guide.trees.map { it.text } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
         // The saved guide's first step names an ability the data no longer has: a red row.

@@ -430,11 +430,27 @@ private class BuildFileWriter(private val rules: BuildRules) {
 
     /** The tree's ability lines; none if the tree isn't in the data. Ported from `AddAbilityLite` (basFormatLite.bas:496). */
     private fun addAbilities(buildTree: BuildTree, tree: Tree?) {
-        if (buildTree.abilities.isEmpty() || tree == null) {
+        if ((buildTree.abilities.isEmpty() && buildTree.missing.isEmpty()) || tree == null) {
             return
         }
-        for (ability in buildTree.abilities) {
-            addLine(abilityLine(ability, tree))
+        // Kotlin only: placeholders go back where they were among the abilities.
+        for (i in buildTree.abilities.indices) {
+            addMissing(buildTree, i)
+            addLine(abilityLine(buildTree.abilities[i], tree))
+        }
+        for (m in buildTree.missing) {
+            if (m.position >= buildTree.abilities.size) {
+                addLine("Ability: " + m.text)
+            }
+        }
+    }
+
+    /** The placeholders that came before ability [index] in the file. */
+    private fun addMissing(buildTree: BuildTree, index: Int) {
+        for (m in buildTree.missing) {
+            if (m.position == index) {
+                addLine("Ability: " + m.text)
+            }
         }
     }
 

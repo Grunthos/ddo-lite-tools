@@ -166,6 +166,27 @@ class BuildTree(var treeName: String) {
     var source: CharacterClass? = null
     var classLevels = 0
     val abilities = ArrayList<BuildAbility>()
+
+    /**
+     * Kotlin only: the file's ability lines the current data hasn't (VB drops them). They show as red
+     * placeholder slots after the abilities, count for nothing in the rules (which only see
+     * [abilities]), and are saved back where they were until cleared.
+     */
+    val missing = ArrayList<MissingAbility>()
+}
+
+/**
+ * A tree's ability line the data hasn't: [text] as in the file ("Tier 1: Weapon Group Specialization:
+ * Axes"), its [tier], and [position], how many of the tree's abilities came before it in the file
+ * (where it's saved back).
+ */
+class MissingAbility(val tier: Int, val text: String, val position: Int) {
+    /** The ability as the slot shows it: the text without its "Tier n: ". */
+    val caption: String
+        get() {
+            val colon = text.indexOf(": ")
+            return if (text.startsWith("Tier ") && colon > 0) text.substring(colon + 2) else text
+        }
 }
 
 /** A tree the leveling guide uses. Ported from `BuildGuideTreeType` (basBuildDefs.bas:286). */
@@ -358,6 +379,7 @@ class Build {
         c.source = t.source
         c.classLevels = t.classLevels
         c.abilities.addAll(t.abilities)
+        c.missing.addAll(t.missing)
         return c
     }
 }

@@ -81,7 +81,9 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             result.add(DeprecationMessage("Feats: \"" + change.oldName + "\" renamed to \"" + change.newName + "\"", MessageGroup.NAME_CHANGE, i + 1))
         }
         for (i in deprecations.enhancements.indices) {
-            result.add(DeprecationMessage("Enhancements: " + abilityNotice(deprecations.enhancements[i]), MessageGroup.ENHANCEMENT, i + 1))
+            val e = deprecations.enhancements[i]
+            val kept = if (e.kept) " (kept as a red slot)" else ""
+            result.add(DeprecationMessage("Enhancements: " + abilityNotice(e) + kept, MessageGroup.ENHANCEMENT, i + 1))
         }
         for (i in deprecations.reducedRanks.indices) {
             val r = deprecations.reducedRanks[i]

@@ -67,13 +67,16 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
 
     /** "Reset <tree>" (mnuTrees_Click): its abilities go. VB quirk kept: the tier 5 tree stays set. */
     fun resetTree(row: Int) {
-        list.getOrNull(row - 1)?.abilities?.clear()
+        val bt = list.getOrNull(row - 1) ?: return
+        bt.abilities.clear()
+        bt.missing.clear()
     }
 
     /** "Reset All Trees" (mnuTrees_Click). */
     fun resetAllTrees() {
         for (bt in list) {
             bt.abilities.clear()
+            bt.missing.clear()
         }
     }
 
@@ -182,6 +185,7 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
     /** The slot menu's "Reset tree" (mnuEnhancements_Click): every ability goes, and it's no longer the tier 5 tree. */
     fun resetAbilities(bt: BuildTree) {
         bt.abilities.clear()
+        bt.missing.clear()
         if (tier5 == bt.treeName) {
             moveTier5("")
         }

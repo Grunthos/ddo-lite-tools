@@ -34,6 +34,8 @@ data class DeprecatedAbility(
     val rank: Int,
     val guideTreeDisplay: String,
     val parsed: Boolean,
+    /** Kotlin only: kept in its tree as a placeholder slot. */
+    val kept: Boolean = false,
 )
 
 /**

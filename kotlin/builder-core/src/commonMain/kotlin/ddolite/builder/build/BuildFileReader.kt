@@ -596,6 +596,12 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         val ability = parseAbility(buildTree.treeName + " " + raw, isDestiny)
         val resolved = if (ability.parsed) resolveAbility(ability, keepLowerRank = true) else null
         if (resolved == null) {
+            // Kotlin only: an enhancement tree in the data keeps the line as a placeholder slot.
+            if (!isDestiny && ability.parsed && data.findTree(buildTree.treeName) != null) {
+                buildTree.missing.add(MissingAbility(ability.tier, raw, buildTree.abilities.size))
+                deprecations.enhancements.add(ability.copy(kept = true))
+                return
+            }
             deprecateAbility(ability)
             return
         }

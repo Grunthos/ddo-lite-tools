@@ -152,6 +152,27 @@ class BuildFileTest {
     }
 
     @Test
+    fun treeKeepsMissingAbilitiesAsPlaceholders() {
+        // A line the data hasn't stays in its tree as a placeholder (not an ability), and is saved back
+        // where it was (Kotlin only: VB drops it).
+        val result = read(
+            fighter + "[Enhancements]\n\nTree: Human\nType: Race\n" +
+                "Ability: Tier 0: Versatility: Attack\nAbility: Tier 0: No Such Ability\nAbility: Tier 1: Inflame: Energy Absorption (Rank 2)\n\n",
+        )
+        val human = result.build.trees[0]
+        assertEquals(2, human.abilities.size)
+        assertEquals(1, human.missing.size)
+        assertEquals("No Such Ability", human.missing[0].caption)
+        assertEquals(0, human.missing[0].tier)
+        assertTrue(result.deprecations.enhancements[0].kept)
+        val saved = writeBuildText(result.rules)
+        assertTrue(saved.contains("Ability: Tier 0: Versatility: Attack\r\nAbility: Tier 0: No Such Ability\r\nAbility: Tier 1: Inflame: Energy Absorption (Rank 2)\r\n"), saved)
+        // Resetting the tree clears it too.
+        TreeEdits(result.rules, destinies = false).resetAbilities(human)
+        assertTrue(human.missing.isEmpty())
+    }
+
+    @Test
     fun guideKeepsMissingAbilitiesAndDropsMissingTrees() {
         // A missing ability in a known tree is kept (saved back as read); a missing tree's step is
         // dropped; the steps after both still load (Kotlin only: VB stops at the first).

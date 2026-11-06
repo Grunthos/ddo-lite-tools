@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ddolite.builder.build.TreeEdits
 import ddolite.builder.build.AbilityDetails
+import ddolite.builder.build.DetailLine
+import ddolite.builder.build.MissingAbility
 import ddolite.builder.build.BLANK_ABILITY
 import ddolite.builder.build.BuildAbility
 import ddolite.builder.build.BuildTree
@@ -671,7 +673,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val r = rules ?: return emptyList()
         val tree = currentTree()
         val bt = currentBuildTree()
-        if (tree == null || bt == null || bt.abilities.isEmpty()) {
+        if (tree == null || bt == null || (bt.abilities.isEmpty() && bt.missing.isEmpty())) {
             return listOf(AbilitySlotRow("", "", "", 0, 0, false))
         }
         val spend = r.spentInTree(tree, bt)
@@ -684,6 +686,10 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
                 val error = r.abilityError(tree, bt, a, spend) != null
                 rows.add(AbilitySlotRow(a.tier.toString(), info.caption, info.cost.toString(), a.rank, info.maxRanks, error))
             }
+        }
+        // Kotlin only: the file's abilities the data hasn't, as red placeholders after the rest.
+        for (m in bt.missing) {
+            rows.add(AbilitySlotRow(m.tier.toString(), m.caption, "?", 0, 0, true))
         }
         return rows
     }
@@ -785,6 +791,19 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         details = r.details(tree, bt, tier, ability, selector, slot)
     }
 
+    /** The details for slot [row]: an ability's, or a placeholder's (Kotlin only). */
+    private fun showSlotDetails(bt: BuildTree, row: Int) {
+        if (row > bt.abilities.size) {
+            val m = bt.missing.getOrNull(row - bt.abilities.size - 1) ?: return
+            details = AbilityDetails(
+                "Not in the current data", missingDetails(m), "", "", null,
+            )
+            return
+        }
+        val a = bt.abilities[row - 1]
+        showDetails(a.tier, a.ability, a.selector, row)
+    }
+
     /** usrList_SlotClick (:1902). */
     override fun clickSlot(row: Int, button: PointerButton) {
         val bt = currentBuildTree() ?: return
@@ -802,13 +821,11 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
             }
         } else if (button == PointerButton.PRIMARY) {
             selectSlot(row)
-            val a = bt.abilities[row - 1]
-            showDetails(a.tier, a.ability, a.selector, row)
+            showSlotDetails(bt, row)
         } else if (button == PointerButton.SECONDARY) {
             selectSlot(row)
             slotHover = row
-            val a = bt.abilities[row - 1]
-            showDetails(a.tier, a.ability, a.selector, row)
+            showSlotDetails(bt, row)
             slotMenuRow = row
         }
         changed()
@@ -849,6 +866,18 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     private fun clearSlot(row: Int) {
         val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
+        if (row > bt.abilities.size) {
+            // A placeholder (Kotlin only): it goes, and isn't saved any more.
+            val index = row - bt.abilities.size - 1
+            if (index < 0 || index >= bt.missing.size) {
+                return
+            }
+            bt.missing.removeAt(index)
+            showAbilities()
+            noSelection()
+            treesChanged()
+            return
+        }
         if (!edits.clearSlot(bt, row)) {
             return
         }
@@ -1046,5 +1075,16 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
             slotHover = 0
         }
         dragComplete = false
+    }
+
+    /** What a placeholder slot says in the details box. */
+    private fun missingDetails(m: MissingAbility): List<DetailLine> {
+        return listOf(
+            DetailLine("Tier " + m.tier + ": " + m.caption, null, true),
+            DetailLine("", null, false),
+            DetailLine("The build file has this ability, but the current data hasn't (it may have been renamed or removed). It costs nothing, and anything that needed it shows an error.", null, false),
+            DetailLine("", null, false),
+            DetailLine("Double-click it (or right-click › Clear this ability) to remove it, then add what it became, if anything. Until then it's saved as it was read.", null, false),
+        )
     }
 }
