@@ -28,7 +28,7 @@ where things are; **Look** = how they're drawn.
 | "(Errors)" after a heading in the main window's output is a link that opens that window. | Feature | `Modules/Build/basOutput.bas` | d362644 |
 | Leveling Guide: when "Available" lists nothing, the list says why ("Nothing in Warpriest at level 1: the earliest is level 3."). | Feature | `frmEnhancements.frm` `ShowGuideAvailable` | 86dc7a4 |
 | Leveling Guide: the level caption gives the build's classes at that level: "Level: 20 (Ftr 12/Clr 8)" (VB: "Cur. Level: 20"). | Feature | `frmEnhancements.frm` `GuideTotals` (:2500), `lblGuideLevel` | e139669, 121fe14 |
-| An ability's requirement reads "Req: 5 AP, Lvl 4" ("Req: unattainable" in red) on the Enhancements and Destinies status line and the Leveling Guide's info line (VB: "5 AP spent in tree"; in the guide "Spent in Tree: 5 AP" and "Min Level: 4" or "Untrainable"). | Feature | `frmEnhancements.frm` lblProg (:2385), lblGuideSpentInTree and lblGuideLevels (:3566); frmDestiny2 likewise | (this commit) |
+| An ability's requirement reads "Req: 5 AP, Lvl 4" ("Req: unattainable" in red) on the Enhancements and Destinies status line and the Leveling Guide's info line (VB: "5 AP spent in tree"; in the guide "Spent in Tree: 5 AP" and "Min Level: 4" or "Untrainable"). | Feature | `frmEnhancements.frm` lblProg (:2385), lblGuideSpentInTree and lblGuideLevels (:3566); frmDestiny2 likewise | 0a315f2 |
 | Leveling Guide: "Spent in Kensei: 13 AP" at the bottom left for the selected tree (the whole guide's spend in it). | Feature | `frmEnhancements.frm`, a new label | 5d20256 |
 
 ## 3. Layout
