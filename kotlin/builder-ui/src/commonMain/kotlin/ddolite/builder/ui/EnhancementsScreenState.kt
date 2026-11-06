@@ -72,8 +72,6 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
 
     override val drag = DragDropState<EnhancementDrag>()
 
-    // The button of the last press, so only a left-button drag starts a drag.
-    internal var lastButton = PointerButton.PRIMARY
 
     private val rules: EnhancementRules?
         get() {

@@ -111,8 +111,6 @@ class FeatsScreenState(private val session: BuilderSession) {
 
     val drag = DragDropState<FeatDrag>()
 
-    // The button of the last press on a slot or list, so only a left-button drag starts a drag.
-    internal var lastButton = PointerButton.PRIMARY
 
     // mlngSourceIndex: the row a slot drag started from (0 = a drag from the lists).
     private var sourceRow = 0

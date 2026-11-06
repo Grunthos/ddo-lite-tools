@@ -1,43 +1,24 @@
 package ddolite.builder.ui
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.isCtrlPressed
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ddolite.builder.build.BuildRules
 import ddolite.builder.build.DropState
 import ddolite.builder.build.FeatListEntry
@@ -45,7 +26,6 @@ import ddolite.builder.build.FeatTab
 import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
-import kotlin.time.TimeSource
 
 /** frmFeats' client area, in pixels at 100%. */
 private const val FEATS_WIDTH = 815
@@ -58,11 +38,8 @@ private const val FEATS_HEIGHT = 593
  */
 
 /** usrList: at the content corner. Its column headers sit on the first line, its border a line down. */
-private const val LIST_LEFT = 0
-private const val LIST_TOP = 0
 private const val LIST_WIDTH = 409
-private const val LIST_HEADER = LINE
-private const val LIST_HEIGHT = LIST_HEADER + 491
+private const val LIST_HEIGHT = LINE + 491
 
 /** The feat list and the selector list beside it, under their captions. */
 private const val FEATS_LEFT = LIST_WIDTH + GAP
@@ -75,9 +52,6 @@ private const val LISTS_HEIGHT = 282
 private const val DETAILS_CAPTION_TOP = LISTS_TOP + LISTS_HEIGHT + 10
 private const val DETAILS_TOP = DETAILS_CAPTION_TOP + LINE
 private const val DETAILS_HEIGHT = LIST_HEIGHT - DETAILS_TOP
-
-/** userList's DEFAULT_MAX_ROWS: more rows than this get a scroll bar. */
-private const val MAX_ROWS = 21
 
 /**
  * The Feats window (Source/Forms/Build/frmFeats.frm): the header (Selected, the channel tabs if
@@ -174,7 +148,7 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
     val label = labelStyle(theme)
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
-    SlotList(screen, rules, theme, onMenu)
+    FeatSlots(screen, rules, theme, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
     if (!granted) {
         // lblFeats, usrchkShowAll (moved to its right by FeatListTitle), lblSelectors.
@@ -245,121 +219,64 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
 }
 
 /**
- * The feat slots (userList with userSlot rows): column headers above a bordered list; each row
- * has its texts and a slot drawn by its drop state (userSlot.Refresh). Rows are numbered from 1.
+ * The feat slots (usrList, the shared [UserList]): Source, Level, the feat and BAB on the Selected
+ * and channel tabs; Source, the granted feat and Level on Granted. Each slot shows its drop state,
+ * an error in red and the row under the mouse; a left press chooses it, a right press opens the menu,
+ * a double-click clears it, and a left drag moves its feat. Rows are numbered from 1.
  */
 @Composable
-private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, onMenu: () -> Unit) {
+private fun FeatSlots(screen: FeatsScreenState, rules: BuildRules, theme: Theme, onMenu: () -> Unit) {
     val rows = screen.rows()
     val granted = screen.tab == FeatTab.GRANTED
-    val textMeasurer = rememberTextMeasurer()
-    val normal = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE)
-    val bold = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, fontWeight = FontWeight.Bold)
-    // The measurer works in pixels; the layout below is in dp.
-    val scale = LocalDensity.current.density
-    // userList.UserControl_Initialize: slot height 4/3 of the text, a quarter of that between slots,
-    // two spaces between columns.
-    val textHeight = (textMeasurer.measure("X", normal).size.height / scale).toInt()
-    val slotHeight = textHeight * 4 / 3
-    val marginY = slotHeight / 4
-    val marginX = (textMeasurer.measure("  ", normal).size.width / scale).toInt()
-    var clientWidth = LIST_WIDTH - 2
-    if (rows.size > MAX_ROWS) {
-        clientWidth -= 17
-    }
-    // DefineColumn: (alignment, header, size text); the slot column takes what's left (Refresh).
-    val headers: List<String>
-    val sizeTexts: List<String>
-    val aligns: List<TextAlign>
-    val slotColumn: Int
+    // DefineColumn: (header, size text, alignment); the slot column takes what's left.
+    val columns: List<ListColumn>
     if (granted) {
-        headers = listOf("Source", "Granted Feat", "Level")
-        sizeTexts = listOf("Arcane Trickster", "", "20") // MAX_CLASS_NAME
-        aligns = listOf(TextAlign.Start, TextAlign.Center, TextAlign.End)
-        slotColumn = 1
+        columns = listOf(
+            ListColumn("Source", "Arcane Trickster", TextAlign.Start), // MAX_CLASS_NAME
+            ListColumn("Granted Feat", "", TextAlign.Center, slot = true),
+            ListColumn("Level", "20", TextAlign.End),
+        )
     } else {
-        headers = listOf("Source", "Level", "Feat", "BAB")
-        sizeTexts = listOf("Legendary", "Level", "", "BAB")
-        aligns = listOf(TextAlign.Start, TextAlign.End, TextAlign.Center, TextAlign.Center)
-        slotColumn = 2
-    }
-    val lefts = IntArray(headers.size)
-    val widths = IntArray(headers.size)
-    var x = marginX
-    for (i in 0 until slotColumn) {
-        lefts[i] = x
-        widths[i] = (textMeasurer.measure(sizeTexts[i], bold).size.width / scale).toInt()
-        x = lefts[i] + widths[i] + marginX
-    }
-    lefts[slotColumn] = x
-    var right = clientWidth - marginX
-    for (i in headers.size - 1 downTo slotColumn + 1) {
-        widths[i] = (textMeasurer.measure(sizeTexts[i], bold).size.width / scale).toInt()
-        lefts[i] = right - widths[i]
-        right = lefts[i] - marginX
-    }
-    widths[slotColumn] = right - lefts[slotColumn]
-
-    val textStyle = labelStyle(theme)
-    // DrawColumnHeaders: a header may be wider than its column; right-aligned ones then reach left.
-    for (i in headers.indices) {
-        val headerWidth = (textMeasurer.measure(headers[i], normal).size.width / scale).toInt()
-        var x = lefts[i]
-        if (aligns[i] == TextAlign.Center) {
-            x = lefts[i] + (widths[i] - headerWidth) / 2
-        } else if (aligns[i] == TextAlign.End) {
-            x = lefts[i] + widths[i] - headerWidth
-        }
-        BasicText(
-            headers[i],
-            style = textStyle,
-            softWrap = false,
-            modifier = Modifier.offset((LIST_LEFT + 1 + x).dp, (LIST_TOP + LIST_HEADER - textHeight - 2).dp),
+        columns = listOf(
+            ListColumn("Source", "Legendary", TextAlign.Start),
+            ListColumn("Level", "Level", TextAlign.End),
+            ListColumn("Feat", "", TextAlign.Center, slot = true),
+            ListColumn("BAB", "BAB", TextAlign.Center),
         )
     }
-    val scroll = rememberScrollState()
-    Box(
-        modifier = Modifier.offset(LIST_LEFT.dp, (LIST_TOP + LIST_HEADER).dp).size(LIST_WIDTH.dp, (LIST_HEIGHT - LIST_HEADER).dp)
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.WORKSPACE, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        Box(
-            modifier = Modifier.offset(1.dp, 1.dp).size((LIST_WIDTH - 2).dp, (LIST_HEIGHT - LIST_HEADER - 2).dp)
-                .verticalScroll(scroll),
-        ) {
-            val contentHeight = (slotHeight + marginY) * rows.size + marginY * 2
-            Box(modifier = Modifier.size(clientWidth.dp, contentHeight.dp)) {
-                val controlText = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
-                for (r in rows.indices) {
-                    val row = r + 1
-                    val entry = rows[r]
-                    val top = (slotHeight + marginY) * r + marginY
-                    val texts = rowTexts(entry, rules, granted)
-                    val hover = screen.hoverRow == row
-                    var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = controlText)
-                    if (hover) {
-                        style = style.copy(fontWeight = FontWeight.Bold)
-                    }
-                    for (i in headers.indices) {
-                        if (i == slotColumn) {
-                            continue
-                        }
-                        BasicText(
-                            texts[i],
-                            style = style.copy(textAlign = aligns[i]),
-                            maxLines = 1,
-                            modifier = Modifier.offset(lefts[i].dp, (top + (slotHeight - textHeight) / 2).dp).width(widths[i].dp),
-                        )
-                    }
-                    FeatSlot(screen, theme, entry, row, lefts[slotColumn], top, widths[slotColumn], slotHeight, onMenu)
-                }
+    UserList(
+        theme,
+        columns,
+        rows.size,
+        cellText = { row, col ->
+            val entry = rows.getOrNull(row - 1)
+            if (entry == null) "" else rowTexts(entry, rules, granted)[col]
+        },
+        slot = { row ->
+            val entry = rows.getOrNull(row - 1)
+            if (entry == null) SlotContent("", false) else SlotContent(entry.display, entry.errorState)
+        },
+        dropState = { row -> screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
+        hoverRow = screen.hoverRow,
+        left = 0, top = 0, width = LIST_WIDTH, height = LIST_HEIGHT,
+        headerHeight = LINE,
+        drag = screen.drag,
+        rowKey = { row -> FeatSlotKey(row) },
+        dragItem = { row -> FeatDrag.FromSlot(row) },
+        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startDrag(item) },
+        onDrop = { item, target -> screen.dropped(item, target) },
+        onPress = { row, button ->
+            screen.clickSlot(row, button)
+            if (screen.menuRow != 0) {
+                onMenu()
             }
-        }
-        ScrollBar(theme, scroll, LIST_WIDTH - 1 - SCROLL_BAR, 1, LIST_HEIGHT - LIST_HEADER - 2)
-    }
+        },
+        onDoubleClick = { row -> screen.doubleClickSlot(row) },
+        onHover = { row -> screen.hoverRow = row },
+    )
 }
 
-/** The texts of a row's columns (the slot's own column is drawn by [FeatSlot]): InitSelectedFeatsList (:505), ShowGrantedFeats (:479). */
+/** The texts of a row's columns (the slot's own column is the feat): InitSelectedFeatsList (:505), ShowGrantedFeats (:479). */
 private fun rowTexts(entry: FeatListEntry, rules: BuildRules, granted: Boolean): List<String> {
     if (granted) {
         return listOf(entry.sourceForm, "", entry.level.toString())
@@ -371,75 +288,6 @@ private fun rowTexts(entry: FeatListEntry, rules: BuildRules, granted: Boolean):
     return listOf(entry.sourceForm, entry.level.toString() + "  ", "", bab)
 }
 
-/**
- * One feat slot (userSlot): its background shows the drop state, red text an error, a dark
- * border the row under the mouse. A press chooses it (left) or opens the menu (right), a second
- * press soon after is a double-click (clears it), and a left drag moves its feat.
- */
-@Composable
-private fun FeatSlot(screen: FeatsScreenState, theme: Theme, entry: FeatListEntry, row: Int, left: Int, top: Int, width: Int, height: Int, onMenu: () -> Unit) {
-    val state = screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT
-    val background = when (state) {
-        DropState.DEFAULT -> theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND)
-        DropState.CAN_DROP -> theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACK_HIGHLIGHT)
-        DropState.CAN_DROP_ERROR -> theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACK_ERROR)
-        DropState.SUBORDINATE -> theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACK_RELATED)
-    }
-    var border = theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)
-    if (screen.hoverRow == row) {
-        border = theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_HIGHLIGHT)
-    }
-    var textColor = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)
-    if (entry.errorState) {
-        textColor = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT_ERROR)
-    }
-    val clicks = remember { DoubleClickTimer() }
-    val currentOnMenu by rememberUpdatedState(onMenu)
-    Box(
-        modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
-            .dropTarget(screen.drag, FeatSlotKey(row))
-            .background(background)
-            .border(1.dp, border)
-            .pointerInput(row) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        if (event.type == PointerEventType.Enter || event.type == PointerEventType.Move) {
-                            if (screen.drag.dragging == null) {
-                                screen.hoverRow = row
-                            }
-                        } else if (event.type == PointerEventType.Exit) {
-                            if (screen.hoverRow == row && screen.drag.dragging == null) {
-                                screen.hoverRow = 0
-                            }
-                        } else if (event.type == PointerEventType.Press) {
-                            val button = pressedButton(event)
-                            screen.lastButton = button
-                            if (button == PointerButton.PRIMARY && clicks.isDoubleClick(row)) {
-                                screen.doubleClickSlot(row)
-                            } else {
-                                screen.clickSlot(row, button)
-                                if (screen.menuRow != 0) {
-                                    currentOnMenu()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .dragSource(screen.drag, FeatDrag.FromSlot(row), onStart = { item ->
-                screen.lastButton == PointerButton.PRIMARY && screen.startDrag(item)
-            }) { item, target -> screen.dropped(item, target) },
-    ) {
-        BasicText(
-            entry.display,
-            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = textColor),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.offset(4.dp, ((height - 15) / 2).dp).width((width - 8).dp),
-        )
-    }
-}
 
 
 /** The feat being dragged, next to the pointer (VB shows the system's drag cursor). */

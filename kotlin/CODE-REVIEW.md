@@ -116,8 +116,8 @@ window; and the Feats window was ported before the shared list controls existed.
 | 4 | 4 push-button helpers | **Done**: `PushButton` (OverviewScreen.kt's simple controls) |
 | 5 | Feats' private list box, details box and double-click timer | **Done**: the shared ones (149 lines) |
 | 6 | Captions built from `MenuChoice` lists before each pop-up menu | **Done**: `PopupMenu` takes the list |
-| 7 | Enhancements and Destinies: ~420 of the Destinies state's 534 code lines, and 262 of its window's 345, also in Enhancements | Next: a shared interface for the tabs (each window keeps its own rules); a base class later, once golden tests exist |
-| 8 | The Feats slot list re-implements `UserList` | Next: onto `UserList`, with columns before and after the slot |
+| 7 | Enhancements and Destinies: ~420 of the Destinies state's 534 code lines, and 262 of its window's 345, also in Enhancements | **Done**: `TreeAbilitiesScreen` and `TreeListScreen` (TreeTabs.kt), one tab each, each window keeping its own rules; small layout differences unified, the Trees tab sized from its text (KOTLIN-CHANGES.md). A base class for the rules could follow once golden tests exist |
+| 8 | The Feats slot list re-implements `UserList` | **Done**: on `UserList`, which now works out from its height when the scroll bar needs room; screens unchanged |
 
 Every change above was checked with the screenshots, pixel for pixel (no differences).
 
