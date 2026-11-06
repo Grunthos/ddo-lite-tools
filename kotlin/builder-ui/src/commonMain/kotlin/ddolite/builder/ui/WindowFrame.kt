@@ -33,6 +33,12 @@ class ContentArea(windowWidth: Int, windowHeight: Int, hasFooter: Boolean = true
 
     /** The height, ending just above the footer, or [MARGIN] above the window's bottom without one. */
     val height = windowHeight - CONTENT_TOP - (if (hasFooter) BAR_HEIGHT + TIGHT else MARGIN)
+
+    /**
+     * Where the boxes end: a line above the bottom, leaving room for a status line (totals) under
+     * them; windows without one end their boxes here too, so every window's boxes end alike.
+     */
+    val boxesBottom = height - LINE - TIGHT
 }
 
 /**

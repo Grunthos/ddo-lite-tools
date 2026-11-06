@@ -37,8 +37,8 @@ private const val FEATS_HEIGHT = 593
  * under them the details beside the filter list, both ending level with the slots.
  */
 
-/** usrList: at the content corner. Its column headers sit on the first line, its border a line down; it runs to
- * the content's bottom. */
+/** usrList: at the content corner. Its column headers sit on the first line, its border a line down; it ends
+ * where every window's boxes end. */
 private const val LIST_WIDTH = 409
 
 /** The feat list and the selector list beside it, under their captions. */
@@ -145,11 +145,11 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
 @Composable
 private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    // The slots, and the details and filter boxes, run down to the content's bottom (no totals line here).
-    val detailsHeight = area.height - DETAILS_TOP
+    // The slots, and the details and filter boxes, end where every window's boxes end.
+    val detailsHeight = area.boxesBottom - DETAILS_TOP
     val label = labelStyle(theme)
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
-    FeatSlots(screen, rules, theme, area.height, onMenu)
+    FeatSlots(screen, rules, theme, area.boxesBottom, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
     if (!granted) {
         // lblFeats, usrchkShowAll (moved to its right by FeatListTitle), lblSelectors.

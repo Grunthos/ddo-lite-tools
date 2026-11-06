@@ -96,8 +96,8 @@ internal fun TreeAbilitiesTab(screen: TreeAbilitiesScreen, theme: Theme, area: C
     var comboOpen by remember { mutableStateOf(false) }
     val rows = screen.slotRows()
     val rightWidth = area.width - ABILITIES_LEFT
-    // The slots end a line above the content's bottom, leaving room for the totals.
-    val slotsHeight = area.height - LINE - TIGHT
+    // The slots end where every window's boxes end, with the totals under them.
+    val slotsHeight = area.boxesBottom
     val totalsTop = slotsHeight + TIGHT
     UserList(
         theme,
