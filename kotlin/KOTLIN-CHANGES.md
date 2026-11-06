@@ -18,6 +18,7 @@ where things are; **Look** = how they're drawn.
 |---|---|---|---|
 | Leveling Guide: ranks II and III of an ability are offered with the selector rank I took (VB offers every selector again). VB-BUGS 22k. | Rule | `Forms/Build/frmEnhancements.frm` `ShowGuideAvailable` (:2606) | 4ed3270 |
 | Leveling Guide: after deleting, moving or inserting rows (and on Undo, Redo or returning to the tab) the tree stays selected and its ability list is rebuilt. VB-BUGS 22j. | Rule | `frmEnhancements.frm` `RefreshGuide` (:3430), `ShowTab` (:1134) | a55d6e5 |
+| Leveling Guide: a step whose ability the data no longer has is kept as a red row (tier and tree shown, AP and Prog "?", costs nothing, saved back as read); a step whose tree the data no longer has is dropped; both are listed in Messages, and the rest of the guide loads. VB stops reading the guide at the first such step. | Rule | `Modules/Build/basFormatLite.bas` `LoadLevelingGuideText` (:1263) | (this commit) |
 | A file that can't be read or imported shows the error instead of closing the program. | Rule | `LoadBuild` and the import routines' error handlers | 8fc0792 |
 
 ## 2. Features VB doesn't have

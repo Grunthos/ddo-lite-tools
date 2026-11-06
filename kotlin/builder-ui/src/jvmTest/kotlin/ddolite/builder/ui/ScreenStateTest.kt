@@ -123,6 +123,10 @@ class ScreenStateTest {
     @Test
     fun guideListFollowsADeletedRow() {
         val session = TestSession.open("Kensei Warpriest.build")
+        // From an empty guide (the saved one's missing steps load as red rows).
+        val rules = session.rules!!
+        ddolite.builder.build.GuideRules(rules).clear()
+        rules.initLevelingGuide()
         val enhancements = session.enhancements
         enhancements.opened()
         enhancements.chooseTab(2)

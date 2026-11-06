@@ -220,6 +220,10 @@ the Kotlin output with these files and list every difference.
 - [ ] Take rank I of a multi-rank ability with a selector (e.g. Efficient Metamagic as Maximize): ranks II
       and III are offered with the same selector. **VB bug to confirm:** VB offers every selector (22k).
 - [ ] With a tree selected, "Spent in <tree>: N AP" at the bottom left (new).
+- [ ] Open the original `Save/Kensei Warpriest.build`: its guide loads, with the steps the data no longer has
+      as red rows (e.g. "Human Versatility: Damage Boost"; AP and Prog "?"); selecting one explains it;
+      Messages lists each; Delete Row removes one; saving keeps those not deleted (new; VB drops the
+      whole guide at the first such step).
 
 ## 7d. Main window output
 

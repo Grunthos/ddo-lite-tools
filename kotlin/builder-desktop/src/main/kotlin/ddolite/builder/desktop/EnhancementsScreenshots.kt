@@ -98,6 +98,11 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
     ImageComposeScene(width = 815, height = 555, density = Density(1f)) { EnhancementsWindowContent(prototype) {} }.use { scene ->
         screen.chooseTab(2)
         println("Guide: trees " + guide.trees.map { it.text } + "; " + guide.totals?.levelCaption() + ", " + guide.totals?.apCaption())
+        // The saved guide's first step names an ability the data no longer has: a red row.
+        guide.pressRow(1, right = false, ctrl = false, shift = false)
+        guide.releaseRow(1)
+        println("  row 1: " + guide.rows()[0].style + " " + guide.detailsCaption)
+        shot(scene, outDir.resolve("38-guide-missing-row.png"))
         // "Available" on a Cleric tree at level 1 (the build's first Cleric level is 3).
         val rules = prototype.rules
         if (rules != null) {

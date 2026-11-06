@@ -1652,7 +1652,7 @@ class BuildOutput(private val rules: BuildRules, private val format: OutputForma
                     resetLevel = e.level
                     out.reset = e.display
                 }
-                GuideStepStyle.UNKNOWN -> {}
+                GuideStepStyle.UNKNOWN, GuideStepStyle.MISSING -> {} // a missing step isn't output
             }
         }
         for (level in levels) {

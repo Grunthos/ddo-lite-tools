@@ -309,6 +309,13 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, width: Int, onMenu
                             else -> e.spentInTree.toString()
                         }
                         GuideStepStyle.UNKNOWN -> {}
+                        // Kotlin only: a step the data hasn't, in red, its cost unknown.
+                        GuideStepStyle.MISSING -> display = when (ci) {
+                            1 -> e.display
+                            2 -> if (e.missingTree.isEmpty()) "?" else e.tier.toString()
+                            3 -> if (e.missingTree.isEmpty()) "?" else e.missingTree
+                            else -> "?"
+                        }
                     }
                 }
                 var cellBack = back

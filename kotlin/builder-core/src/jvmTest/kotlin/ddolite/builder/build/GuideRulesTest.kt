@@ -9,13 +9,22 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * The leveling guide's rules ([GuideRules]) on Kensei Warpriest. Its saved guide starts with an
- * ability the data no longer has, so (as in VB) it opens with no guide; these tests build one.
+ * The leveling guide's rules ([GuideRules]) on Kensei Warpriest, from an empty guide; these tests
+ * build one.
  */
 class GuideRulesTest {
     private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
 
-    private fun open(): BuildRules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+    /**
+     * Kensei Warpriest with an empty guide: its saved guide's steps that the data no longer has load as
+     * red rows, so the tests start from the guide's Delete All.
+     */
+    private fun open(): BuildRules {
+        val rules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+        GuideRules(rules).clear()
+        rules.initLevelingGuide()
+        return rules
+    }
 
     private fun guideTree(g: GuideRules, display: String): Int = g.treeList(false).first { it.text == display }.number
 

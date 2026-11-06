@@ -183,6 +183,13 @@ class BuildGuideEnhancement(val id: Int) {
     var ability = 0
     var selector = 0
     var rank = 0
+
+    /**
+     * Kotlin only: the file's text for a step whose tree exists but whose ability the current data
+     * hasn't ([id] 0). It shows as a red row, costs nothing, and is saved back as it was read. VB
+     * stops reading the guide at such a step.
+     */
+    var missing: String? = null
 }
 
 /** The leveling guide. Ported from `BuildGuideType` (basBuildDefs.bas:300). */
@@ -330,6 +337,7 @@ class Build {
             ce.ability = e.ability
             ce.selector = e.selector
             ce.rank = e.rank
+            ce.missing = e.missing
             c.guide.enhancements.add(ce)
         }
         c.tier5 = tier5

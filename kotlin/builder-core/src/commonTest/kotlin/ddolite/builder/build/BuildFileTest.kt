@@ -6,6 +6,7 @@ import ddolite.builder.data.loadBuilderData
 import ddolite.dataformat.MapDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -145,9 +146,31 @@ class BuildFileTest {
                 "Guide: Hum Tier 0: Versatility: Attack\nGuide: Bank AP\nGuide: Reset Tree: Hum\n",
         )
         assertEquals(listOf(1, 200, 101), result.build.guide.enhancements.map { it.id })
-        assertNull(result.deprecations.levelingGuide)
+        assertTrue(result.deprecations.guide.isEmpty())
         val saved = writeBuildText(result.rules)
         assertTrue(saved.contains("[LevelingGuide]\r\n\r\nGuide: Hum Tier 0: Versatility: Attack\r\nGuide: Bank AP\r\nGuide: Reset Tree: Hum\r\n"), saved)
+    }
+
+    @Test
+    fun guideKeepsMissingAbilitiesAndDropsMissingTrees() {
+        // A missing ability in a known tree is kept (saved back as read); a missing tree's step is
+        // dropped; the steps after both still load (Kotlin only: VB stops at the first).
+        val result = read(
+            fighter + "[Enhancements]\n\nTree: Human\nType: Race\n\n[LevelingGuide]\n\n" +
+                "Guide: Hum Tier 0: No Such Ability\nGuide: Nowhere Tier 1: Something\nGuide: Bank AP\n" +
+                "Guide: Hum Tier 0: Versatility: Attack\n",
+        )
+        val steps = result.build.guide.enhancements
+        assertEquals(listOf(0, 200, 1), steps.map { it.id })
+        assertEquals("Hum Tier 0: No Such Ability", steps[0].missing)
+        val guide = result.deprecations.guide
+        assertEquals(2, guide.size)
+        assertTrue(guide[0].kept)
+        assertFalse(guide[1].kept)
+        assertEquals("Nowhere Tier 1: Something", guide[1].text)
+        val saved = writeBuildText(result.rules)
+        assertTrue(saved.contains("Guide: Hum Tier 0: No Such Ability\r\nGuide: Bank AP\r\nGuide: Hum Tier 0: Versatility: Attack\r\n"), saved)
+        assertFalse(saved.contains("Nowhere"), saved)
     }
 
     @Test

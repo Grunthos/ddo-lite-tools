@@ -15,6 +15,9 @@ class GuideExportTest {
 
     private fun guide(): BuildRules {
         val rules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+        // From an empty guide (the saved one's missing steps load as red rows).
+        GuideRules(rules).clear()
+        rules.initLevelingGuide()
         val g = GuideRules(rules)
         val kensei = g.treeList(false).first { it.text == "Kensei" }.number
         g.addAbility(kensei, 0, 0, 1, 1) // Kensei Focus: Archery

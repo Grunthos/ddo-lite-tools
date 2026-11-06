@@ -14,7 +14,7 @@ import ddolite.builder.model.Tree
 import ddolite.builder.model.TreeStyle
 
 /** What a leveling guide step is. Ported from `GuideEnhancementEnum` (geUnknown …). */
-enum class GuideStepStyle { UNKNOWN, ENHANCEMENT, RESET_TREE, RESET_ALL_TREES, BANK_AP }
+enum class GuideStepStyle { UNKNOWN, ENHANCEMENT, RESET_TREE, RESET_ALL_TREES, BANK_AP, MISSING }
 
 /**
  * One leveling guide step with what's worked out from it. Ported from `GuideEnhancementType`
@@ -46,6 +46,9 @@ class GuideEnhancement(val style: GuideStepStyle) {
     var bank = 0
     var errorState = false
     var errorText = ""
+
+    /** For a [GuideStepStyle.MISSING] step: the tree as the file names it ("" if the line can't be read). */
+    var missingTree = ""
 }
 
 /** The Leveling Guide tab's ability filter (cboGuideAbility): `GuideFilterEnum` (frmEnhancements.frm:955). */
@@ -174,6 +177,10 @@ class GuideRules(private val rules: BuildRules) {
             } else if (id == 200) {
                 style = GuideStepStyle.BANK_AP
             }
+            val missing = step.missing
+            if (missing != null) {
+                style = GuideStepStyle.MISSING
+            }
             var buildGuideTree = id
             var guide = 0
             if (style == GuideStepStyle.ENHANCEMENT) {
@@ -218,6 +225,24 @@ class GuideRules(private val rules: BuildRules) {
                     e.spentRacial = spentRacial
                 }
                 GuideStepStyle.UNKNOWN -> {}
+                GuideStepStyle.MISSING -> {
+                    // "Human Tier 0: Human Versatility: Damage Boost": the tree, tier and the rest, for
+                    // the grid's columns. Costs nothing: the totals carry on from the step before.
+                    val text = missing ?: ""
+                    e.display = text
+                    val tierAt = text.indexOf(" Tier ")
+                    val colon = text.indexOf(": ", tierAt + 1)
+                    if (tierAt > 0 && colon > tierAt) {
+                        val tier = text.substring(tierAt + 6, colon).toIntOrNull()
+                        if (tier != null) {
+                            e.missingTree = text.substring(0, tierAt)
+                            e.tier = tier
+                            e.display = text.substring(colon + 2)
+                        }
+                    }
+                    e.spent = spent
+                    e.spentRacial = spentRacial
+                }
             }
             if (e.buildGuideTree != 0) {
                 e.buildTree = trees[guide - 1].buildTree
@@ -376,6 +401,7 @@ class GuideRules(private val rules: BuildRules) {
             e.spentInTree = 0
             when (e.style) {
                 GuideStepStyle.UNKNOWN -> {}
+                GuideStepStyle.MISSING -> e.level = level // doesn't move the level on
                 GuideStepStyle.ENHANCEMENT -> {
                     spent = spent + e.cost
                     spentInTree[e.buildGuideTree] = spentInTree[e.buildGuideTree] + e.cost
@@ -486,6 +512,11 @@ class GuideRules(private val rules: BuildRules) {
             val e = steps[i]
             e.errorState = false
             e.errorText = ""
+            if (e.style == GuideStepStyle.MISSING) {
+                e.errorState = true
+                e.errorText = "Not in the current data"
+                continue
+            }
             val tree = e.tree
             val g = guideTree(e.guideTree)
             do {

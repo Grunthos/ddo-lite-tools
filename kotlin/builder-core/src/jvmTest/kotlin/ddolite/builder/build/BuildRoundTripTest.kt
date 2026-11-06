@@ -87,6 +87,15 @@ class BuildRoundTripTest {
                         remaining.remove(line)
                     }
                 }
+                // A guide step for rank 1 of an ability that now has one rank is written without
+                // " (Rank 1)" (GetGuideLine adds it only for abilities with ranks).
+                if (line.startsWith("-Guide: ") && line.endsWith(" (Rank 1)")) {
+                    val without = "+" + line.substring(1, line.length - " (Rank 1)".length)
+                    if (remaining.contains(without)) {
+                        remaining.remove(without)
+                        remaining.remove(line)
+                    }
+                }
             }
             for (line in remaining) {
                 if (line.startsWith("-Ability: ")) {
@@ -120,15 +129,20 @@ class BuildRoundTripTest {
                 expectedAdded.add("+Standard: Destiny 22\tEpic Pact Dice")
             }
             assertEquals(expectedAdded, added, name)
-            if (removedGuide > 0) {
-                // VB ignores the rest of the guide after the first step that doesn't resolve.
-                assertTrue(deprecations.levelingGuide != null, name)
+            // Only a missing tree's steps leave the file; a missing ability is saved back as read.
+            var dropped = 0
+            for (g in deprecations.guide) {
+                if (!g.kept) {
+                    dropped++
+                }
             }
+            assertEquals(dropped, removedGuide, "$name guide")
         }
     }
 
     /**
-     * What the Kotlin writer saves, it reads back with nothing deprecated and saves again unchanged.
+     * What the Kotlin writer saves, it reads back with nothing deprecated (but the guide's kept red
+     * rows, which stay until deleted) and saves again unchanged.
      *
      * One exception, as in VB: when the leveling guide's first step doesn't resolve, its tree has
      * already been added to the guide's trees, so the first save writes an empty [LevelingGuide]
@@ -141,10 +155,14 @@ class BuildRoundTripTest {
             val first = writeBuildFile(original.rules)
             val reloaded = readBuildFile(first, data, BuildPoints.ADVENTURER)
             assertEquals(emptyList(), reloaded.problems, name)
-            assertTrue(!reloaded.deprecations.any, "$name: ${reloaded.deprecations.feats} ${reloaded.deprecations.enhancements}")
+            val d = reloaded.deprecations
+            assertTrue(d.feats.isEmpty() && d.nameChanges.isEmpty() && d.enhancements.isEmpty() && d.destinies.isEmpty(), "$name: ${d.feats} ${d.enhancements}")
+            for (g in d.guide) {
+                assertTrue(g.kept, "$name: ${g.text}")
+            }
             val second = writeBuildFile(reloaded.rules)
             val differences = lineDifferences(Windows1252.decode(first), Windows1252.decode(second))
-            if (original.deprecations.levelingGuide != null && original.build.guide.enhancements.isEmpty()) {
+            if (original.build.guide.trees.isNotEmpty() && original.build.guide.enhancements.isEmpty()) {
                 assertEquals(listOf("-[LevelingGuide]", "-", "-"), differences, name)
             } else {
                 assertEquals(emptyList(), differences, name)

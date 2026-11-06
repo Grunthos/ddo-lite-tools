@@ -367,6 +367,19 @@ class GuideScreenState(private val session: BuilderSession) {
         requirement = d.requirement
     }
 
+    /** Kotlin only: what a step the current data hasn't says in the details box. */
+    private fun showMissingDetails(e: GuideEnhancement) {
+        clearGuideDetails(clearLabel = false)
+        detailsCaption = "Not in the current data"
+        details = listOf(
+            DetailLine(if (e.missingTree.isEmpty()) e.display else e.missingTree + " Tier " + e.tier + ": " + e.display, null, true),
+            DetailLine("", null, false),
+            DetailLine("The current data has no such ability, so its cost is unknown: this row costs nothing and doesn't move the level on.", null, false),
+            DetailLine("", null, false),
+            DetailLine("Right-click › Delete Row to remove it, then add the ability it became, if any. Until then it's saved as it was read.", null, false),
+        )
+    }
+
     /** ClearGuideDetails (:3585). */
     private fun clearGuideDetails(clearLabel: Boolean) {
         if (clearLabel) {
@@ -504,6 +517,8 @@ class GuideScreenState(private val session: BuilderSession) {
         val e = rows()[row - 1]
         if (isSelected(row) && e.style == GuideStepStyle.ENHANCEMENT) {
             showGuideDetails(e.guideTree, e.tier, e.ability, e.selector, e.rank, row)
+        } else if (isSelected(row) && e.style == GuideStepStyle.MISSING) {
+            showMissingDetails(e)
         } else {
             clearGuideDetails(clearLabel = true)
         }

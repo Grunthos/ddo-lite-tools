@@ -475,7 +475,8 @@ private class BuildFileWriter(private val rules: BuildRules) {
     private fun guideLine(step: BuildGuideEnhancement): String {
         val id = step.id
         if (id == 0) {
-            return "Unknown"
+            // Kotlin only: a step the data hasn't is written back as it was read.
+            return step.missing ?: "Unknown"
         }
         if (id in 1..99) {
             val guideTree = guideTreeFor(id) ?: return "Error"

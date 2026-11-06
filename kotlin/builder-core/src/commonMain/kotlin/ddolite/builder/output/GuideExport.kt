@@ -30,6 +30,9 @@ object GuideExport {
         var level = 1
         var index = 0
         for (e in rules.guideEnhancements) {
+            if (e.style == GuideStepStyle.MISSING) {
+                continue // a step the data hasn't (Kotlin only) isn't exported
+            }
             index++
             if (e.level > level) {
                 lines.add(",,,,,,$index")
@@ -64,6 +67,9 @@ object GuideExport {
         var treeWidth = "Tree".length
         var enhancementWidth = "Enhancement".length
         for (e in rules.guideEnhancements) {
+            if (e.style == GuideStepStyle.MISSING) {
+                continue
+            }
             if (enhancementWidth < (e.display + e.rankText).length) {
                 enhancementWidth = (e.display + e.rankText).length
             }
@@ -79,6 +85,9 @@ object GuideExport {
         lines.add(blankColumns('-', treeWidth, enhancementWidth).joinToString(margin))
         var level = 1
         for (e in rules.guideEnhancements) {
+            if (e.style == GuideStepStyle.MISSING) {
+                continue
+            }
             val columns = blankColumns(' ', treeWidth, enhancementWidth)
             if (e.level > level) {
                 lines.add(columns.joinToString(margin))

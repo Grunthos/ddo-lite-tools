@@ -41,9 +41,7 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
         val issues = deprecations.feats.size
         var notices = deprecations.nameChanges.size
         notices = notices + deprecations.enhancements.size
-        if (deprecations.levelingGuide != null) {
-            notices = notices + 1
-        }
+        notices = notices + deprecations.guide.size
         notices = notices + deprecations.destinies.size
         return Pair(issues, notices)
     }
@@ -81,9 +79,15 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
         for (i in deprecations.enhancements.indices) {
             result.add(DeprecationMessage("Enhancements: " + abilityNotice(deprecations.enhancements[i]), MessageGroup.ENHANCEMENT, i + 1))
         }
-        val guide = deprecations.levelingGuide
-        if (guide != null) {
-            result.add(DeprecationMessage("Leveling Guide: " + abilityNotice(guide), MessageGroup.GUIDE, 1))
+        for (i in deprecations.guide.indices) {
+            val g = deprecations.guide[i]
+            var text: String
+            if (g.kept) {
+                text = "Leveling Guide: " + abilityNotice(g.ability) + " (kept as a red row)"
+            } else {
+                text = "Leveling Guide: tree " + g.ability.guideTreeDisplay + " not found, step dropped: " + g.text
+            }
+            result.add(DeprecationMessage(text, MessageGroup.GUIDE, i + 1))
         }
         return result
     }
@@ -170,10 +174,17 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             }
             MessageGroup.ENHANCEMENT -> abilityDetails(details, deprecations.enhancements[message.index - 1], "Enhancement not found or invalid:")
             MessageGroup.GUIDE -> {
-                val guide = deprecations.levelingGuide
-                if (guide != null) {
-                    // A text build's guide is cut short at the line; only binary builds reset it.
-                    abilityDetails(details, guide, "Leveling Guide truncated at invalid ability:")
+                // Kotlin only: VB cuts the guide short at the first such line.
+                val g = deprecations.guide[message.index - 1]
+                if (g.kept) {
+                    abilityDetails(details, g.ability, "Leveling Guide ability not found:")
+                    details.addText("")
+                    details.addText("It's kept in the guide as a red row that costs nothing. Delete it there, and add the ability it became, if any.")
+                } else {
+                    details.addText("Leveling Guide tree not found: " + g.ability.guideTreeDisplay)
+                    details.addText("")
+                    details.addText("This step was dropped from the guide:")
+                    details.addText(g.text)
                 }
             }
             MessageGroup.DESTINY -> abilityDetails(details, deprecations.destinies[message.index - 1], "Destiny ability not found or invalid:")
@@ -322,7 +333,7 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             MessageGroup.FEAT -> deprecations.feats.removeAt(message.index - 1)
             MessageGroup.NAME_CHANGE -> deprecations.nameChanges.removeAt(message.index - 1)
             MessageGroup.ENHANCEMENT -> deprecations.enhancements.removeAt(message.index - 1)
-            MessageGroup.GUIDE -> deprecations.levelingGuide = null
+            MessageGroup.GUIDE -> deprecations.guide.removeAt(message.index - 1)
             MessageGroup.DESTINY -> deprecations.destinies.removeAt(message.index - 1)
         }
         val (issues, notices) = countMessages()

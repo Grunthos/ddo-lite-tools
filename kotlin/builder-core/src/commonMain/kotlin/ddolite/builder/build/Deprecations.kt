@@ -42,19 +42,20 @@ data class DeprecatedAbility(
  * `LoadFileLite`; the binary-format parts (WarSoul, DivineMight, …) aren't needed for .build files.
  *
  * @property nameChanges renames from NameChange.txt that were applied, each once.
- * @property levelingGuide the first guide line that didn't resolve; VB ignores the rest of the guide after it.
+ * @property guide the guide steps that didn't resolve, kept as red rows or dropped (Kotlin only: VB
+ *   keeps only the first and ignores the rest of the guide after it).
  */
 class Deprecations {
     val feats = ArrayList<DeprecatedFeat>()
     val nameChanges = ArrayList<NameChange>()
     val enhancements = ArrayList<DeprecatedAbility>()
     val destinies = ArrayList<DeprecatedAbility>()
-    var levelingGuide: DeprecatedAbility? = null
+    val guide = ArrayList<GuideDeprecation>()
 
     /** VB's `gtypDeprecate.Deprecated`: anything to show. */
     val any: Boolean
         get() = feats.isNotEmpty() || nameChanges.isNotEmpty() || enhancements.isNotEmpty() ||
-            destinies.isNotEmpty() || levelingGuide != null
+            destinies.isNotEmpty() || guide.isNotEmpty()
 
     /** Records a rename once. Ported from `DeprecateNameChange` (basDeprecate.bas:69). */
     fun addNameChange(change: NameChange) {
@@ -63,3 +64,10 @@ class Deprecations {
         }
     }
 }
+
+/**
+ * A leveling guide step that didn't resolve: [text] is the file's line. [kept] when its tree exists
+ * (the ability doesn't): the guide keeps it as a red row. Otherwise its tree is missing and it was
+ * dropped. Kotlin only (see [Deprecations.guide]).
+ */
+class GuideDeprecation(val ability: DeprecatedAbility, val text: String, val kept: Boolean)

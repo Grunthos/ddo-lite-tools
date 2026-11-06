@@ -724,11 +724,15 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
 
     /**
      * "Guide: <tree> Tier n: Ability…", "Reset Tree: <tree>", "Reset All Trees" or "Bank AP".
-     * Ported from `LoadLevelingGuideText` (basFormatLite.bas:1263). After the first line that
-     * doesn't resolve, the rest of the guide is ignored.
+     * Ported from `LoadLevelingGuideText` (basFormatLite.bas:1263).
+     *
+     * Kotlin only: VB ignores the rest of the guide after the first line that doesn't resolve. Here a
+     * line whose tree exists but whose ability doesn't is kept as a red row (its text saved back as
+     * read), and a line whose tree doesn't exist is dropped; both are listed in Messages, and the
+     * rest of the guide loads.
      */
     private fun loadLevelingGuide() {
-        if (deprecations.levelingGuide != null || field != "guide") {
+        if (field != "guide") {
             return
         }
         if (value == "Bank AP") {
@@ -739,26 +743,33 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             val display = value.substring(12)
             val lookup = guideTreeLookup(display)
             if (lookup == 0) {
-                deprecations.levelingGuide =
-                    DeprecatedAbility(false, "", "", 0, "", "", 0, display, false)
+                val dropped = DeprecatedAbility(false, "", "", 0, "", "", 0, display, false)
+                deprecations.guide.add(GuideDeprecation(dropped, value, kept = false))
             } else {
                 build.guide.enhancements.add(BuildGuideEnhancement(100 + lookup))
             }
         } else {
             val parsed = parseAbility(value, false)
-            if (!parsed.parsed) {
-                deprecations.levelingGuide = parsed
-                return
+            var lookup = 0
+            if (parsed.guideTreeDisplay.isNotEmpty()) {
+                lookup = guideTreeLookup(parsed.guideTreeDisplay)
             }
-            val lookup = guideTreeLookup(parsed.guideTreeDisplay)
             if (lookup == 0) {
-                deprecations.levelingGuide = parsed
+                // The tree isn't in the data (or the line can't be read): dropped.
+                deprecations.guide.add(GuideDeprecation(parsed, value, kept = false))
                 return
             }
             val ability = parsed.copy(treeName = guideLookups[lookup - 1].tree.name)
-            val resolved = resolveAbility(ability)
+            var resolved: ResolvedAbility? = null
+            if (parsed.parsed) {
+                resolved = resolveAbility(ability)
+            }
             if (resolved == null) {
-                deprecations.levelingGuide = ability
+                // The tree exists but the ability doesn't: kept as a red row.
+                val step = BuildGuideEnhancement(0)
+                step.missing = value
+                build.guide.enhancements.add(step)
+                deprecations.guide.add(GuideDeprecation(ability, value, kept = true))
                 return
             }
             val step = BuildGuideEnhancement(lookup)
@@ -769,7 +780,6 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             build.guide.enhancements.add(step)
         }
     }
-
     /**
      * The 1-based guide tree for [display] (a tree abbreviation, with " (<class initials>)" when two
      * classes share it), adding it if new; 0 if it can't be matched. Ported from `GuideTreeLookup`

@@ -44,7 +44,8 @@ class BuildOutputTest {
         // Runs of spaces become dots in the background colour; lists use [list] and [*].
         assertTrue(text.contains("[color=#112233]. . . . . .[/color]"))
         assertTrue(text.contains("Kensei (27 AP)[list][*]Kensei Focus: Axes"))
-        assertTrue(text.contains("[/list][/list]\r\nWarpriest (22 AP)"))
+        // The build has a leveling guide, so its trees are in their guide colours.
+        assertTrue(text.contains("[/list][/list][/color]\r\nWarpriest (22 AP)"))
     }
 
     @Test
