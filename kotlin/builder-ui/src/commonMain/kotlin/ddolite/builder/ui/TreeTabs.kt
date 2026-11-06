@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -202,4 +204,161 @@ internal fun TreeAbilitiesTab(screen: TreeAbilitiesScreen, theme: Theme, area: C
             screen.chooseComboTree(names[index])
         }
     }
+}
+
+/**
+ * What the Enhancements and Destinies windows' Trees tabs share (frmEnhancements and frmDestiny2
+ * picTab(0)): the build's trees on the left, the ones it could add on the right. Each window's state
+ * keeps its own rules; this is what [TreeListTab] draws and calls.
+ */
+interface TreeListScreen {
+    val drag: DragDropState<EnhancementDrag>
+
+    /** The first column's caption ("Class", "Destiny"), and the texts it can show, so it's sized to the widest. */
+    val nameColumn: String
+    fun nameColumnTexts(): List<String>
+
+    /** The most trees a build can have (7 enhancement trees, 3 destinies): the list always fits them. */
+    val maxTrees: Int
+
+    /** The build's trees (usrTree), a row's columns, the drop states, the row under the mouse, the row whose menu is open. */
+    fun treeRows(): List<ddolite.builder.build.BuildTree?>
+    fun treeColumns(row: Int): TreeColumns
+    val treeDropStates: List<DropState>
+    var treeHover: Int
+    val treeMenuRow: Int
+
+    /** The trees it could add (lstTree), with their class where they have one, and the highlighted one. */
+    fun listedTrees(): List<ListedTree>
+    val treeListIndex: Int
+
+    /** The AP line. */
+    fun apCaption(): Caption
+
+    fun clickTree(row: Int, button: PointerButton)
+    fun doubleClickTree(row: Int)
+    fun pressListTree(index: Int)
+    fun doubleClickListTree()
+    fun startTreeDrag(item: EnhancementDrag): Boolean
+    fun treeDropped(item: EnhancementDrag, target: Any?)
+}
+
+/*
+ * The Trees tab's layout, from the content corner: the build's trees on the left and the trees to add
+ * on the right, captions on the first line and boxes a line below; the AP line under them; and each
+ * window's own frames under that, one under each list (the windows place them from these).
+ */
+internal const val TREE_LIST_WIDTH = 361
+internal const val TREE_LIST_HEIGHT = LINE + 171
+internal const val ADD_TREES_LEFT = TREE_LIST_WIDTH + 23
+private const val ADD_TREES_TOP = LINE
+private const val TREES_AP_TOP = TREE_LIST_HEIGHT + 7
+internal const val TREE_FRAMES_TOP = TREES_AP_TOP + 28
+internal const val TREE_FRAME_HEIGHT = 157
+
+/**
+ * The Trees tab (frmEnhancements picTab(0)) and the Destiny Trees tab (frmDestiny2 picTab(0)), with
+ * [below] the window's own frames (the racial and universal AP, or the permanent destiny points).
+ * Kotlin only: the first column is as wide as the widest text it can show, and the add list's Class
+ * column starts after its longest tree name (VB sizes both from fixed sample names).
+ */
+@Composable
+internal fun TreeListTab(screen: TreeListScreen, theme: Theme, area: ContentArea, onMenu: () -> Unit, below: @Composable () -> Unit) {
+    val label = labelStyle(theme)
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current.density
+    val bold = label.copy(fontWeight = FontWeight.Bold)
+    val rows = screen.treeRows()
+
+    // The first column's widest text: its caption, what it can show, and what it shows now.
+    var widest = screen.nameColumn
+    var widestWidth = measurer.measure(widest, bold).size.width
+    val candidates = ArrayList(screen.nameColumnTexts())
+    for (row in 1..rows.size) {
+        candidates.add(screen.treeColumns(row).className)
+    }
+    for (text in candidates) {
+        val w = measurer.measure(text, bold).size.width
+        if (w > widestWidth) {
+            widest = text
+            widestWidth = w
+        }
+    }
+    UserList(
+        theme,
+        listOf(
+            ListColumn(screen.nameColumn, widest, TextAlign.Start),
+            ListColumn("Tree", "", TextAlign.Center, slot = true),
+            ListColumn("Tier", "Tier", TextAlign.Center),
+            ListColumn("AP", "AP", TextAlign.Center),
+        ),
+        rows.size,
+        cellText = { row, col ->
+            val columns = screen.treeColumns(row)
+            when (col) {
+                0 -> columns.className
+                2 -> columns.tier
+                3 -> columns.ap
+                else -> ""
+            }
+        },
+        slot = { row -> SlotContent(rows.getOrNull(row - 1)?.treeName ?: "", false) },
+        dropState = { row -> screen.treeDropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
+        hoverRow = screen.treeHover,
+        left = 0, top = 0, width = TREE_LIST_WIDTH, height = TREE_LIST_HEIGHT,
+        fitRows = screen.maxTrees,
+        headerHeight = LINE,
+        drag = screen.drag,
+        rowKey = { row -> TreeRowKey(row) },
+        dragItem = { row -> EnhancementDrag.TreeRow(row) },
+        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
+        onDrop = { item, target -> screen.treeDropped(item, target) },
+        onPress = { row, button ->
+            screen.clickTree(row, button)
+            if (screen.treeMenuRow != 0) {
+                onMenu()
+            }
+        },
+        onDoubleClick = { row -> screen.doubleClickTree(row) },
+        onHover = { row -> screen.treeHover = row },
+    )
+
+    // The trees to add: names, and a Class column after the longest name when any has a class.
+    val listed = screen.listedTrees()
+    val texts = ArrayList<String>()
+    var classes = false
+    var longestName = 0
+    val listStyle = controlStyle(theme)
+    for (tree in listed) {
+        if (tree.source.isEmpty()) {
+            texts.add(tree.name)
+        } else {
+            texts.add(tree.name + "\t" + tree.source)
+            classes = true
+        }
+        val w = (measurer.measure(tree.name, listStyle).size.width / density).toInt()
+        if (w > longestName) {
+            longestName = w
+        }
+    }
+    var classColumn = 0
+    Label("Tree", label, ADD_TREES_LEFT, 0)
+    if (classes) {
+        classColumn = longestName + ITEM_GAP
+        Label("Class", label, ADD_TREES_LEFT + classColumn, 0)
+    }
+    ListBox(
+        theme, texts, { i -> i == screen.treeListIndex }, ADD_TREES_LEFT, ADD_TREES_TOP, area.width - ADD_TREES_LEFT,
+        TREE_LIST_HEIGHT - ADD_TREES_TOP, screen.drag,
+        onPress = { i, _ -> screen.pressListTree(i) },
+        onDoubleClick = { _ -> screen.doubleClickListTree() },
+        dragItem = { i -> EnhancementDrag.ListTree(listed[i].name) },
+        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
+        onDrop = { item, target -> screen.treeDropped(item, target) },
+        dropKey = TreeListKey,
+        itemColumn = classColumn,
+    )
+    val ap = screen.apCaption()
+    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(216.dp, TREES_AP_TOP.dp))
+    below()
 }

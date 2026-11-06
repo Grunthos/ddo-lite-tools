@@ -29,7 +29,7 @@ private const val MAX_DESTINIES = 3
  *
  * Drags reuse [EnhancementDrag] and its drop keys. Rows are numbered from 1; 0 means none.
  */
-class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScreen {
+class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScreen, TreeListScreen {
     /** The tab showing (mlngTab): 0 Destiny Trees, 1 Destinies. */
     var tab by mutableIntStateOf(0)
         private set
@@ -122,20 +122,20 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
 
     // ================================================================ Destiny Trees tab
 
-    var treeDropStates: List<DropState> by mutableStateOf(emptyList())
+    override var treeDropStates: List<DropState> by mutableStateOf(emptyList())
         private set
 
-    var treeHover by mutableIntStateOf(0)
+    override var treeHover by mutableIntStateOf(0)
 
     /** The destiny highlighted in the available list (lstTree), -1 = none. */
-    var treeListIndex by mutableIntStateOf(-1)
+    override var treeListIndex by mutableIntStateOf(-1)
         private set
 
-    var treeMenuRow by mutableIntStateOf(0)
+    override var treeMenuRow by mutableIntStateOf(0)
         private set
 
     /** The rows of usrTree: one per destiny, plus an empty one while a destiny is dragged in. */
-    fun treeRows(): List<BuildTree?> {
+    override fun treeRows(): List<BuildTree?> {
         val build = build() ?: return emptyList()
         val rows = ArrayList<BuildTree?>()
         for (t in build.destinies) {
@@ -151,7 +151,7 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
      * usrTree's columns for a destiny (ShowDestinies, :887). VB bug kept: the max tier goes in the
      * "Destiny" column (`SetText i, 1, GetMaxTier(i)`) and the Tier column stays empty.
      */
-    fun treeColumns(row: Int): TreeColumns {
+    override fun treeColumns(row: Int): TreeColumns {
         val r = rules ?: return TreeColumns("", "", "")
         if (treeRows().getOrNull(row - 1) == null) {
             return TreeColumns("", "", "")
@@ -179,6 +179,22 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
         val r = rules ?: return Caption("", false)
         val totals = r.destinyTotals()
         return Caption(totals.caption(), totals.overspent)
+    }
+
+    /** The Destiny Trees tab's first column. It shows each destiny's max tier (treeColumns), so it's sized to that. */
+    override val nameColumn = "Destiny"
+
+    override fun nameColumnTexts(): List<String> = emptyList()
+
+    override val maxTrees = MAX_DESTINIES
+
+    /** The destinies to add, for the shared tab (no class column). */
+    override fun listedTrees(): List<ListedTree> {
+        val result = ArrayList<ListedTree>()
+        for (name in availableDestinies()) {
+            result.add(ListedTree(name, ""))
+        }
+        return result
     }
 
     /** ShowAvailableDestinies (:962) and AddDestiny (:975): destinies not chosen or locked out. */
@@ -214,7 +230,7 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
     }
 
     /** usrTree_SlotClick (:806). */
-    fun clickTree(row: Int, button: PointerButton) {
+    override fun clickTree(row: Int, button: PointerButton) {
         treeListIndex = -1
         if (button == PointerButton.PRIMARY) {
             selectTreeRow(if (selectedTreeRow() == row) 0 else row)
@@ -279,7 +295,7 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
     }
 
     /** usrTree_SlotDblClick (:866): removes the destiny, clearing it as the tier 5 destiny. */
-    fun doubleClickTree(row: Int) {
+    override fun doubleClickTree(row: Int) {
         treeListIndex = -1
         val edits = edits() ?: return
         if (!edits.removeTree(row)) {
@@ -291,14 +307,14 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
     }
 
     /** lstTree_MouseDown (:1012). */
-    fun pressListTree(index: Int) {
+    override fun pressListTree(index: Int) {
         selectTreeRow(0)
         treeListIndex = index
         changed()
     }
 
     /** lstTree_DblClick (:1002): adds the destiny after the others (at most 3). */
-    fun doubleClickListTree() {
+    override fun doubleClickListTree() {
         val build = build() ?: return
         if (treeListIndex == -1 || build.destinies.size >= MAX_DESTINIES) {
             return
@@ -324,7 +340,7 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
     }
 
     /** A destiny drag is starting: from the list (lstTree_MouseMove, :1018) or a row (usrTree_RequestDrag, :1068). */
-    fun startTreeDrag(item: EnhancementDrag): Boolean {
+    override fun startTreeDrag(item: EnhancementDrag): Boolean {
         val build = build() ?: return false
         if (item is EnhancementDrag.ListTree) {
             if (treeListIndex == -1) {
@@ -349,7 +365,7 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
     }
 
     /** usrTree_OLEDragDrop (:1048), then ShowDestinies. */
-    fun treeDropped(item: EnhancementDrag, target: Any?) {
+    override fun treeDropped(item: EnhancementDrag, target: Any?) {
         val build = build()
         var changedTrees = false
         if (build != null && target is TreeRowKey) {

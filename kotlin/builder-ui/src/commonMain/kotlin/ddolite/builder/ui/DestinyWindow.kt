@@ -3,7 +3,6 @@ package ddolite.builder.ui
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import ddolite.builder.build.DropState
 import ddolite.common.theme.Theme
 
 /** frmDestiny2's client area, in pixels at 100%. */
@@ -92,7 +89,7 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     ) { area ->
         if (state.rules != null) {
             if (screen.tab == 0) {
-                DestinyTreesTab(screen, theme, area) { menuAt = pointer }
+                TreeListTab(screen, theme, area, onMenu = { menuAt = pointer }) { PermDestinyPoints(screen, theme, area) }
             } else {
                 TreeAbilitiesTab(screen, theme, area) { menuAt = pointer }
             }
@@ -100,89 +97,25 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     }
 }
 
-/*
- * The Destiny Trees tab's layout, from the content corner: the build's destinies on the left, the
- * destinies it could add on the right (captions on the first line, boxes a line below), the AP line
- * under them, and the permanent destiny points under the right-hand list.
- */
-private const val DESTINIES_WIDTH = 361
-private const val DESTINIES_HEIGHT = LINE + 171
-private const val ADD_LEFT = DESTINIES_WIDTH + 23
-private const val ADD_TOP = LINE
-private const val DESTINY_AP_TOP = DESTINIES_HEIGHT + 7
-private const val PDP_TOP = DESTINY_AP_TOP + 28
-private const val PDP_HEIGHT = 157
-
-/** The Destiny Trees tab (picTab(0)): the build's destinies, the destinies it could add, the AP line and the permanent destiny points. */
+/** The permanent destiny points frame under the Destiny Trees tab's right-hand list (fraDestinyAP). */
 @Composable
-private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
+private fun PermDestinyPoints(screen: DestinyScreenState, theme: Theme, area: ContentArea) {
     val label = labelStyle(theme)
-    val rows = screen.treeRows()
-    UserList(
-        theme,
-        listOf(
-            ListColumn("Destiny", "Divine Crusader", TextAlign.Start), // MAX_DESTINY_NAME
-            ListColumn("Tree", "", TextAlign.Center, slot = true),
-            ListColumn("Tier", "Tier", TextAlign.Center),
-            ListColumn("AP", "AP", TextAlign.Center),
-        ),
-        rows.size,
-        cellText = { row, col ->
-            val columns = screen.treeColumns(row)
-            when (col) {
-                0 -> columns.className
-                2 -> columns.tier
-                3 -> columns.ap
-                else -> ""
-            }
-        },
-        slot = { row -> SlotContent(rows.getOrNull(row - 1)?.treeName ?: "", false) },
-        dropState = { row -> screen.treeDropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
-        hoverRow = screen.treeHover,
-        left = 0, top = 0, width = DESTINIES_WIDTH, height = DESTINIES_HEIGHT,
-        drag = screen.drag,
-        rowKey = { row -> TreeRowKey(row) },
-        dragItem = { row -> EnhancementDrag.TreeRow(row) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
-        onDrop = { item, target -> screen.treeDropped(item, target) },
-        onPress = { row, button ->
-            screen.clickTree(row, button)
-            if (screen.treeMenuRow != 0) {
-                onMenu()
-            }
-        },
-        onDoubleClick = { row -> screen.doubleClickTree(row) },
-        onHover = { row -> screen.treeHover = row },
-        headerHeight = LINE,
-    )
-    Label("Tree", label, ADD_LEFT, 0)
-    val listed = screen.availableDestinies()
-    ListBox(
-        theme, listed, { i -> i == screen.treeListIndex }, ADD_LEFT, ADD_TOP, area.width - ADD_LEFT, DESTINIES_HEIGHT - ADD_TOP, screen.drag,
-        onPress = { i, _ -> screen.pressListTree(i) },
-        onDoubleClick = { _ -> screen.doubleClickListTree() },
-        dragItem = { i -> EnhancementDrag.ListTree(listed[i]) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
-        onDrop = { item, target -> screen.treeDropped(item, target) },
-        dropKey = TreeListKey,
-    )
-    val ap = screen.apCaption()
-    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(216.dp, DESTINY_AP_TOP.dp))
 
     // fraDestinyAP, under the destinies to add (a captioned frame, as the Enhancements window's).
-    GroupFrame(theme, "Perm Destiny Points", ADD_LEFT, PDP_TOP, area.width - ADD_LEFT, PDP_HEIGHT)
+    GroupFrame(theme, "Perm Destiny Points", ADD_TREES_LEFT, TREE_FRAMES_TOP, area.width - ADD_TREES_LEFT, TREE_FRAME_HEIGHT)
     Spinner(
         value = screen.pdp(),
         min = screen.pdpMin(),
         max = screen.pdpMax(),
         theme = theme,
         onValueChange = { screen.setPdp(it) },
-        modifier = Modifier.offset((ADD_LEFT + 36).dp, (PDP_TOP + 24).dp).size(65.dp, 20.dp),
+        modifier = Modifier.offset((ADD_TREES_LEFT + 36).dp, (TREE_FRAMES_TOP + 24).dp).size(65.dp, 20.dp),
     )
-    Label("- Perm Destiny Points can be spent at level 20", label, ADD_LEFT + 24, PDP_TOP + 48)
-    Label("- PDPs are earned at 1 per 3 Fate Points", label, ADD_LEFT + 24, PDP_TOP + 68)
-    Label("- Fate Point are earned 1 per 3 EPL ", label, ADD_LEFT + 24, PDP_TOP + 88)
-    Label("- Fate/Destiny Tomes can add more points", label, ADD_LEFT + 24, PDP_TOP + 108)
-    Label("- You get 36 FP's for unlocking all Destiny Trees", label, ADD_LEFT + 24, PDP_TOP + 128)
+    Label("- Perm Destiny Points can be spent at level 20", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 48)
+    Label("- PDPs are earned at 1 per 3 Fate Points", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 68)
+    Label("- Fate Point are earned 1 per 3 EPL ", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 88)
+    Label("- Fate/Destiny Tomes can add more points", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 108)
+    Label("- You get 36 FP's for unlocking all Destiny Trees", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 128)
 }
 

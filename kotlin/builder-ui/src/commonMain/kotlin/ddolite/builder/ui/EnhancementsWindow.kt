@@ -3,7 +3,6 @@ package ddolite.builder.ui
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ddolite.common.theme.Theme
 
@@ -90,7 +88,7 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
     ) { area ->
         if (state.rules != null) {
             when (screen.tab) {
-                0 -> TreesTab(screen, theme, area) { menuAt = pointer }
+                0 -> TreeListTab(screen, theme, area, onMenu = { menuAt = pointer }) { ApFrames(screen, theme, area) }
                 1 -> TreeAbilitiesTab(screen, theme, area) { menuAt = pointer }
                 else -> GuideTab(screen.guide, theme, area) { menuAt = pointer }
             }
@@ -130,89 +128,13 @@ private fun EnhancementMenus(screen: EnhancementsScreenState, at: Offset?, densi
     }
 }
 
-/*
- * The Trees tab's layout, from the content corner: the build's trees on the left, the trees it could
- * add on the right, both with their captions on the first line and their boxes a line below; under
- * them the AP line and the racial and universal AP frames, each under its column.
- */
-private const val BUILD_TREES_WIDTH = 361
-private const val BUILD_TREES_HEIGHT = LINE + 171
-private const val ADD_TREES_LEFT = BUILD_TREES_WIDTH + 23
-private const val ADD_TREES_LABEL_TOP = 0
-private const val ADD_TREES_TOP = ADD_TREES_LABEL_TOP + LINE
-
-/** Where the add list's Class column starts, and its caption over it. */
-private const val ADD_TREES_CLASS_COLUMN = 176
-private const val TREES_AP_TOP = BUILD_TREES_HEIGHT + 7
-private const val AP_FRAMES_TOP = TREES_AP_TOP + 28
-private const val AP_FRAME_HEIGHT = 157
-
-/** The Trees tab (picTab(0)): the build's trees, the trees it could add, the AP line, and the racial and universal AP. */
+/** The racial and universal AP frames under the Trees tab's lists (fraRacialAP, fraUniversalAP). */
 @Composable
-private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
+private fun ApFrames(screen: EnhancementsScreenState, theme: Theme, area: ContentArea) {
     val label = labelStyle(theme)
-    val rows = screen.treeRows()
-    UserList(
-        theme,
-        listOf(
-            ListColumn("Class", "Arcane Trickster", TextAlign.Start),
-            ListColumn("Tree", "", TextAlign.Center, slot = true),
-            ListColumn("Tier", "Tier", TextAlign.Center),
-            ListColumn("AP", "AP", TextAlign.Center),
-        ),
-        rows.size,
-        cellText = { row, col ->
-            val columns = screen.treeColumns(row)
-            when (col) {
-                0 -> columns.className
-                2 -> columns.tier
-                3 -> columns.ap
-                else -> ""
-            }
-        },
-        slot = { row -> SlotContent(rows.getOrNull(row - 1)?.treeName ?: "", false) },
-        dropState = { row -> screen.treeDropStates.getOrNull(row - 1) ?: ddolite.builder.build.DropState.DEFAULT },
-        hoverRow = screen.treeHover,
-        left = 0, top = 0, width = BUILD_TREES_WIDTH, height = BUILD_TREES_HEIGHT,
-        fitRows = 7, // a build has at most seven trees
-        headerHeight = LINE,
-        drag = screen.drag,
-        rowKey = { row -> TreeRowKey(row) },
-        dragItem = { row -> EnhancementDrag.TreeRow(row) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
-        onDrop = { item, target -> screen.treeDropped(item, target) },
-        onPress = { row, button ->
-            screen.clickTree(row, button)
-            if (screen.treeMenuRow != 0) {
-                onMenu()
-            }
-        },
-        onDoubleClick = { row -> screen.doubleClickTree(row) },
-        onHover = { row -> screen.treeHover = row },
-    )
-    Label("Tree", label, ADD_TREES_LEFT, ADD_TREES_LABEL_TOP)
-    Label("Class", label, ADD_TREES_LEFT + ADD_TREES_CLASS_COLUMN, ADD_TREES_LABEL_TOP)
-    val listed = screen.availableTrees()
-    val texts = ArrayList<String>()
-    for (tree in listed) {
-        texts.add(tree.name + "\t" + tree.source)
-    }
-    ListBox(
-        theme, texts, { i -> i == screen.treeListIndex }, ADD_TREES_LEFT, ADD_TREES_TOP, area.width - ADD_TREES_LEFT,
-        BUILD_TREES_HEIGHT - ADD_TREES_TOP, screen.drag,
-        onPress = { i, _ -> screen.pressListTree(i) },
-        onDoubleClick = { _ -> screen.doubleClickListTree() },
-        dragItem = { i -> EnhancementDrag.ListTree(listed[i].name) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startTreeDrag(item) },
-        onDrop = { item, target -> screen.treeDropped(item, target) },
-        dropKey = TreeListKey,
-        itemColumn = ADD_TREES_CLASS_COLUMN,
-    )
-    val ap = screen.apCaption()
-    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(216.dp, TREES_AP_TOP.dp))
 
     // fraRacialAP, under the build's trees.
-    GroupFrame(theme, "Racial Past Life AP", 0, AP_FRAMES_TOP, BUILD_TREES_WIDTH, AP_FRAME_HEIGHT)
+    GroupFrame(theme, "Racial Past Life AP", 0, TREE_FRAMES_TOP, TREE_LIST_WIDTH, TREE_FRAME_HEIGHT)
     val build = screenBuild(screen)
     Spinner(
         value = build?.racialAP ?: 0,
@@ -220,28 +142,28 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, area: Conten
         max = screen.racialApMax(),
         theme = theme,
         onValueChange = { screen.setRacialAp(it) },
-        modifier = Modifier.offset(36.dp, (AP_FRAMES_TOP + 32).dp).size(65.dp, 20.dp),
+        modifier = Modifier.offset(36.dp, (TREE_FRAMES_TOP + 32).dp).size(65.dp, 20.dp),
     )
     val note = screen.racialApNote
     if (note != null) {
-        Label(note, label, 112, AP_FRAMES_TOP + 34)
+        Label(note, label, 112, TREE_FRAMES_TOP + 34)
     }
-    Label("- Racial AP can be spent at level 1", label, 24, AP_FRAMES_TOP + 68)
-    Label("- Racial Past Lives offer up to +" + screen.racialLives() + " Racial AP", label, 24, AP_FRAMES_TOP + 88)
-    Label("- Racial AP Tomes can add another +" + (screen.racialApMax() - screen.racialLives()) + " Racial AP", label, 24, AP_FRAMES_TOP + 108)
+    Label("- Racial AP can be spent at level 1", label, 24, TREE_FRAMES_TOP + 68)
+    Label("- Racial Past Lives offer up to +" + screen.racialLives() + " Racial AP", label, 24, TREE_FRAMES_TOP + 88)
+    Label("- Racial AP Tomes can add another +" + (screen.racialApMax() - screen.racialLives()) + " Racial AP", label, 24, TREE_FRAMES_TOP + 108)
 
     // fraUniversalAP, under the trees to add. VB never fills in lblUniversalAPhelp(1)'s "?".
-    GroupFrame(theme, "Universal AP", ADD_TREES_LEFT, AP_FRAMES_TOP, area.width - ADD_TREES_LEFT, AP_FRAME_HEIGHT)
+    GroupFrame(theme, "Universal AP", ADD_TREES_LEFT, TREE_FRAMES_TOP, area.width - ADD_TREES_LEFT, TREE_FRAME_HEIGHT)
     Spinner(
         value = build?.universalAP ?: 0,
         min = 0,
         max = universalMax(screen),
         theme = theme,
         onValueChange = { screen.setUniversalAp(it) },
-        modifier = Modifier.offset((ADD_TREES_LEFT + 36).dp, (AP_FRAMES_TOP + 32).dp).size(65.dp, 20.dp),
+        modifier = Modifier.offset((ADD_TREES_LEFT + 36).dp, (TREE_FRAMES_TOP + 32).dp).size(65.dp, 20.dp),
     )
-    Label("- Universal AP can be spent at level 1", label, ADD_TREES_LEFT + 24, AP_FRAMES_TOP + 68)
-    Label("- Universal AP Tomes can add +?", label, ADD_TREES_LEFT + 24, AP_FRAMES_TOP + 88)
+    Label("- Universal AP can be spent at level 1", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 68)
+    Label("- Universal AP Tomes can add +?", label, ADD_TREES_LEFT + 24, TREE_FRAMES_TOP + 88)
 }
 
 private fun screenBuild(screen: EnhancementsScreenState) = screen.build()

@@ -58,7 +58,7 @@ class AbilitySlotRow(val tier: String, val caption: String, val cost: String, va
  *
  * Rows are numbered from 1 as VB's userList; 0 means none. The Leveling Guide tab's state is [guide].
  */
-class EnhancementsScreenState(private val session: BuilderSession) : TreeAbilitiesScreen {
+class EnhancementsScreenState(private val session: BuilderSession) : TreeAbilitiesScreen, TreeListScreen {
     /** The tab showing (mlngTab): 0 Trees, 1 Enhancements, 2 Leveling Guide. */
     var tab by mutableIntStateOf(0)
         private set
@@ -182,18 +182,18 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     // ================================================================ Trees tab
 
     /** The build trees' rows' drop states (usrTree), index row - 1; may have one more row than trees while adding. */
-    var treeDropStates: List<DropState> by mutableStateOf(emptyList())
+    override var treeDropStates: List<DropState> by mutableStateOf(emptyList())
         private set
 
     /** The row under the mouse (usrTree.Active). */
-    var treeHover by mutableIntStateOf(0)
+    override var treeHover by mutableIntStateOf(0)
 
     /** The tree highlighted in the available list (lstTree.ListIndex), -1 = none. */
-    var treeListIndex by mutableIntStateOf(-1)
+    override var treeListIndex by mutableIntStateOf(-1)
         private set
 
     /** The build tree whose menu is showing; 0 = none. */
-    var treeMenuRow by mutableIntStateOf(0)
+    override var treeMenuRow by mutableIntStateOf(0)
         private set
 
     /** lblRacialAPreq: shown only after the spinner changes (VB doesn't set it in LoadData). */
@@ -201,7 +201,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         private set
 
     /** The rows of usrTree: one per build tree, plus an empty one while a tree is dragged in (ShowTrees, :1354). */
-    fun treeRows(): List<BuildTree?> {
+    override fun treeRows(): List<BuildTree?> {
         val build = session.rules?.build ?: return emptyList()
         val rows = ArrayList<BuildTree?>()
         for (t in build.trees) {
@@ -214,7 +214,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** usrTree's Class, Tier and AP columns for a build tree (ShowTrees). */
-    fun treeColumns(row: Int): TreeColumns {
+    override fun treeColumns(row: Int): TreeColumns {
         val r = rules ?: return TreeColumns("", "", "")
         val bt = treeRows().getOrNull(row - 1) ?: return TreeColumns("", "", "")
         if (bt.treeType == TreeStyle.RACE) {
@@ -248,6 +248,21 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val totals = r.apTotals()
         return Caption(totals.caption(), totals.overspent)
     }
+
+    /** The Trees tab's first column: the tree's class, sized for the longest class name (VB: MAX_CLASS_NAME). */
+    override val nameColumn = "Class"
+
+    override fun nameColumnTexts(): List<String> {
+        val names = ArrayList<String>()
+        for (c in session.data.classes) {
+            names.add(c.name)
+        }
+        return names
+    }
+
+    override val maxTrees = TREE_SLOTS
+
+    override fun listedTrees(): List<ListedTree> = availableTrees()
 
     /**
      * The trees the build could add: its classes' trees (most levels first), its race's trees,
@@ -333,7 +348,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** usrTree_SlotClick (:1267): left toggles the selection, right opens the tree menu. */
-    fun clickTree(row: Int, button: PointerButton) {
+    override fun clickTree(row: Int, button: PointerButton) {
         treeListIndex = -1
         if (button == PointerButton.PRIMARY) {
             if (selectedTreeRow() == row) {
@@ -409,7 +424,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** usrTree_SlotDblClick (:1333): removes the tree (not the race's), clearing it as the tier 5 tree. */
-    fun doubleClickTree(row: Int) {
+    override fun doubleClickTree(row: Int) {
         treeListIndex = -1
         val edits = edits() ?: return
         if (!edits.removeTree(row)) {
@@ -421,14 +436,14 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** lstTree_MouseDown (:1501): selects the tree and clears the slot selection. */
-    fun pressListTree(index: Int) {
+    override fun pressListTree(index: Int) {
         selectTreeRow(0)
         treeListIndex = index
         changed()
     }
 
     /** lstTree_DblClick (:1491): adds the tree after the others (at most 7). */
-    fun doubleClickListTree() {
+    override fun doubleClickListTree() {
         val build = session.rules?.build ?: return
         if (treeListIndex == -1 || build.trees.size > 6) {
             return
@@ -454,7 +469,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** A tree drag is starting: from the list, ShowTrees(True, True) (lstTree_MouseMove, :1507); from a row, usrTree_RequestDrag (:1553). */
-    fun startTreeDrag(item: EnhancementDrag): Boolean {
+    override fun startTreeDrag(item: EnhancementDrag): Boolean {
         val build = session.rules?.build ?: return false
         if (item is EnhancementDrag.ListTree) {
             if (treeListIndex == -1) {
@@ -480,7 +495,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     }
 
     /** A tree drag ended: usrTree_OLEDragDrop (:1537), then the complete-drag handlers' ShowTrees. */
-    fun treeDropped(item: EnhancementDrag, target: Any?) {
+    override fun treeDropped(item: EnhancementDrag, target: Any?) {
         val build = session.rules?.build
         var changedTrees = false
         if (build != null && target is TreeRowKey) {
