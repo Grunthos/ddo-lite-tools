@@ -1,8 +1,5 @@
 package ddolite.builder.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,17 +11,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ddolite.builder.build.DropState
-import ddolite.common.theme.ColorGroup
-import ddolite.common.theme.ColorValue
 import ddolite.common.theme.Theme
 
 /** frmDestiny2's client area, in pixels at 100%. */
@@ -104,7 +94,7 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
             if (screen.tab == 0) {
                 DestinyTreesTab(screen, theme, area) { menuAt = pointer }
             } else {
-                DestiniesTab(screen, theme, area) { menuAt = pointer }
+                TreeAbilitiesTab(screen, theme, area) { menuAt = pointer }
             }
         }
     }
@@ -149,7 +139,7 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: Cont
         slot = { row -> SlotContent(rows.getOrNull(row - 1)?.treeName ?: "", false) },
         dropState = { row -> screen.treeDropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
         hoverRow = screen.treeHover,
-        left = 0, top = 0, width = DESTINIES_WIDTH, height = DESTINIES_HEIGHT, maxRows = 21,
+        left = 0, top = 0, width = DESTINIES_WIDTH, height = DESTINIES_HEIGHT,
         drag = screen.drag,
         rowKey = { row -> TreeRowKey(row) },
         dragItem = { row -> EnhancementDrag.TreeRow(row) },
@@ -168,7 +158,7 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: Cont
     Label("Tree", label, ADD_LEFT, 0)
     val listed = screen.availableDestinies()
     ListBox(
-        theme, listed, { i -> i == screen.listIndex }, ADD_LEFT, ADD_TOP, area.width - ADD_LEFT, DESTINIES_HEIGHT - ADD_TOP, screen.drag,
+        theme, listed, { i -> i == screen.treeListIndex }, ADD_LEFT, ADD_TOP, area.width - ADD_LEFT, DESTINIES_HEIGHT - ADD_TOP, screen.drag,
         onPress = { i, _ -> screen.pressListTree(i) },
         onDoubleClick = { _ -> screen.doubleClickListTree() },
         dragItem = { i -> EnhancementDrag.ListTree(listed[i]) },
@@ -196,134 +186,3 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: Cont
     Label("- You get 36 FP's for unlocking all Destiny Trees", label, ADD_LEFT + 24, PDP_TOP + 128)
 }
 
-/*
- * The Destinies tab's layout, as the Enhancements tab's: the ability slots on the left; the tree
- * drop-down, the abilities and selectors lists and the details to the right; the totals under all.
- */
-private const val SLOTS_WIDTH = 329
-private const val SLOTS_HEIGHT = LINE + 403
-private const val ABILITIES_LEFT = SLOTS_WIDTH + GAP
-private const val ABILITIES_WIDTH = 233
-private const val SELECTORS_LEFT = ABILITIES_LEFT + ABILITIES_WIDTH + GAP
-private const val TREE_COMBO_TOP = LINE
-private const val LISTS_LABEL_TOP = TREE_COMBO_TOP + COMBO_HEIGHT + 11
-private const val LISTS_TOP = LISTS_LABEL_TOP + LINE
-private const val LISTS_HEIGHT = 201
-private const val ABILITY_CAPTION_TOP = LISTS_TOP + LISTS_HEIGHT + 8
-private const val ABILITY_DETAILS_TOP = ABILITY_CAPTION_TOP + LINE
-private const val ABILITY_TOTALS_TOP = SLOTS_HEIGHT + TIGHT
-
-/** The Destinies tab (picTab(1)): the chosen destiny's abilities, lists, details and totals. */
-@Composable
-private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = labelStyle(theme)
-    val control = controlStyle(theme)
-    var comboOpen by remember { mutableStateOf(false) }
-    val rows = screen.slotRows()
-    val rightWidth = area.width - ABILITIES_LEFT
-    UserList(
-        theme,
-        listOf(
-            ListColumn("Tier", "Tier", TextAlign.Center),
-            ListColumn("Ability", "", TextAlign.Center, slot = true),
-            ListColumn("AP", " 20", TextAlign.Center),
-        ),
-        rows.size,
-        cellText = { row, col ->
-            val r = rows.getOrNull(row - 1)
-            when (col) {
-                0 -> r?.tier ?: ""
-                2 -> r?.cost ?: ""
-                else -> ""
-            }
-        },
-        slot = { row ->
-            val r = rows.getOrNull(row - 1)
-            if (r == null) SlotContent("", false) else SlotContent(r.caption, r.error, r.ranks, r.maxRanks)
-        },
-        dropState = { row -> screen.slotStates.getOrNull(row - 1) ?: DropState.DEFAULT },
-        hoverRow = screen.slotHover,
-        left = 0, top = 0, width = SLOTS_WIDTH, height = SLOTS_HEIGHT, maxRows = 16,
-        drag = screen.drag,
-        rowKey = { row -> AbilityRowKey(row) },
-        dragItem = { row -> EnhancementDrag.AbilityRow(row) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
-        onDrop = { item, target -> screen.abilityDropped(item, target) },
-        onPress = { row, button ->
-            screen.clickSlot(row, button)
-            if (screen.slotMenuRow != 0) {
-                onMenu()
-            }
-        },
-        onDoubleClick = { row -> screen.doubleClickSlot(row) },
-        onHover = { row -> screen.slotHover = row },
-        onRankChange = { row, ranks -> screen.changeRank(row, ranks) },
-        headerHeight = LINE,
-    )
-    Label("Tree", label, ABILITIES_LEFT, 0)
-    ComboBox(theme, control, screen.comboTree, ABILITIES_LEFT, TREE_COMBO_TOP, ABILITIES_WIDTH, COMBO_HEIGHT) { comboOpen = !comboOpen }
-    val tier5 = screen.tier5()
-    if (tier5.isNotEmpty()) {
-        Label("Tier 5 Tree", label, SELECTORS_LEFT, 0)
-        Label(tier5, label, SELECTORS_LEFT, TREE_COMBO_TOP + 3) // level with the drop-down's text
-    }
-    Label("Abilities", label, ABILITIES_LEFT, LISTS_LABEL_TOP)
-    CheckBox(theme, "Show All", screen.showAll, true, ABILITIES_LEFT + 112, LISTS_LABEL_TOP - 2, ABILITIES_WIDTH - 112) { screen.changeShowAll(!screen.showAll) }
-    Label("Selectors", label, SELECTORS_LEFT, LISTS_LABEL_TOP)
-    val abilityTexts = ArrayList<String>()
-    for (item in screen.abilities) {
-        abilityTexts.add(screen.abilityText(item))
-    }
-    ListBox(
-        theme, abilityTexts, { i -> i == screen.abilityIndex }, ABILITIES_LEFT, LISTS_TOP, ABILITIES_WIDTH, LISTS_HEIGHT, screen.drag,
-        onPress = { i, _ -> screen.clickAbility(i) },
-        onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = false) },
-        dragItem = { i -> EnhancementDrag.ListAbility(screen.abilities[i].tier, screen.abilities[i].ability) },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
-        onDrop = { item, target -> screen.abilityDropped(item, target) },
-        dropKey = AbilityListKey,
-    )
-    val selectorTexts = ArrayList<String>()
-    for (s in screen.selectors) {
-        selectorTexts.add(s.name)
-    }
-    ListBox(
-        theme, selectorTexts, { i -> i == screen.selectorIndex }, SELECTORS_LEFT, LISTS_TOP, area.width - SELECTORS_LEFT, LISTS_HEIGHT, screen.drag,
-        onPress = { i, _ -> screen.clickSelector(i) },
-        onDoubleClick = { _ -> screen.doubleClickList(fromSelectors = true) },
-        dragItem = { _ ->
-            val item = screen.abilities.getOrNull(screen.abilityIndex)
-            if (item == null) null else EnhancementDrag.ListAbility(item.tier, item.ability)
-        },
-        onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startAbilityDrag(item) },
-        onDrop = { item, target -> screen.abilityDropped(item, target) },
-    )
-    val details = screen.details
-    BasicText(
-        details?.caption ?: "Details",
-        style = label.copy(fontWeight = FontWeight.Bold),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.offset(ABILITIES_LEFT.dp, ABILITY_CAPTION_TOP.dp).width(rightWidth.dp),
-    )
-    // The details box ends level with the slots.
-    DetailsBox(theme, details?.lines ?: emptyList(), ABILITIES_LEFT, ABILITY_DETAILS_TOP, rightWidth, SLOTS_HEIGHT - ABILITY_DETAILS_TOP)
-    val ap = screen.apCaption()
-    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(8.dp, ABILITY_TOTALS_TOP.dp))
-    Label(screen.spentCaption(), label, 264, ABILITY_TOTALS_TOP)
-    if (details != null) {
-        Label(details.ranks, label, ABILITIES_LEFT + 112, ABILITY_TOTALS_TOP)
-        Label(details.cost, label, ABILITIES_LEFT + 176, ABILITY_TOTALS_TOP)
-        val prog = details.progression
-        if (prog != null) {
-            Label(prog, label, ABILITIES_LEFT + 312, ABILITY_TOTALS_TOP)
-        }
-    }
-    if (comboOpen) {
-        val names = screen.comboTrees()
-        DropList(theme, control, names, ABILITIES_LEFT, TREE_COMBO_TOP + COMBO_HEIGHT, ABILITIES_WIDTH) { index ->
-            comboOpen = false
-            screen.chooseComboTree(names[index])
-        }
-    }
-}

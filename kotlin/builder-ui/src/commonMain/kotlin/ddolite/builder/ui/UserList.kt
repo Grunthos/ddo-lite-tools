@@ -71,7 +71,7 @@ class DoubleClickTimer {
  * VB's userList control (Source/Controls/Build/userList.ctl) with its userSlot rows
  * (Source/Controls/userSlot.ctl): column headers above a bordered list, columns sized as
  * DefineColumn/Refresh do (fixed columns from the left up to the slot, from the right after it),
- * a scroll bar past [maxRows] rows. Each slot shows its drop state, error and hover border; a
+ * a scroll bar when the rows don't fit. Each slot shows its drop state, error and hover border; a
  * press calls [onPress] (VB raises SlotClick on mouse down), a quick second press [onDoubleClick],
  * a left drag [dragItem] (refused if [onStartDrag] says no), and the rank arrows [onRankChange].
  * Rows are numbered from 1.
@@ -92,7 +92,6 @@ fun <T> UserList(
     top: Int,
     width: Int,
     height: Int,
-    maxRows: Int,
     drag: DragDropState<T>,
     rowKey: (Int) -> Any,
     dragItem: (Int) -> T?,
@@ -124,9 +123,10 @@ fun <T> UserList(
             slotHeight = marginY * 4
         }
     }
+    // Room for the scroll bar when the rows don't fit (VB's DEFAULT_MAX_ROWS, here from the height).
     var clientWidth = width - 2
-    if (rowCount > maxRows) {
-        clientWidth -= 17
+    if ((slotHeight + marginY) * rowCount + marginY * 2 > height - headerSpace - 2) {
+        clientWidth -= SCROLL_BAR
     }
     var slotColumn = 0
     for (i in columns.indices) {

@@ -114,7 +114,7 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
                 slot = { row -> SlotContent(rows.getOrNull(row - 1)?.spell ?: "", false) },
                 dropState = { row -> screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
                 hoverRow = screen.hoverRow,
-                left = 0, top = 0, width = SLOTS_WIDTH, height = SLOTS_HEIGHT, maxRows = 21,
+                left = 0, top = 0, width = SLOTS_WIDTH, height = SLOTS_HEIGHT,
                 drag = screen.drag,
                 rowKey = { row -> SpellSlotKey(row) },
                 dragItem = { row -> SpellDrag.FromSlot(row) },

@@ -29,7 +29,7 @@ private const val MAX_DESTINIES = 3
  *
  * Drags reuse [EnhancementDrag] and its drop keys. Rows are numbered from 1; 0 means none.
  */
-class DestinyScreenState(private val session: BuilderSession) {
+class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScreen {
     /** The tab showing (mlngTab): 0 Destiny Trees, 1 Destinies. */
     var tab by mutableIntStateOf(0)
         private set
@@ -37,7 +37,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     var revision by mutableIntStateOf(0)
         private set
 
-    val drag = DragDropState<EnhancementDrag>()
+    override val drag = DragDropState<EnhancementDrag>()
 
     private val rules: EnhancementRules?
         get() {
@@ -61,7 +61,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     /** Form_Load (:574). */
     fun opened() {
         tab = 0
-        listIndex = -1
+        treeListIndex = -1
         treeDropStates = emptyList()
         treeHover = 0
         loadData()
@@ -128,7 +128,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     var treeHover by mutableIntStateOf(0)
 
     /** The destiny highlighted in the available list (lstTree), -1 = none. */
-    var listIndex by mutableIntStateOf(-1)
+    var treeListIndex by mutableIntStateOf(-1)
         private set
 
     var treeMenuRow by mutableIntStateOf(0)
@@ -175,7 +175,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** The destiny AP line (ShowSpentAll, :924). */
-    fun apCaption(): Caption {
+    override fun apCaption(): Caption {
         val r = rules ?: return Caption("", false)
         val totals = r.destinyTotals()
         return Caption(totals.caption(), totals.overspent)
@@ -215,7 +215,7 @@ class DestinyScreenState(private val session: BuilderSession) {
 
     /** usrTree_SlotClick (:806). */
     fun clickTree(row: Int, button: PointerButton) {
-        listIndex = -1
+        treeListIndex = -1
         if (button == PointerButton.PRIMARY) {
             selectTreeRow(if (selectedTreeRow() == row) 0 else row)
         } else if (button == PointerButton.SECONDARY && row <= (build()?.destinies?.size ?: 0)) {
@@ -280,7 +280,7 @@ class DestinyScreenState(private val session: BuilderSession) {
 
     /** usrTree_SlotDblClick (:866): removes the destiny, clearing it as the tier 5 destiny. */
     fun doubleClickTree(row: Int) {
-        listIndex = -1
+        treeListIndex = -1
         val edits = edits() ?: return
         if (!edits.removeTree(row)) {
             return
@@ -293,14 +293,14 @@ class DestinyScreenState(private val session: BuilderSession) {
     /** lstTree_MouseDown (:1012). */
     fun pressListTree(index: Int) {
         selectTreeRow(0)
-        listIndex = index
+        treeListIndex = index
         changed()
     }
 
     /** lstTree_DblClick (:1002): adds the destiny after the others (at most 3). */
     fun doubleClickListTree() {
         val build = build() ?: return
-        if (listIndex == -1 || build.destinies.size >= MAX_DESTINIES) {
+        if (treeListIndex == -1 || build.destinies.size >= MAX_DESTINIES) {
             return
         }
         addBuildDestiny(build.destinies.size + 1)
@@ -313,7 +313,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     /** AddBuildDestiny (:1080): the highlighted destiny into row [row], replacing or adding. */
     private fun addBuildDestiny(row: Int) {
         val edits = edits() ?: return
-        val name = availableDestinies().getOrNull(listIndex) ?: return
+        val name = availableDestinies().getOrNull(treeListIndex) ?: return
         edits.putTree(row, edits.newDestiny(name))
     }
 
@@ -327,7 +327,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     fun startTreeDrag(item: EnhancementDrag): Boolean {
         val build = build() ?: return false
         if (item is EnhancementDrag.ListTree) {
-            if (listIndex == -1) {
+            if (treeListIndex == -1) {
                 return false
             }
             showDestinies(drop = true, add = true)
@@ -366,7 +366,7 @@ class DestinyScreenState(private val session: BuilderSession) {
         }
         showDestinies(drop = false, add = false)
         if (changedTrees) {
-            listIndex = -1
+            treeListIndex = -1
             populateCombo()
             destiniesChanged()
         }
@@ -388,34 +388,34 @@ class DestinyScreenState(private val session: BuilderSession) {
 
     // ================================================================ Destinies tab
 
-    var comboTree by mutableStateOf("")
+    override var comboTree by mutableStateOf("")
         private set
 
     // mlngBuildDestiny: the chosen destiny's position in build.Destiny (1-based, 0 = none).
     private var buildDestiny = 0
 
-    var slotStates: List<DropState> by mutableStateOf(emptyList())
+    override var slotStates: List<DropState> by mutableStateOf(emptyList())
         private set
 
-    var slotHover by mutableIntStateOf(0)
+    override var slotHover by mutableIntStateOf(0)
 
-    var abilities: List<AbilityRef> by mutableStateOf(emptyList())
+    override var abilities: List<AbilityRef> by mutableStateOf(emptyList())
         private set
-    var abilityIndex by mutableIntStateOf(-1)
-        private set
-
-    var selectors: List<SelectorItem> by mutableStateOf(emptyList())
-        private set
-    var selectorIndex by mutableIntStateOf(-1)
+    override var abilityIndex by mutableIntStateOf(-1)
         private set
 
-    var showAll by mutableStateOf(false)
+    override var selectors: List<SelectorItem> by mutableStateOf(emptyList())
+        private set
+    override var selectorIndex by mutableIntStateOf(-1)
         private set
 
-    var details: AbilityDetails? by mutableStateOf(null)
+    override var showAll by mutableStateOf(false)
         private set
 
-    var slotMenuRow by mutableIntStateOf(0)
+    override var details: AbilityDetails? by mutableStateOf(null)
+        private set
+
+    override var slotMenuRow by mutableIntStateOf(0)
         private set
 
     private var sourceRow = 0
@@ -425,7 +425,7 @@ class DestinyScreenState(private val session: BuilderSession) {
 
     private fun currentBuildTree(): BuildTree? = build()?.destinies?.getOrNull(buildDestiny - 1)
 
-    fun comboTrees(): List<String> {
+    override fun comboTrees(): List<String> {
         val build = build() ?: return emptyList()
         val names = ArrayList<String>()
         for (bt in build.destinies) {
@@ -446,7 +446,7 @@ class DestinyScreenState(private val session: BuilderSession) {
         }
     }
 
-    fun chooseComboTree(name: String) {
+    override fun chooseComboTree(name: String) {
         comboTree = name
         treeClick()
         session.saveBackup()
@@ -462,7 +462,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** ShowAbilities (:1112). */
-    fun slotRows(): List<AbilitySlotRow> {
+    override fun slotRows(): List<AbilitySlotRow> {
         val r = rules ?: return emptyList()
         val tree = currentTree()
         val bt = currentBuildTree()
@@ -482,12 +482,12 @@ class DestinyScreenState(private val session: BuilderSession) {
         return rows
     }
 
-    fun spentCaption(): String {
+    override fun spentCaption(): String {
         val r = rules ?: return ""
         return "Spent in Tree: " + r.spentInTree(currentTree(), currentBuildTree()).total
     }
 
-    fun tier5(): String = build()?.destinyTier5 ?: ""
+    override fun tier5(): String = build()?.destinyTier5 ?: ""
 
     private fun showAbilities() {
         slotStates = selectedStates(slotRows().size, 0)
@@ -509,12 +509,12 @@ class DestinyScreenState(private val session: BuilderSession) {
         changed()
     }
 
-    fun abilityText(item: AbilityRef): String {
+    override fun abilityText(item: AbilityRef): String {
         val tree = currentTree() ?: return ""
         return item.tier.toString() + ": " + tree.tiers[item.tier][item.ability].abbreviation
     }
 
-    fun changeShowAll(value: Boolean) {
+    override fun changeShowAll(value: Boolean) {
         showAll = value
         showAvailable()
     }
@@ -542,7 +542,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** usrList_SlotClick (:1375). */
-    fun clickSlot(row: Int, button: PointerButton) {
+    override fun clickSlot(row: Int, button: PointerButton) {
         val bt = currentBuildTree() ?: return
         selectorIndex = -1
         abilityIndex = -1
@@ -593,7 +593,7 @@ class DestinyScreenState(private val session: BuilderSession) {
         destiniesChanged()
     }
 
-    fun doubleClickSlot(row: Int) {
+    override fun doubleClickSlot(row: Int) {
         clearSlot(row)
     }
 
@@ -611,7 +611,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** usrList_RankChange (:1477). */
-    fun changeRank(row: Int, ranks: Int) {
+    override fun changeRank(row: Int, ranks: Int) {
         val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
         val a = edits.setRanks(bt, row, ranks) ?: return
@@ -622,7 +622,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** lstAbility_MouseDown (:1505) and ListAbilityClick (:1536). */
-    fun clickAbility(index: Int): Boolean {
+    override fun clickAbility(index: Int): Boolean {
         val r = rules ?: return false
         val tree = currentTree() ?: return false
         val item = abilities.getOrNull(index) ?: return false
@@ -649,7 +649,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** lstSub_MouseDown (:1605). */
-    fun clickSelector(index: Int) {
+    override fun clickSelector(index: Int) {
         val item = abilities.getOrNull(abilityIndex) ?: return
         val selector = selectors.getOrNull(index) ?: return
         selectorIndex = index
@@ -683,7 +683,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** lstAbility_DblClick / lstSub_DblClick (:1495, :1595). */
-    fun doubleClickList(fromSelectors: Boolean) {
+    override fun doubleClickList(fromSelectors: Boolean) {
         if (abilityIndex == -1) {
             return
         }
@@ -716,7 +716,7 @@ class DestinyScreenState(private val session: BuilderSession) {
     }
 
     /** StartDrag (:1254) with ShowDropSlots (:1160), or usrList_RequestDrag (:1457). */
-    fun startAbilityDrag(item: EnhancementDrag): Boolean {
+    override fun startAbilityDrag(item: EnhancementDrag): Boolean {
         if (item is EnhancementDrag.AbilityRow) {
             val bt = currentBuildTree() ?: return false
             if (item.row > bt.abilities.size) {
@@ -752,7 +752,7 @@ class DestinyScreenState(private val session: BuilderSession) {
      * complete-drag handlers. VB quirk kept: a tier 5 ability dropped (not double-clicked) doesn't
      * make its destiny the tier 5 destiny.
      */
-    fun abilityDropped(item: EnhancementDrag, target: Any?) {
+    override fun abilityDropped(item: EnhancementDrag, target: Any?) {
         val r = rules
         val bt = currentBuildTree()
         if (item is EnhancementDrag.AbilityRow) {

@@ -50,6 +50,8 @@ Kotlin windows' constants.
 | Enhancements | All three tabs start at the same corner and end at the right margin; both lists on the Trees tab line up (VB's are 8 pixels apart); the AP frames sit under the lists above them. | 789e3d2 |
 | Enhancements, Leveling Guide | The lists are 24 pixels shorter; the details caption is bold, with Cost, Spent in Tree and Min Level between it and the box (VB has them under the box); the totals (Level, Available, Spent) are right-aligned together under the grid; the details box ends level with the grid. | 121fe14, 9eba41d, a96ccb0, 738d153 |
 | Destinies | As the Enhancements window; "Perm Destiny Points" is a captioned frame like the Enhancements AP frames. | 02adab5 |
+| Enhancements and Destinies, ability tabs | One shared tab: the slot list fills the window down to the totals line (VB's two forms differ in height, so their lists did: 443 and 403 pixels), and the totals sit in the same places in both (VB's Destinies ones were up to 16 pixels off). | (this commit) |
+| Slot lists (UserList) | Make room for the scroll bar when the rows don't fit, worked out from the height (VB uses a fixed 21 rows; the Spells slots could overlap the bar with 7 to 21 slots). | (this commit) |
 | Messages | The list spans the width; the three columns below share it evenly, all the same height, buttons at each column's right. | 0ee0961 |
 | Options | The four frames line up two by two, frames in a row the same height, buttons at the frames' bottom right; the window is 437 tall (VB 428, whose Output frame runs past the bottom). | 0ee0961 |
 | Output Format | Its links are in the standard header bar (Apply Changes greyed until there's a change); the BBCodes frame reaches the right margin. | 0ee0961 |

@@ -58,7 +58,7 @@ class AbilitySlotRow(val tier: String, val caption: String, val cost: String, va
  *
  * Rows are numbered from 1 as VB's userList; 0 means none. The Leveling Guide tab's state is [guide].
  */
-class EnhancementsScreenState(private val session: BuilderSession) {
+class EnhancementsScreenState(private val session: BuilderSession) : TreeAbilitiesScreen {
     /** The tab showing (mlngTab): 0 Trees, 1 Enhancements, 2 Leveling Guide. */
     var tab by mutableIntStateOf(0)
         private set
@@ -70,7 +70,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     var revision by mutableIntStateOf(0)
         private set
 
-    val drag = DragDropState<EnhancementDrag>()
+    override val drag = DragDropState<EnhancementDrag>()
 
     // The button of the last press, so only a left-button drag starts a drag.
     internal var lastButton = PointerButton.PRIMARY
@@ -243,7 +243,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** The AP line (ShowSpentAll, :1390). */
-    fun apCaption(): Caption {
+    override fun apCaption(): Caption {
         val r = rules ?: return Caption("", false)
         val totals = r.apTotals()
         return Caption(totals.caption(), totals.overspent)
@@ -560,41 +560,41 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     // ================================================================ Enhancements tab
 
     /** The tree chosen in cboTree (its text). */
-    var comboTree by mutableStateOf("")
+    override var comboTree by mutableStateOf("")
         private set
 
     // mlngBuildTree: the chosen tree's position in build.Tree (1-based, 0 = none).
     private var buildTree = 0
 
     /** The ability slots' drop states (usrList), index row - 1. */
-    var slotStates: List<DropState> by mutableStateOf(emptyList())
+    override var slotStates: List<DropState> by mutableStateOf(emptyList())
         private set
 
     /** The slot under the mouse (usrList.Active). */
-    var slotHover by mutableIntStateOf(0)
+    override var slotHover by mutableIntStateOf(0)
 
     /** The ability list (lstAbility) as (tier, ability), and its highlighted row (-1 = none). */
-    var abilities: List<AbilityRef> by mutableStateOf(emptyList())
+    override var abilities: List<AbilityRef> by mutableStateOf(emptyList())
         private set
-    var abilityIndex by mutableIntStateOf(-1)
+    override var abilityIndex by mutableIntStateOf(-1)
         private set
 
     /** The selector list (lstSub), and its highlighted row (-1 = none). */
-    var selectors: List<SelectorItem> by mutableStateOf(emptyList())
+    override var selectors: List<SelectorItem> by mutableStateOf(emptyList())
         private set
-    var selectorIndex by mutableIntStateOf(-1)
+    override var selectorIndex by mutableIntStateOf(-1)
         private set
 
     /** "Show All" (usrchkShowAll). */
-    var showAll by mutableStateOf(false)
+    override var showAll by mutableStateOf(false)
         private set
 
     /** The details box; null shows "Details" with nothing else. */
-    var details: AbilityDetails? by mutableStateOf(null)
+    override var details: AbilityDetails? by mutableStateOf(null)
         private set
 
     /** The slot whose menu is showing (mnuMain(1)); 0 = none. */
-    var slotMenuRow by mutableIntStateOf(0)
+    override var slotMenuRow by mutableIntStateOf(0)
         private set
 
     // mlngSourceIndex: the slot a drag started from; mblnDragComplete: the drag put an ability in a slot.
@@ -607,7 +607,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     private fun currentBuildTree(): BuildTree? = session.rules?.build?.trees?.getOrNull(buildTree - 1)
 
     /** cboTree's items: the build's trees (PopulateCombo). */
-    fun comboTrees(): List<String> {
+    override fun comboTrees(): List<String> {
         val build = session.rules?.build ?: return emptyList()
         val names = ArrayList<String>()
         for (bt in build.trees) {
@@ -637,7 +637,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** cboTree_Click (:2182). */
-    fun chooseComboTree(name: String) {
+    override fun chooseComboTree(name: String) {
         comboTree = name
         treeClick()
         session.saveBackup()
@@ -654,7 +654,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** The slot rows (ShowAbilities, :1622): one blank row when the tree has no abilities. */
-    fun slotRows(): List<AbilitySlotRow> {
+    override fun slotRows(): List<AbilitySlotRow> {
         val r = rules ?: return emptyList()
         val tree = currentTree()
         val bt = currentBuildTree()
@@ -676,13 +676,13 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** "Spent in Tree: N" (lblSpent). */
-    fun spentCaption(): String {
+    override fun spentCaption(): String {
         val r = rules ?: return ""
         return "Spent in Tree: " + r.spentInTree(currentTree(), currentBuildTree()).total
     }
 
     /** "Tier 5 Tree" label (ShowTier5, :1873). */
-    fun tier5(): String = session.rules?.build?.tier5 ?: ""
+    override fun tier5(): String = session.rules?.build?.tier5 ?: ""
 
     private fun showAbilities() {
         val count = slotRows().size
@@ -710,13 +710,13 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** lstAbility's text for a row: "tier: Abbreviation". */
-    fun abilityText(item: AbilityRef): String {
+    override fun abilityText(item: AbilityRef): String {
         val tree = currentTree() ?: return ""
         return item.tier.toString() + ": " + tree.tiers[item.tier][item.ability].abbreviation
     }
 
     /** usrchkShowAll_UserChange (:2178). */
-    fun changeShowAll(value: Boolean) {
+    override fun changeShowAll(value: Boolean) {
         showAll = value
         showAvailable()
     }
@@ -773,7 +773,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** usrList_SlotClick (:1902). */
-    fun clickSlot(row: Int, button: PointerButton) {
+    override fun clickSlot(row: Int, button: PointerButton) {
         val bt = currentBuildTree() ?: return
         selectorIndex = -1
         abilityIndex = -1
@@ -825,7 +825,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** usrList_SlotDblClick (:1958). */
-    fun doubleClickSlot(row: Int) {
+    override fun doubleClickSlot(row: Int) {
         clearSlot(row)
     }
 
@@ -846,7 +846,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** A rank arrow on slot [row] (usrList_RankChange, :2001). */
-    fun changeRank(row: Int, ranks: Int) {
+    override fun changeRank(row: Int, ranks: Int) {
         val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
         val a = edits.setRanks(bt, row, ranks) ?: return
@@ -860,7 +860,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
      * An ability pressed in the list: lstAbility_MouseDown (:2029) and ListAbilityClick (:2060).
      * Shows its details and selectors; returns true if it has no selectors (so it can be dragged).
      */
-    fun clickAbility(index: Int): Boolean {
+    override fun clickAbility(index: Int): Boolean {
         val r = rules ?: return false
         val tree = currentTree() ?: return false
         val item = abilities.getOrNull(index) ?: return false
@@ -888,7 +888,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** lstSub_MouseDown / lstSub_Click (:2128, :2105). */
-    fun clickSelector(index: Int) {
+    override fun clickSelector(index: Int) {
         val item = abilities.getOrNull(abilityIndex) ?: return
         val selector = selectors.getOrNull(index) ?: return
         selectorIndex = index
@@ -926,7 +926,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
     }
 
     /** lstAbility_DblClick / lstSub_DblClick (:2019, :2118). */
-    fun doubleClickList(fromSelectors: Boolean) {
+    override fun doubleClickList(fromSelectors: Boolean) {
         if (abilityIndex == -1) {
             return
         }
@@ -965,7 +965,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
      * A drag is starting. From the lists: StartDrag (:1779) adds a blank slot where the ability
      * would go and lights it up (ShowDropSlots, :1675). From a slot: usrList_RequestDrag (:1981).
      */
-    fun startAbilityDrag(item: EnhancementDrag): Boolean {
+    override fun startAbilityDrag(item: EnhancementDrag): Boolean {
         if (item is EnhancementDrag.AbilityRow) {
             val bt = currentBuildTree() ?: return false
             if (item.row > bt.abilities.size) {
@@ -1001,7 +1001,7 @@ class EnhancementsScreenState(private val session: BuilderSession) {
      * lstAbility_OLEDragDrop (:2090) clears a slot dragged onto the list; otherwise the blank is
      * removed again (lstAbility_OLECompleteDrag, :2080).
      */
-    fun abilityDropped(item: EnhancementDrag, target: Any?) {
+    override fun abilityDropped(item: EnhancementDrag, target: Any?) {
         val r = session.rules
         val bt = currentBuildTree()
         if (item is EnhancementDrag.AbilityRow) {
