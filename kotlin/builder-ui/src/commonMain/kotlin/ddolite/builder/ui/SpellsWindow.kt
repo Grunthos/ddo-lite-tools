@@ -83,18 +83,11 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
             SpellDragGhost(screen, theme)
             val at = menuAt
             if (at != null && screen.menuRow != 0) {
+                // Disabled items are grey and can't be chosen (as VB's).
                 val items = screen.menuItems()
-                val captions = ArrayList<String>()
-                for (item in items) {
-                    captions.add(item.caption)
-                }
-                PopupMenu(captions, -1, at, density, onChoose = { index ->
+                PopupMenu(items, at, density, onChoose = { index ->
                     menuAt = null
-                    if (items[index].enabled) {
-                        screen.chooseMenu(items[index].caption)
-                    } else {
-                        screen.closeMenu()
-                    }
+                    screen.chooseMenu(items[index].caption)
                 }, onDismiss = {
                     menuAt = null
                     screen.closeMenu()

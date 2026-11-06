@@ -79,12 +79,6 @@ private const val DETAILS_HEIGHT = LIST_HEIGHT - DETAILS_TOP
 /** userList's DEFAULT_MAX_ROWS: more rows than this get a scroll bar. */
 private const val MAX_ROWS = 21
 
-/** A ListBox item's height. */
-private const val ITEM_HEIGHT = 15
-
-/** Time within which a second press counts as a double-click. */
-private const val DOUBLE_CLICK_MS = 500L
-
 /**
  * The Feats window (Source/Forms/Build/frmFeats.frm): the header (Selected, the channel tabs if
  * "Channels" is on, Granted; Help), the feat slots (usrList), the feat and selector lists, the
@@ -192,24 +186,28 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
             featNames.add(screen.listCaption(feat))
         }
         ListBox(
-            theme, featNames, { i -> i == screen.featIndex }, FEATS_LEFT, LISTS_TOP, FEATS_LIST_WIDTH, LISTS_HEIGHT, screen,
-            dragItem = { i -> FeatDrag.FromList(screen.feats[i]) },
-            dropKey = FeatListKey,
+            theme, featNames, { i -> i == screen.featIndex }, FEATS_LEFT, LISTS_TOP, FEATS_LIST_WIDTH, LISTS_HEIGHT, screen.drag,
             onPress = { i, _ -> screen.clickFeat(i) },
-            onDoubleClick = { screen.doubleClickList() },
+            onDoubleClick = { _ -> screen.doubleClickList() },
+            dragItem = { i -> FeatDrag.FromList(screen.feats[i]) },
+            onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startDrag(item) },
+            onDrop = { item, target -> screen.dropped(item, target) },
+            dropKey = FeatListKey,
         )
         val selectorNames = ArrayList<String>()
         for (s in screen.selectors) {
             selectorNames.add(s.name)
         }
         ListBox(
-            theme, selectorNames, { i -> i == screen.selectorIndex }, SELECTORS_LEFT, LISTS_TOP, area.width - SELECTORS_LEFT, LISTS_HEIGHT, screen,
+            theme, selectorNames, { i -> i == screen.selectorIndex }, SELECTORS_LEFT, LISTS_TOP, area.width - SELECTORS_LEFT, LISTS_HEIGHT, screen.drag,
+            onPress = { i, _ -> screen.clickSelector(i) },
+            onDoubleClick = { _ -> screen.doubleClickList() },
             dragItem = { _ ->
                 val feat = screen.feats.getOrNull(screen.featIndex)
                 if (feat == null) null else FeatDrag.FromList(feat)
             },
-            onPress = { i, _ -> screen.clickSelector(i) },
-            onDoubleClick = { screen.doubleClickList() },
+            onStartDrag = { item, button -> button == PointerButton.PRIMARY && screen.startDrag(item) },
+            onDrop = { item, target -> screen.dropped(item, target) },
         )
     }
     // Details: lblDetails (a link that widens or restores the box), >> and <<, usrDetails.
@@ -235,64 +233,14 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
             BasicText("<<", style = link, modifier = Modifier.offset((FEATS_LEFT + detailsWidth - 22).dp, DETAILS_CAPTION_TOP.dp).clickable { screen.toggleDetails() })
         }
     }
-    DetailsBox(screen, theme, FEATS_LEFT, DETAILS_TOP, detailsWidth, DETAILS_HEIGHT)
+    DetailsBox(theme, details.lines, FEATS_LEFT, DETAILS_TOP, detailsWidth, DETAILS_HEIGHT)
     if (!expanded) {
         // The same height as the details box (VB's runs 8 pixels lower).
         Label("Filter", label, SELECTORS_LEFT, DETAILS_CAPTION_TOP)
         ListBox(
-            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, SELECTORS_LEFT, DETAILS_TOP, area.width - SELECTORS_LEFT, DETAILS_HEIGHT, screen,
+            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, SELECTORS_LEFT, DETAILS_TOP, area.width - SELECTORS_LEFT, DETAILS_HEIGHT, screen.drag,
             onPress = { i, ctrl -> screen.clickGroup(i, ctrl) },
         )
-    }
-}
-
-/** usrDetails: the lines, wrapped, with the wiki link and errors in their colours (userDetails.DrawText). */
-@Composable
-private fun DetailsBox(screen: FeatsScreenState, theme: Theme, left: Int, top: Int, width: Int, height: Int) {
-    val uriHandler = LocalUriHandler.current
-    val text = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
-    val scroll = rememberScrollState()
-    Box(
-        modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        // The text wraps beside the scroll bar, which is always there (greyed when not needed).
-        Column(
-            modifier = Modifier.offset(1.dp, 1.dp).size((width - 2 - SCROLL_BAR).dp, (height - 2).dp)
-                .verticalScroll(scroll).padding(start = 4.dp, top = 1.dp, end = 4.dp, bottom = 2.dp),
-        ) {
-            for (line in screen.details.lines) {
-                var color = text
-                if (line.error) {
-                    color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_ERROR)
-                }
-                // Lines starting with a space are indented when they wrap (ProcessLine's blnIndent).
-                var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color)
-                if (line.text.startsWith(" ")) {
-                    style = style.copy(textIndent = TextIndent(restLine = 14.sp))
-                }
-                val lineLink = line.link
-                if (lineLink != null && line.text.endsWith("(Wiki)")) {
-                    // lblLink sits over "(Wiki)" in the link colour; here the whole last line opens the page.
-                    val linkStart = line.text.length - "(Wiki)".length
-                    val annotated = buildAnnotatedString {
-                        append(line.text.substring(0, linkStart))
-                        withStyle(SpanStyle(color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_LINK))) {
-                            append("(Wiki)")
-                        }
-                    }
-                    BasicText(
-                        annotated,
-                        style = style,
-                        modifier = Modifier.clickable { uriHandler.openUri(lineLink) },
-                    )
-                } else {
-                    BasicText(line.text, style = style)
-                }
-            }
-        }
-        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2, always = true)
     }
 }
 
@@ -445,7 +393,7 @@ private fun FeatSlot(screen: FeatsScreenState, theme: Theme, entry: FeatListEntr
     if (entry.errorState) {
         textColor = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT_ERROR)
     }
-    val clicks = remember { ClickTimer() }
+    val clicks = remember { DoubleClickTimer() }
     val currentOnMenu by rememberUpdatedState(onMenu)
     Box(
         modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
@@ -493,103 +441,6 @@ private fun FeatSlot(screen: FeatsScreenState, theme: Theme, entry: FeatListEntr
     }
 }
 
-/** Tells a double-click from two clicks: the same row pressed again within [DOUBLE_CLICK_MS]. */
-private class ClickTimer {
-    private var lastTime: TimeSource.Monotonic.ValueTimeMark? = null
-    private var lastRow = -1
-
-    fun isDoubleClick(row: Int): Boolean {
-        val now = TimeSource.Monotonic.markNow()
-        val last = lastTime
-        val result = row == lastRow && last != null && (now - last).inWholeMilliseconds < DOUBLE_CLICK_MS
-        if (result) {
-            lastRow = -1
-        } else {
-            lastRow = row
-            lastTime = now
-        }
-        return result
-    }
-}
-
-/**
- * A ListBox (lstFeat, lstSub, lstGroup) in the controls colours, with Windows' selection colours.
- * An item is chosen as the button goes down, as a ListBox does; [onPress] also gets whether Ctrl
- * was held (lstGroup's extended selection). [dragItem] lets an item be dragged; [dropKey] makes
- * the list a drop target.
- */
-@Composable
-private fun ListBox(
-    theme: Theme,
-    items: List<String>,
-    isSelected: (Int) -> Boolean,
-    left: Int,
-    top: Int,
-    width: Int,
-    height: Int,
-    screen: FeatsScreenState,
-    dragItem: ((Int) -> FeatDrag?)? = null,
-    dropKey: Any? = null,
-    onPress: (Int, Boolean) -> Unit,
-    onDoubleClick: () -> Unit = {},
-) {
-    var modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
-    if (dropKey != null) {
-        modifier = modifier.dropTarget(screen.drag, dropKey)
-    }
-    val clicks = remember { ClickTimer() }
-    val scroll = rememberScrollState()
-    val inner = width - 2 - SCROLL_BAR // beside the scroll bar, always there (greyed when not needed)
-    Box(
-        modifier = modifier
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        Column(modifier = Modifier.offset(1.dp, 1.dp).size(inner.dp, (height - 2).dp).verticalScroll(scroll)) {
-            for (i in items.indices) {
-                var back = Color.Transparent
-                var color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
-                if (isSelected(i)) {
-                    back = HIGHLIGHT
-                    color = HIGHLIGHT_TEXT
-                }
-                var itemModifier = Modifier.size(inner.dp, ITEM_HEIGHT.dp).background(back)
-                    .pointerInput(i, items.size) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                if (event.type == PointerEventType.Press) {
-                                    screen.lastButton = pressedButton(event)
-                                    if (screen.lastButton == PointerButton.PRIMARY && clicks.isDoubleClick(i)) {
-                                        onDoubleClick()
-                                    } else if (screen.lastButton == PointerButton.PRIMARY) {
-                                        onPress(i, event.keyboardModifiers.isCtrlPressed)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                if (dragItem != null) {
-                    val item = dragItem(i)
-                    if (item != null) {
-                        itemModifier = itemModifier.dragSource(screen.drag, item, onStart = { dragged ->
-                            screen.lastButton == PointerButton.PRIMARY && screen.startDrag(dragged)
-                        }) { dragged, target -> screen.dropped(dragged, target) }
-                    }
-                }
-                Box(modifier = itemModifier) {
-                    BasicText(
-                        items[i],
-                        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color),
-                        maxLines = 1,
-                        modifier = Modifier.offset(2.dp, 0.dp),
-                    )
-                }
-            }
-        }
-        ScrollBar(theme, scroll, width - 1 - SCROLL_BAR, 1, height - 2, always = true)
-    }
-}
 
 /** The feat being dragged, next to the pointer (VB shows the system's drag cursor). */
 @Composable

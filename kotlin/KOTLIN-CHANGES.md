@@ -62,10 +62,10 @@ Kotlin windows' constants.
 |---|---|---|---|
 | Text is drawn with subpixel smoothing, full hinting and whole-pixel positions (Compose's own text drawing; VB uses Windows'). | Look | none (VB already uses ClearType) | 6a88281 |
 | The menu bar, message boxes and file dialogs use the platform's look (Java's default "Metal" draws bold menus). | Look | none | 6a88281 |
+| Disabled items in the Enhancements tree menu and the Spells slot menu are grey and can't be chosen, as VB's (the earlier Kotlin drew them black and closed the menu). | Look | none (VB already) | (this commit) |
 | Right-click menus open upward or leftward when there's no room below or to the right, staying inside the window. | Look | none (Windows does this for VB) | 7b0f16e |
 | At 125% or 150% Windows scaling, slot lists keep their size and 7 enhancement trees fit. | Look | none | ba0bb80 |
 
 ## 5. Under discussion
 
-- The Enhancements tree menu and the Spells slot menu draw disabled items in normal black (clicking one
-  closes the menu). VB greys them, as the Leveling Guide's menu already does in Kotlin.
+(Nothing at the moment.)

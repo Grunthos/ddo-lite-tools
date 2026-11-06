@@ -112,18 +112,10 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
 @Composable
 private fun EnhancementMenus(screen: EnhancementsScreenState, at: Offset?, density: Float, onClose: () -> Unit) {
     if (at != null && screen.treeMenuRow != 0) {
-        val items = screen.treeMenuItems()
-        val captions = ArrayList<String>()
-        for (item in items) {
-            captions.add(item.caption)
-        }
-        PopupMenu(captions, -1, at, density, onChoose = { index ->
+        // Disabled items are grey and can't be chosen (as VB's).
+        PopupMenu(screen.treeMenuItems(), at, density, onChoose = { index ->
             onClose()
-            if (items[index].enabled) {
-                screen.chooseTreeMenu(index)
-            } else {
-                screen.closeTreeMenu()
-            }
+            screen.chooseTreeMenu(index)
         }, onDismiss = {
             onClose()
             screen.closeTreeMenu()
