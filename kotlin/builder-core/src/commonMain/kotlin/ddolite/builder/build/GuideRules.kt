@@ -95,14 +95,12 @@ class GuideTotals(
     fun spentCaption(): String = "Spent: $spent + ${racialSpent}r +${universalSpent}u"
 }
 
-/** The guide's details box: caption, lines, and the cost, "Spent in Tree" and level labels (null = hidden). */
+/** The guide's details box: caption, lines, and the cost and requirement labels (null = hidden). */
 class GuideDetails(
     val caption: String,
     val lines: List<DetailLine>,
     val cost: String?,
-    val spentInTree: String?,
-    val levels: String?,
-    val levelsError: Boolean,
+    val requirement: RequirementLabel?,
 )
 
 /**
@@ -1360,13 +1358,12 @@ class GuideRules(private val rules: BuildRules) {
                 out.addErrorText("Error: " + e.errorText)
             }
         }
+        // The requirement: AP spent in the tree, and the minimum level (GuideAbilityML; below 1 = unattainable).
         val prog = enhancements.spentReq(tree.style, tier, ability + 1)
-        val spentInTree = if (prog != 0) "Spent in Tree: $prog AP" else null
         val ml = abilityMinLevel(guide, tier, ability, selector, rank)
-        val levels = if (ml < 1) "Untrainable" else "Min Level: $ml"
         return GuideDetails(
             "Tier $tier: " + data.name, out.build(), enhancements.costDescrip(data, selector, perRank = false),
-            spentInTree, levels, ml < 1,
+            requirementLabel(prog, ml),
         )
     }
 

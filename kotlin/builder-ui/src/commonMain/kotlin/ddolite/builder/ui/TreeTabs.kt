@@ -192,9 +192,14 @@ internal fun TreeAbilitiesTab(screen: TreeAbilitiesScreen, theme: Theme, area: C
     if (details != null) {
         Label(details.ranks, label, ABILITIES_LEFT + 96, totalsTop)
         Label(details.cost, label, ABILITIES_LEFT + 168, totalsTop)
-        val prog = details.progression
-        if (prog != null) {
-            Label(prog, label, ABILITIES_LEFT + 304, totalsTop)
+        // The requirement ("Req: 5 AP, Lvl 4"), at the details box's right edge.
+        val requirement = details.requirement
+        if (requirement != null) {
+            BasicText(
+                requirement.text,
+                style = captionStyle(theme, requirement.unattainable).copy(textAlign = TextAlign.End),
+                modifier = Modifier.offset(ABILITIES_LEFT.dp, totalsTop.dp).width(rightWidth.dp),
+            )
         }
     }
     if (comboOpen) {

@@ -76,14 +76,10 @@ class GuideScreenState(private val session: BuilderSession) {
     var details: List<DetailLine> by mutableStateOf(emptyList())
         private set
 
-    /** lblGuideCost, lblGuideSpentInTree and lblGuideLevels; null = hidden. */
+    /** lblGuideCost, and the requirement (VB's lblGuideSpentInTree and lblGuideLevels); null = hidden. */
     var costLabel: String? by mutableStateOf(null)
         private set
-    var spentLabel: String? by mutableStateOf(null)
-        private set
-    var levelsLabel: String? by mutableStateOf(null)
-        private set
-    var levelsError by mutableStateOf(false)
+    var requirement: ddolite.builder.build.RequirementLabel? by mutableStateOf(null)
         private set
 
     /** Guide.Enhancement(i).Selected, index row - 1. */
@@ -368,9 +364,7 @@ class GuideScreenState(private val session: BuilderSession) {
         detailsCaption = d.caption
         details = d.lines
         costLabel = d.cost
-        spentLabel = d.spentInTree
-        levelsLabel = d.levels
-        levelsError = d.levelsError
+        requirement = d.requirement
     }
 
     /** ClearGuideDetails (:3585). */
@@ -380,8 +374,7 @@ class GuideScreenState(private val session: BuilderSession) {
         }
         details = emptyList()
         costLabel = null
-        spentLabel = null
-        levelsLabel = null
+        requirement = null
     }
 
     /** A double-click on lstGuideAbility or lstGuideSub: GuideChooseAbility (:3033). */

@@ -172,7 +172,7 @@ class GuideRulesTest {
         assertEquals(all.size - 1, g.availableAbilities(kensei, GuideFilter.ALL_ENHANCEMENTS, 1).size)
         val details = g.details(kensei, 0, 0, 0, 1, 0)!!
         assertEquals("Tier 0: Kensei Focus", details.caption)
-        assertEquals("Min Level: 1", details.levels)
+        assertEquals("Req: Lvl 1", details.requirement?.text)
         assertEquals("Cost: 1 AP", details.cost)
     }
 }

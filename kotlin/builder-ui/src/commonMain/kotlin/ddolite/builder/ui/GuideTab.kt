@@ -85,8 +85,8 @@ private const val TOTALS_TOP = GRID_BOTTOM + TIGHT
  * Tree, AP, Prog) with the totals under it. Laid out from the form's positions; the grid's
  * columns are sized as InitGrid (:3597) does, to their headers and the widest tree name.
  *
- * Kotlin layout changes: the lists are 24 pixels shorter; the details caption is bold, with the Cost,
- * Spent in Tree and Min Level labels between it and the box (VB has them under the box), lined up
+ * Kotlin layout changes: the lists are 24 pixels shorter; the details caption is bold, with the Cost
+ * and requirement ("Req: 5 AP, Lvl 4") labels between it and the box (VB has them under the box), lined up
  * with the box's edges; and the totals (whose level caption also gives the build's classes) are
  * right-aligned under the grid.
  *
@@ -147,17 +147,11 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, area: ContentArea,
     if (cost != null) {
         Label(cost, label, 0, INFO_TOP)
     }
-    val spent = screen.spentLabel
-    if (spent != null) {
-        BasicText(spent, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset(0.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
-    }
-    val levels = screen.levelsLabel
-    if (levels != null) {
-        var style = label.copy(textAlign = TextAlign.End)
-        if (screen.levelsError) {
-            style = style.copy(color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR))
-        }
-        BasicText(levels, style = style, modifier = Modifier.offset(0.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
+    // The requirement, at the box's right edge.
+    val requirement = screen.requirement
+    if (requirement != null) {
+        val style = captionStyle(theme, requirement.unattainable).copy(textAlign = TextAlign.End)
+        BasicText(requirement.text, style = style, modifier = Modifier.offset(0.dp, INFO_TOP.dp).width(PANEL_WIDTH.dp))
     }
 
     // Kotlin only: what the guide spends in the selected tree, bottom left on the totals line.

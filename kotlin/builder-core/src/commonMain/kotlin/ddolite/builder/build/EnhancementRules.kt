@@ -41,8 +41,37 @@ class DestinyTotals(val spentBase: Int, val spentPdp: Int, val maxBase: Int, val
 /** AP spent in a tree: [byTier] is cumulative (index n = spent in tiers 0..n, as VB's plngSpent(0 To 6)). */
 class TreeSpend(val byTier: IntArray, val total: Int)
 
-/** The enhancement ability details box: caption, lines, and the Ranks / Cost / "AP spent in tree" labels. */
-class AbilityDetails(val caption: String, val lines: List<DetailLine>, val ranks: String, val cost: String, val progression: String?)
+/** The enhancement ability details box: caption, lines, and the Ranks / Cost / requirement labels. */
+class AbilityDetails(val caption: String, val lines: List<DetailLine>, val ranks: String, val cost: String, val requirement: RequirementLabel?)
+
+/** What an ability needs, for a status line: "Req: 5 AP, Lvl 4"; [unattainable] shows in the error colour. */
+class RequirementLabel(val text: String, val unattainable: Boolean)
+
+/**
+ * The label for an ability needing [apInTree] AP spent in its tree (0 = none) and build level [level]
+ * (null = no level requirement, as for destinies; below 1 = can't be reached on this build), or null
+ * if it needs nothing. Kotlin only: VB shows "5 AP spent in tree" on the Enhancements tab (lblProg),
+ * and "Spent in Tree: 5 AP" and "Min Level: 4" or "Untrainable" in the guide.
+ */
+fun requirementLabel(apInTree: Int, level: Int?): RequirementLabel? {
+    if (level != null && level < 1) {
+        return RequirementLabel("Req: unattainable", true)
+    }
+    var text = ""
+    if (apInTree != 0) {
+        text = "$apInTree AP"
+    }
+    if (level != null) {
+        if (text.isNotEmpty()) {
+            text = "$text, "
+        }
+        text = text + "Lvl " + level
+    }
+    if (text.isEmpty()) {
+        return null
+    }
+    return RequirementLabel("Req: $text", false)
+}
 
 /** The blank ability VB puts in a tree while an ability is dragged over it (`Ability = 0`). */
 const val BLANK_ABILITY = -1
@@ -963,12 +992,14 @@ class EnhancementRules(val rules: BuildRules) {
                 out.addErrorText("Error: $error")
             }
         }
-        var progression: String? = null
-        val prog = spentReq(tree.style, tier, ability + 1)
-        if (prog != 0) {
-            progression = "$prog AP spent in tree"
+        // The requirement: AP spent in the tree, and the build level (from the class and character
+        // levels above; -1 = unattainable). Destinies have no level requirement here.
+        var level: Int? = null
+        if (tree.style != TreeStyle.DESTINY) {
+            level = if (buildLevels == -1) 0 else maxOf(buildLevels, 1)
         }
-        return AbilityDetails("Tier $tier: " + data.name, out.build(), "Ranks: " + data.ranks, costDescrip(data, selector), progression)
+        val requirement = requirementLabel(spentReq(tree.style, tier, ability + 1), level)
+        return AbilityDetails("Tier $tier: " + data.name, out.build(), "Ranks: " + data.ranks, costDescrip(data, selector), requirement)
     }
 
     internal fun detailsReqs(out: DetailsBuilder, tree: Tree, reqs: Requirements, rank: Int) {
