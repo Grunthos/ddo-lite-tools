@@ -51,11 +51,12 @@ class Deprecations {
     val enhancements = ArrayList<DeprecatedAbility>()
     val destinies = ArrayList<DeprecatedAbility>()
     val guide = ArrayList<GuideDeprecation>()
+    val reducedRanks = ArrayList<ReducedRank>()
 
     /** VB's `gtypDeprecate.Deprecated`: anything to show. */
     val any: Boolean
         get() = feats.isNotEmpty() || nameChanges.isNotEmpty() || enhancements.isNotEmpty() ||
-            destinies.isNotEmpty() || guide.isNotEmpty()
+            destinies.isNotEmpty() || guide.isNotEmpty() || reducedRanks.isNotEmpty()
 
     /** Records a rename once. Ported from `DeprecateNameChange` (basDeprecate.bas:69). */
     fun addNameChange(change: NameChange) {
@@ -71,3 +72,9 @@ class Deprecations {
  * dropped. Kotlin only (see [Deprecations.guide]).
  */
 class GuideDeprecation(val ability: DeprecatedAbility, val text: String, val kept: Boolean)
+
+/**
+ * A tree's ability whose rank in the file the data no longer has: kept at [ranks], its highest.
+ * Kotlin only (VB drops the ability).
+ */
+class ReducedRank(val ability: DeprecatedAbility, val ranks: Int)

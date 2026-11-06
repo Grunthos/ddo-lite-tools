@@ -15,6 +15,9 @@ enum class MessageGroup(val base: Int) {
     ENHANCEMENT(3000),
     GUIDE(4000),
     DESTINY(5000),
+
+    /** Kotlin only: an ability kept at a lower rank. */
+    REDUCED_RANK(6000),
 }
 
 /** One line of the Messages screen's list: its text, group, and 1-based place in that group. */
@@ -42,6 +45,7 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
         var notices = deprecations.nameChanges.size
         notices = notices + deprecations.enhancements.size
         notices = notices + deprecations.guide.size
+        notices = notices + deprecations.reducedRanks.size
         notices = notices + deprecations.destinies.size
         return Pair(issues, notices)
     }
@@ -78,6 +82,11 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
         }
         for (i in deprecations.enhancements.indices) {
             result.add(DeprecationMessage("Enhancements: " + abilityNotice(deprecations.enhancements[i]), MessageGroup.ENHANCEMENT, i + 1))
+        }
+        for (i in deprecations.reducedRanks.indices) {
+            val r = deprecations.reducedRanks[i]
+            val section = if (r.ability.isDestiny) "Destinies: " else "Enhancements: "
+            result.add(DeprecationMessage(section + abilityName(r.ability) + ": Rank " + r.ability.rank + " kept at rank " + r.ranks + " (" + ranksText(r.ranks) + " now)", MessageGroup.REDUCED_RANK, i + 1))
         }
         for (i in deprecations.guide.indices) {
             val g = deprecations.guide[i]
@@ -156,11 +165,50 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
 
     /** "Tree Tier n: Ability: Selector not found". Ported from `AbilityNotice` (frmDeprecate.frm:400). */
     fun abilityNotice(ability: DeprecatedAbility): String {
+        // Kotlin only: an ability that's there with fewer ranks says so, not "not found".
+        val ranks = ranksNow(ability)
+        if (ranks != null && ability.rank > ranks) {
+            return abilityName(ability) + ": Rank " + ability.rank + " not available (" + ranksText(ranks) + " now)"
+        }
+        return abilityName(ability) + " not found"
+    }
+
+    /** "Kensei Tier 1: Action Boost: Haste Boost". */
+    private fun abilityName(ability: DeprecatedAbility): String {
         var result = ability.treeName + " Tier " + ability.tier + ": " + ability.abilityName
         if (ability.selectorName.isNotEmpty()) {
             result = result + ": " + ability.selectorName
         }
-        return result + " not found"
+        return result
+    }
+
+    private fun ranksText(ranks: Int): String = if (ranks == 1) "1 rank" else "$ranks ranks"
+
+    /** The ranks the data's ability has, if it's there under the file's name (with its selector); else null. */
+    private fun ranksNow(ability: DeprecatedAbility): Int? {
+        val data = rules.data
+        val tree = (if (ability.isDestiny) data.findDestiny(ability.treeName) else data.findTree(ability.treeName)) ?: return null
+        val tier = tree.tiers.getOrNull(ability.tier) ?: return null
+        for (a in tier) {
+            var found = false
+            if (a.name == ability.abilityName) {
+                if (ability.selectorName.isEmpty()) {
+                    found = a.selectors.isEmpty()
+                } else {
+                    for (s in a.selectors) {
+                        if (s.name == ability.selectorName) {
+                            found = true
+                        }
+                    }
+                }
+            } else if (a.name == ability.abilityName + ": " + ability.selectorName) {
+                found = true
+            }
+            if (found) {
+                return if (a.ranks < 1) 1 else a.ranks
+            }
+        }
+        return null
     }
 
     /** The details box for a message: the details part of `lstMessage_Click` (frmDeprecate.frm:420). */
@@ -188,6 +236,12 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
                 }
             }
             MessageGroup.DESTINY -> abilityDetails(details, deprecations.destinies[message.index - 1], "Destiny ability not found or invalid:")
+            MessageGroup.REDUCED_RANK -> {
+                val r = deprecations.reducedRanks[message.index - 1]
+                abilityDetails(details, r.ability, "Ability kept at a lower rank:")
+                details.addText("")
+                details.addText("The file has Rank " + r.ability.rank + ", but the current data has " + ranksText(r.ranks) + ", so it's kept at rank " + r.ranks + ".")
+            }
         }
         return details.build()
     }
@@ -335,6 +389,7 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             MessageGroup.ENHANCEMENT -> deprecations.enhancements.removeAt(message.index - 1)
             MessageGroup.GUIDE -> deprecations.guide.removeAt(message.index - 1)
             MessageGroup.DESTINY -> deprecations.destinies.removeAt(message.index - 1)
+            MessageGroup.REDUCED_RANK -> deprecations.reducedRanks.removeAt(message.index - 1)
         }
         val (issues, notices) = countMessages()
         return issues + notices == 0

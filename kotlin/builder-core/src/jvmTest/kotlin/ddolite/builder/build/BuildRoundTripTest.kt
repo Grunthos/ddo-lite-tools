@@ -77,6 +77,7 @@ class BuildRoundTripTest {
             // A selector on a feat that no longer has selectors is dropped without a message
             // (FindFeat, basFormatLite.bas:970): "-Standard: …\tFeat: Selector" with "+Standard: …\tFeat".
             val remaining = ArrayList(differences)
+            var reduced = 0
             for (line in differences) {
                 val tab = line.indexOf('\t')
                 val colon = line.indexOf(':', tab + 1)
@@ -85,6 +86,19 @@ class BuildRoundTripTest {
                     if (remaining.contains(without)) {
                         remaining.remove(without)
                         remaining.remove(line)
+                    }
+                }
+                // An ability kept at a lower rank (Kotlin only) is written at that rank: "-Ability: …
+                // (Rank 3)" with "+Ability: …" (one rank) or "+Ability: … (Rank 2)".
+                if (line.startsWith("-Ability: ") && line.endsWith(")") && line.contains(" (Rank ")) {
+                    val name = line.substring(1, line.lastIndexOf(" (Rank "))
+                    for (other in ArrayList(remaining)) {
+                        if (other == "+$name" || (other.startsWith("+$name (Rank ") && other != "+" + line.substring(1))) {
+                            remaining.remove(other)
+                            remaining.remove(line)
+                            reduced++
+                            break
+                        }
                     }
                 }
                 // A guide step for rank 1 of an ability that now has one rank is written without
@@ -116,6 +130,7 @@ class BuildRoundTripTest {
                 }
             }
             assertEquals(deprecations.enhancements.size + deprecations.destinies.size, removedAbilities, "$name abilities")
+            assertEquals(deprecations.reducedRanks.size, reduced, "$name reduced ranks")
             // A renamed feat is written back under its new name in the same slot.
             assertEquals(deprecations.feats.size + deprecations.nameChanges.size, removedFeats, "$name feats")
             val expectedAdded = ArrayList<String>()

@@ -94,7 +94,7 @@ private class SlotRef(val type: BuildFeatType, val index: Int)
 private class Combo(val text: String, val number: Int)
 
 /** An ability found in its tier: its 0-based position, and its selector (numbered from 1; 0 for none). */
-private class ResolvedAbility(val ability: Int, val selector: Int)
+private class ResolvedAbility(val ability: Int, val selector: Int, val rank: Int)
 
 /** The state of `LoadFileLite` while it reads one file (VB's module-level variables in basFormatLite). */
 private class BuildFileReader(private val data: BuilderData, preferred: BuildPoints) {
@@ -594,12 +594,15 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
     /** Ported from `AddTreeAbility` (basFormatLite.bas:1154). */
     private fun addTreeAbility(raw: String, buildTree: BuildTree, isDestiny: Boolean) {
         val ability = parseAbility(buildTree.treeName + " " + raw, isDestiny)
-        val resolved = if (ability.parsed) resolveAbility(ability) else null
+        val resolved = if (ability.parsed) resolveAbility(ability, keepLowerRank = true) else null
         if (resolved == null) {
             deprecateAbility(ability)
             return
         }
-        buildTree.abilities.add(BuildAbility(ability.tier, resolved.ability, ability.rank, resolved.selector))
+        if (resolved.rank < ability.rank) {
+            deprecations.reducedRanks.add(ReducedRank(ability, resolved.rank))
+        }
+        buildTree.abilities.add(BuildAbility(ability.tier, resolved.ability, resolved.rank, resolved.selector))
     }
 
     /**
@@ -674,7 +677,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * An ability name with ": " in it (Warpriest's "Inflame: Energy Absorption") is found from its
      * two parsed halves.
      */
-    private fun resolveAbility(ability: DeprecatedAbility): ResolvedAbility? {
+    private fun resolveAbility(ability: DeprecatedAbility, keepLowerRank: Boolean = false): ResolvedAbility? {
         val tree = (if (ability.isDestiny) data.findDestiny(ability.treeName) else data.findTree(ability.treeName))
             ?: return null
         if (ability.tier > tree.style.tierCount || ability.tier >= tree.tiers.size) {
@@ -714,10 +717,19 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (a >= abilities.size) {
             return null
         }
-        if (ability.rank > abilities[a].ranks) {
-            return null
+        // Kotlin only, with [keepLowerRank] (a tree's ability lines): a rank the ability no longer has
+        // keeps it at its highest (VB drops it).
+        var maxRanks = abilities[a].ranks
+        if (maxRanks < 1) {
+            maxRanks = 1
         }
-        return ResolvedAbility(a, selector)
+        if (ability.rank > maxRanks) {
+            if (!keepLowerRank) {
+                return null
+            }
+            return ResolvedAbility(a, selector, maxRanks)
+        }
+        return ResolvedAbility(a, selector, ability.rank)
     }
 
     // ---------------------------------------------------------------- leveling guide

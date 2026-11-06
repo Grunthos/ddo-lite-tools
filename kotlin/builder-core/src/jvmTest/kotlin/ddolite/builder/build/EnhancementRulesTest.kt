@@ -23,7 +23,8 @@ class EnhancementRulesTest {
         val rules = open("Warlock Blaster.build")
         val totals = EnhancementRules(rules).apTotals()
         // Tabaxi (racial) 13 AP from the racial pool; Feydark Illusionist (global) 2 from the universal pool.
-        assertEquals("Spent: 65 +13r +2u / Max: 80 +18r +2u AP", totals.caption())
+        // (Stricken and Steal Life Force, Rank 3 in the file, now have one rank: kept at rank 1.)
+        assertEquals("Spent: 69 +13r +2u / Max: 80 +18r +2u AP", totals.caption())
         assertTrue(!totals.overspent)
     }
 
@@ -32,12 +33,12 @@ class EnhancementRulesTest {
         val rules = open("Warlock Blaster.build")
         val er = EnhancementRules(rules)
         val spend = er.spentInTree(data.findTree("Soul Eater"), buildTree(rules, "Soul Eater"))
-        assertEquals(30, spend.total)
-        assertEquals(30, spend.byTier[6])
+        assertEquals(34, spend.total)
+        assertEquals(34, spend.byTier[6])
         for (tier in 1..6) {
             assertTrue(spend.byTier[tier] >= spend.byTier[tier - 1])
         }
-        assertEquals(30, er.quickSpentInTree(rules.findBuildTree("Soul Eater")))
+        assertEquals(34, er.quickSpentInTree(rules.findBuildTree("Soul Eater")))
     }
 
     @Test

@@ -934,7 +934,7 @@ class EnhancementRules(val rules: BuildRules) {
 
     /**
      * The details box for ability [ability] of [tier] with [selector], and the slot's error if
-     * [slot] is given. Ported from frmEnhancements.ShowDetails (:2293), ShowDetailsReqs (:2416),
+     * [slot] is given (first, in Kotlin; last in VB). Ported from frmEnhancements.ShowDetails (:2293), ShowDetailsReqs (:2416),
      * ShowRankReqs (:2433) and basWiki.TierLink; for destinies frmDestiny2.ShowDetails (:1778), where
      * a selector's description gets a wiki link too and the level requirements aren't shown (VB's code
      * for them is commented out).
@@ -942,6 +942,14 @@ class EnhancementRules(val rules: BuildRules) {
     fun details(tree: Tree, buildTree: BuildTree?, tier: Int, ability: Int, selector: Int, slot: BuildAbility?): AbilityDetails {
         val data = tree.tiers[tier][ability]
         val out = DetailsBuilder()
+        // Kotlin only: why the slot is red comes first (VB writes it last, after the description).
+        if (slot != null && buildTree != null) {
+            val error = abilityError(tree, buildTree, slot, spentInTree(tree, buildTree))
+            if (error != null) {
+                out.addErrorText("Error: $error")
+                out.addText("")
+            }
+        }
         if (data.description.isNotEmpty()) {
             out.addDescrip(data.description, makeWiki(tree.wiki) + tierLink(tier))
         }
@@ -984,12 +992,6 @@ class EnhancementRules(val rules: BuildRules) {
                 out.addText(" - Unattainable for this build")
             } else {
                 out.addText(" - $buildLevels build levels")
-            }
-        }
-        if (slot != null && buildTree != null) {
-            val error = abilityError(tree, buildTree, slot, spentInTree(tree, buildTree))
-            if (error != null) {
-                out.addErrorText("Error: $error")
             }
         }
         // The requirement: AP spent in the tree, and the build level (from the class and character

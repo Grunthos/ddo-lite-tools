@@ -31,7 +31,8 @@ class BuildOutputTest {
         assertTrue(lines.contains(" 1 Heroic : Power Attack"))
         assertTrue(lines.contains("30 Legend : Scion of: Arborea OR Astral Plane"))
         assertTrue(lines.contains("    • Kensei Focus: Axes, Spiritual Bond, Strike With No Thought, Power Surge"))
-        assertTrue(lines.contains("         1. Extra Action Boost III, Exotic Weapon Mastery: Axes"))
+        // Haste Boost: Rank 3 in the file, kept at its one rank now.
+        assertTrue(lines.contains("         1. Extra Action Boost III, Exotic Weapon Mastery: Axes, Haste Boost"))
         // The text ends with one line break (VB adds vbNewLine to the last line).
         assertTrue(text.endsWith("Die Hard\r\n"))
     }
@@ -43,9 +44,9 @@ class BuildOutputTest {
         assertTrue(text.contains("[u]Level Order[/u]"))
         // Runs of spaces become dots in the background colour; lists use [list] and [*].
         assertTrue(text.contains("[color=#112233]. . . . . .[/color]"))
-        assertTrue(text.contains("Kensei (27 AP)[list][*]Kensei Focus: Axes"))
+        assertTrue(text.contains("Kensei (30 AP)[list][*]Kensei Focus: Axes"))
         // The build has a leveling guide, so its trees are in their guide colours.
-        assertTrue(text.contains("[/list][/list][/color]\r\nWarpriest (22 AP)"))
+        assertTrue(text.contains("[/list][/list][/color]\r\nWarpriest (23 AP)"))
     }
 
     @Test
