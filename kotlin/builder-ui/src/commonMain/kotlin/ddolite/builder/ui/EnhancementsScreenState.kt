@@ -150,12 +150,14 @@ class EnhancementsScreenState(private val session: BuilderSession) {
 
     /**
      * LoadData (:1148): the footer links, the racial and universal AP spinners, and the tier 5
-     * tree (dropped below level 12). The combo of trees is refilled (PopulateCombo).
+     * tree (dropped below level 12). The trees are shown (ShowTrees, :1184) and the combo of trees
+     * is refilled (PopulateCombo).
      */
     private fun loadData() {
         val edits = edits() ?: return
         sourceRow = 0
         edits.loadDataLimits()
+        showTrees(drop = false, add = false)
         populateCombo()
         guide.loadData()
     }

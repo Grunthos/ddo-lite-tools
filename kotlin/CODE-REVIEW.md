@@ -101,3 +101,33 @@ each shared module.
    tests exist; then they can be split safely.
 5. **Compose UI tests** for a few windows (click a link, see the result) would cover the last 0%
    files; worth it once the layout settles.
+
+## 4. Repetition in the windows (2026-11-06)
+
+Why there was repetition: the port follows VB form by form, and VB's forms were copied from one another
+(frmDestiny2 from frmEnhancements); VB's built-in controls had to be re-created in Compose, often per
+window; and the Feats window was ported before the shared list controls existed.
+
+| # | Repetition | Status |
+|---|---|---|
+| 1 | The same text styles written out 28 times | **Done**: `labelStyle`, `controlStyle`, `captionStyle` (Styles.kt) |
+| 2 | Pointer tracking for menus, in 5 windows | **Done**: `Modifier.trackPointer` (WindowFrame.kt) |
+| 3 | The dragged item's box, in 4 windows | **Done**: `DragGhost` (WindowFrame.kt) |
+| 4 | 4 push-button helpers | **Done**: `PushButton` (OverviewScreen.kt's simple controls) |
+| 5 | Feats' private list box, details box and double-click timer | **Done**: the shared ones (149 lines) |
+| 6 | Captions built from `MenuChoice` lists before each pop-up menu | **Done**: `PopupMenu` takes the list |
+| 7 | Enhancements and Destinies: ~420 of the Destinies state's 534 code lines, and 262 of its window's 345, also in Enhancements | Next: a shared interface for the tabs (each window keeps its own rules); a base class later, once golden tests exist |
+| 8 | The Feats slot list re-implements `UserList` | Next: onto `UserList`, with columns before and after the slot |
+
+Every change above was checked with the screenshots, pixel for pixel (no differences).
+
+**Tests first** for 7 and 8: `TreeAndSlotScreensTest` drives the Destinies window (both tabs, the tree
+menu, PDPs, undo), the Enhancements Trees tab (add, swap, remove, the race tree kept, menu reset) and
+the Feats slots (drag from the list, swap, drag back, the menu, the read-only Granted tab). It found a
+porting bug: the Enhancements window's LoadData left out VB's `ShowTrees False, False` (:1184), so
+until something redrew the Trees tab, its rows couldn't be selected and the menu's Delete and Reset
+did nothing. Fixed.
+
+Coverage (lines / branches): DestinyScreenState 70% / 39%, FeatsScreenState 74% / 50%,
+EnhancementsScreenState 59% / 34%, GuideScreenState 66% / 35%, SpellsScreenState 46% / 24%;
+builder-ui overall 25% / 14% (was 15% / 7%; the window drawing itself isn't unit tested).
