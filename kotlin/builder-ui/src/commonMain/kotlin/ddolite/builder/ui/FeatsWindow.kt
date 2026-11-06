@@ -37,9 +37,9 @@ private const val FEATS_HEIGHT = 593
  * under them the details beside the filter list, both ending level with the slots.
  */
 
-/** usrList: at the content corner. Its column headers sit on the first line, its border a line down. */
+/** usrList: at the content corner. Its column headers sit on the first line, its border a line down; it runs to
+ * the content's bottom. */
 private const val LIST_WIDTH = 409
-private const val LIST_HEIGHT = LINE + 491
 
 /** The feat list and the selector list beside it, under their captions. */
 private const val FEATS_LEFT = LIST_WIDTH + GAP
@@ -51,7 +51,6 @@ private const val LISTS_HEIGHT = 282
 /** The details caption, then the box (under the feat list) beside the filter list (under the selectors). */
 private const val DETAILS_CAPTION_TOP = LISTS_TOP + LISTS_HEIGHT + 10
 private const val DETAILS_TOP = DETAILS_CAPTION_TOP + LINE
-private const val DETAILS_HEIGHT = LIST_HEIGHT - DETAILS_TOP
 
 /**
  * The Feats window (Source/Forms/Build/frmFeats.frm): the header (Selected, the channel tabs if
@@ -146,9 +145,11 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
 @Composable
 private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
+    // The slots, and the details and filter boxes, run down to the content's bottom (no totals line here).
+    val detailsHeight = area.height - DETAILS_TOP
     val label = labelStyle(theme)
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
-    FeatSlots(screen, rules, theme, onMenu)
+    FeatSlots(screen, rules, theme, area.height, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
     if (!granted) {
         // lblFeats, usrchkShowAll (moved to its right by FeatListTitle), lblSelectors.
@@ -207,12 +208,12 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
             BasicText("<<", style = link, modifier = Modifier.offset((FEATS_LEFT + detailsWidth - 22).dp, DETAILS_CAPTION_TOP.dp).clickable { screen.toggleDetails() })
         }
     }
-    DetailsBox(theme, details.lines, FEATS_LEFT, DETAILS_TOP, detailsWidth, DETAILS_HEIGHT)
+    DetailsBox(theme, details.lines, FEATS_LEFT, DETAILS_TOP, detailsWidth, detailsHeight)
     if (!expanded) {
         // The same height as the details box (VB's runs 8 pixels lower).
         Label("Filter", label, SELECTORS_LEFT, DETAILS_CAPTION_TOP)
         ListBox(
-            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, SELECTORS_LEFT, DETAILS_TOP, area.width - SELECTORS_LEFT, DETAILS_HEIGHT, screen.drag,
+            theme, screen.groupNames(), { i -> screen.groupSelection.contains(i) }, SELECTORS_LEFT, DETAILS_TOP, area.width - SELECTORS_LEFT, detailsHeight, screen.drag,
             onPress = { i, ctrl -> screen.clickGroup(i, ctrl) },
         )
     }
@@ -225,7 +226,7 @@ private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
  * a double-click clears it, and a left drag moves its feat. Rows are numbered from 1.
  */
 @Composable
-private fun FeatSlots(screen: FeatsScreenState, rules: BuildRules, theme: Theme, onMenu: () -> Unit) {
+private fun FeatSlots(screen: FeatsScreenState, rules: BuildRules, theme: Theme, height: Int, onMenu: () -> Unit) {
     val rows = screen.rows()
     val granted = screen.tab == FeatTab.GRANTED
     // DefineColumn: (header, size text, alignment); the slot column takes what's left.
@@ -258,7 +259,7 @@ private fun FeatSlots(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
         },
         dropState = { row -> screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
         hoverRow = screen.hoverRow,
-        left = 0, top = 0, width = LIST_WIDTH, height = LIST_HEIGHT,
+        left = 0, top = 0, width = LIST_WIDTH, height = height,
         headerHeight = LINE,
         drag = screen.drag,
         rowKey = { row -> FeatSlotKey(row) },

@@ -46,6 +46,7 @@ Kotlin windows' constants.
 | Stats | The four frames start at the content corner; the right-hand frames end at the right margin; the content is 8 pixels higher. | 0ee0961 |
 | Skills | The grid and the Skill Tomes frames start at the content corner (VB centres them). | 0ee0961 |
 | Feats | Slots at the corner; the right-hand lists end at the right margin; the Filter list is the same height as the details box (VB's runs 8 pixels lower). | 02adab5 |
+| Feats (2) | The slots, details box and filter list run down to the footer (VB leaves an empty strip there, where other windows have a totals line). | (this commit) |
 | Spells | Slots at the corner with the details under them (VB centres the slots); the class drop-down and level spinner on the first line on the right; the spell list under them, ending level with the details. | 02adab5 |
 | Enhancements | All three tabs start at the same corner and end at the right margin; both lists on the Trees tab line up (VB's are 8 pixels apart); the AP frames sit under the lists above them. | 789e3d2 |
 | Enhancements, Leveling Guide | The lists are 24 pixels shorter; the details caption is bold, with Cost, Spent in Tree and Min Level between it and the box (VB has them under the box); the totals (Level, Available, Spent) are right-aligned together under the grid; the details box ends level with the grid. | 121fe14, 9eba41d, a96ccb0, 738d153 |
