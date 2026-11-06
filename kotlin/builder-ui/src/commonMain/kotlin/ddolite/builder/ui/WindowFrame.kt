@@ -1,12 +1,19 @@
 package ddolite.builder.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import ddolite.common.theme.ColorGroup
 import ddolite.common.theme.ColorValue
@@ -60,5 +67,38 @@ fun WindowFrame(
             }
         }
         overlay()
+    }
+}
+
+/**
+ * Calls [onMove] with the pointer's position (window pixels) on every pointer event, before the
+ * controls under it see the event: where a pop-up menu opens, as VB's PopupMenu shows it at the
+ * pointer. Goes on a window's [WindowFrame] (its `modifier`).
+ */
+fun Modifier.trackPointer(onMove: (Offset) -> Unit): Modifier = this.pointerInput(Unit) {
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            onMove(event.changes[0].position)
+        }
+    }
+}
+
+/**
+ * What's being dragged, as [text] in a drop-slot coloured box beside the pointer at [position]
+ * (window pixels). Drawn in a window's overlay. VB shows the system's drag cursor instead.
+ */
+@Composable
+fun DragGhost(theme: Theme, text: String, position: Offset) {
+    if (text.isEmpty()) {
+        return
+    }
+    val density = LocalDensity.current.density
+    Box(
+        modifier = Modifier.offset((position.x / density + 12).dp, (position.y / density + 8).dp)
+            .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
+            .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
+    ) {
+        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
     }
 }

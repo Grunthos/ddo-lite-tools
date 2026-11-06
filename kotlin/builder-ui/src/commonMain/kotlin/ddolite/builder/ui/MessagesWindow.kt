@@ -36,6 +36,7 @@ private const val COLUMN_LABEL_TOP = COLUMN_BUTTON_TOP + 10
 private const val COLUMN_BOX_TOP = COLUMN_BUTTON_TOP + 28
 private const val COLUMN_BOX_HEIGHT = 218
 private const val PUSH_BUTTON_WIDTH = 89
+private const val PUSH_BUTTON_HEIGHT = 29
 
 /**
  * The Messages window (Source/Forms/Build/frmDeprecate.frm): what the opened build file had that
@@ -79,7 +80,7 @@ fun MessagesWindowContent(state: BuilderSession) {
 
         // lblDetails (EnableLabel dims it with no message chosen), chkIgnore, the details.
         Label("Details", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.detailsLabelEnabled) workspace else dim), 0, COLUMN_LABEL_TOP)
-        PushButton(theme, screen.ignoreCaption, screen.ignoreEnabled, columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.ignore() }
+        PushButton(theme, screen.ignoreCaption, columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP, PUSH_BUTTON_WIDTH, PUSH_BUTTON_HEIGHT, screen.ignoreEnabled) { screen.ignore() }
         DetailsBox(theme, screen.details, 0, COLUMN_BOX_TOP, columnWidth, COLUMN_BOX_HEIGHT)
 
         // usrchkGuess, chkChoose and lstGuess.
@@ -87,7 +88,7 @@ fun MessagesWindowContent(state: BuilderSession) {
             CheckBox(theme, "Best Guess", screen.bestGuess, screen.bestGuessEnabled, guessLeft, COLUMN_LABEL_TOP - 2, 137) { screen.toggleBestGuess() }
         }
         if (screen.chooseVisible) {
-            PushButton(theme, "Choose", screen.chooseEnabled, guessLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.choose() }
+            PushButton(theme, "Choose", guessLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP, PUSH_BUTTON_WIDTH, PUSH_BUTTON_HEIGHT, screen.chooseEnabled) { screen.choose() }
         }
         val names = ArrayList<String>()
         for (feat in screen.guesses) {
@@ -103,7 +104,7 @@ fun MessagesWindowContent(state: BuilderSession) {
             Label("Selectors", TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = if (screen.selectorsLabelEnabled) workspace else dim), selectorLeft, COLUMN_LABEL_TOP)
         }
         if (screen.selectorButtonVisible) {
-            PushButton(theme, "Choose", screen.selectorButtonEnabled, selectorLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP) { screen.chooseSelector() }
+            PushButton(theme, "Choose", selectorLeft + columnWidth - PUSH_BUTTON_WIDTH, COLUMN_BUTTON_TOP, PUSH_BUTTON_WIDTH, PUSH_BUTTON_HEIGHT, screen.selectorButtonEnabled) { screen.chooseSelector() }
         }
         DetailsBox(theme, emptyList(), selectorLeft, COLUMN_BOX_TOP, columnWidth, COLUMN_BOX_HEIGHT)
         if (screen.selectorListVisible) {
@@ -112,27 +113,5 @@ fun MessagesWindowContent(state: BuilderSession) {
                 drag = drag, onPress = { i, _ -> screen.clickSelector(i) }, enabled = screen.selectorListEnabled,
             )
         }
-    }
-}
-
-/** A graphical CheckBox used as a push button (VB's UncheckButton pattern), 89 x 29; grey text when disabled. */
-@Composable
-private fun PushButton(theme: Theme, caption: String, enabled: Boolean, left: Int, top: Int, onClick: () -> Unit) {
-    var modifier = Modifier.offset(left.dp, top.dp).size(89.dp, 29.dp)
-        .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-        .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
-    if (enabled) {
-        modifier = modifier.clickable(onClick = onClick)
-    }
-    var color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)
-    if (!enabled) {
-        color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT_DIM)
-    }
-    Box(modifier = modifier) {
-        BasicText(
-            caption,
-            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth().offset(0.dp, 6.dp),
-        )
     }
 }

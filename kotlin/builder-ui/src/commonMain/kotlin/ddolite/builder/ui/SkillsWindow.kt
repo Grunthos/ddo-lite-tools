@@ -82,14 +82,7 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
 
     WindowFrame(
         theme, SKILLS_WIDTH, SKILLS_HEIGHT,
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    pointer = event.changes[0].position
-                }
-            }
-        },
+        modifier = Modifier.trackPointer { pointer = it },
         header = {
             // usrHeader_Click (frmSkills.frm:1186).
             var tab = 0
@@ -219,6 +212,26 @@ private fun SkillTomes(skills: SkillsScreenState, theme: Theme) {
 private val MENU_BACKGROUND = Color(0xFFF2F2F2)
 private val MENU_BORDER = Color(0xFFCCCCCC)
 private val MENU_DISABLED = Color(0xFF6D6D6D)
+
+/**
+ * A [PopupMenu] of [items], each with its own enabled state (VB's mnu…(i).Enabled): a disabled one is
+ * grey and does nothing.
+ */
+@Composable
+internal fun PopupMenu(
+    items: List<MenuChoice>,
+    at: Offset,
+    density: Float,
+    onChoose: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    clientWidth: Int = 815,
+) {
+    val captions = ArrayList<String>()
+    for (item in items) {
+        captions.add(item.caption)
+    }
+    PopupMenu(captions, -1, at, density, onChoose, onDismiss, clientWidth, enabled = { index -> items[index].enabled })
+}
 
 /**
  * A pop-up menu at [at] (pixels in the window), like VB's PopupMenu: "-" is a separator, item

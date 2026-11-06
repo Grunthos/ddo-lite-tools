@@ -106,14 +106,7 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
     WindowFrame(
         theme, FEATS_WIDTH, FEATS_HEIGHT,
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    pointer = event.changes[0].position
-                }
-            }
-        },
+        modifier = Modifier.trackPointer { pointer = it },
         header = {
             // usrHeader_Click (frmFeats.frm:343): a tab, or Help.
             val captions = ArrayList<String>()
@@ -185,7 +178,7 @@ fun FeatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
 @Composable
 private fun FeatsBody(screen: FeatsScreenState, rules: BuildRules, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = labelStyle(theme)
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK))
     SlotList(screen, rules, theme, onMenu)
     val granted = screen.tab == FeatTab.GRANTED
@@ -359,7 +352,7 @@ private fun SlotList(screen: FeatsScreenState, rules: BuildRules, theme: Theme, 
     }
     widths[slotColumn] = right - lefts[slotColumn]
 
-    val textStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val textStyle = labelStyle(theme)
     // DrawColumnHeaders: a header may be wider than its column; right-aligned ones then reach left.
     for (i in headers.indices) {
         val headerWidth = (textMeasurer.measure(headers[i], normal).size.width / scale).toInt()
@@ -608,16 +601,5 @@ private fun FeatDragGhost(screen: FeatsScreenState, theme: Theme) {
     } else if (item is FeatDrag.FromSlot) {
         text = screen.rows().getOrNull(item.row - 1)?.display ?: ""
     }
-    if (text.isEmpty()) {
-        return
-    }
-    val density = LocalDensity.current.density
-    val at = screen.drag.position
-    Box(
-        modifier = Modifier.offset((at.x / density + 12).dp, (at.y / density + 8).dp)
-            .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
-    }
+    DragGhost(theme, text, screen.drag.position)
 }

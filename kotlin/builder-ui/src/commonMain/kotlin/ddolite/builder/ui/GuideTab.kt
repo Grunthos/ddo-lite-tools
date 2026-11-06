@@ -94,8 +94,8 @@ private const val TOTALS_TOP = GRID_BOTTOM + TIGHT
  */
 @Composable
 internal fun GuideTab(screen: GuideScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     var comboOpen by remember { mutableStateOf(false) }
     val drag = remember { DragDropState<Int>() }
 
@@ -110,7 +110,7 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, area: ContentArea,
             drag = drag, onPress = { i, _ -> screen.clickSelector(i) }, onDoubleClick = { screen.chooseAbility() },
         )
         // Centred under the selector list.
-        GuideButton(theme, "Back to Trees", (TREE_WIDTH - BACK_WIDTH) / 2, BACK_TOP, BACK_WIDTH, BUTTON_HEIGHT) { screen.backToTrees() }
+        PushButton(theme, "Back to Trees", (TREE_WIDTH - BACK_WIDTH) / 2, BACK_TOP, BACK_WIDTH, BUTTON_HEIGHT) { screen.backToTrees() }
     } else {
         // Its caption level with the drop-down's text.
         CheckBox(theme, "Show All", screen.showAllTrees, true, 0, COMBO_TOP + 4, TREE_WIDTH) { screen.toggleShowAllTrees() }
@@ -182,23 +182,6 @@ internal fun GuideTab(screen: GuideScreenState, theme: Theme, area: ContentArea,
     }
 }
 
-/** A graphical CheckBox used as a button (chkBackToTrees). */
-@Composable
-private fun GuideButton(theme: Theme, caption: String, left: Int, top: Int, width: Int, height: Int, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
-            .clickable(onClick = onClick),
-    ) {
-        BasicText(
-            caption,
-            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp),
-        )
-    }
-}
-
 /** One grid column (VB's ColumnType): header, x and width within picGuide, alignment. */
 private class GuideColumn(val header: String, val left: Int, val width: Int, val align: TextAlign) {
     val right: Int get() = left + width
@@ -237,7 +220,7 @@ private fun GuideGrid(screen: GuideScreenState, theme: Theme, width: Int, onMenu
         x += widths[i]
     }
 
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = labelStyle(theme)
     for (c in columns) {
         BasicText(c.header, style = label.copy(textAlign = TextAlign.Center), modifier = Modifier.offset((GRID_LEFT + c.left).dp, GRID_HEADER_TOP.dp).width(c.width.dp))
     }

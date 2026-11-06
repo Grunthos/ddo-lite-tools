@@ -51,14 +51,7 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
     WindowFrame(
         theme, DESTINY_WIDTH, DESTINY_HEIGHT,
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    pointer = event.changes[0].position
-                }
-            }
-        },
+        modifier = Modifier.trackPointer { pointer = it },
         header = {
             // usrHeader_Click (:650).
             HeaderBar(
@@ -83,7 +76,10 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
             HeaderBar(theme, listOf("< Enhancements"), null, emptyList(), isEnabled = { true }, onClick = { link -> onNavigate(link) })
         },
         overlay = {
-            DestinyDragGhost(screen, theme, density)
+            val dragging = screen.drag.dragging
+            if (dragging != null) {
+                DragGhost(theme, screen.dragText(dragging), screen.drag.position)
+            }
             val at = menuAt
             if (at != null && screen.treeMenuRow != 0) {
                 PopupMenu(screen.treeMenuItems(), -1, at, density, onChoose = { index ->
@@ -114,24 +110,6 @@ fun DestinyWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     }
 }
 
-/** The dragged item next to the pointer (window coordinates). */
-@Composable
-private fun DestinyDragGhost(screen: DestinyScreenState, theme: Theme, density: Float) {
-    val dragging = screen.drag.dragging ?: return
-    val text = screen.dragText(dragging)
-    if (text.isEmpty()) {
-        return
-    }
-    val at = screen.drag.position
-    Box(
-        modifier = Modifier.offset((at.x / density + 12).dp, (at.y / density + 8).dp)
-            .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
-    }
-}
-
 /*
  * The Destiny Trees tab's layout, from the content corner: the build's destinies on the left, the
  * destinies it could add on the right (captions on the first line, boxes a line below), the AP line
@@ -148,7 +126,7 @@ private const val PDP_HEIGHT = 157
 /** The Destiny Trees tab (picTab(0)): the build's destinies, the destinies it could add, the AP line and the permanent destiny points. */
 @Composable
 private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = labelStyle(theme)
     val rows = screen.treeRows()
     UserList(
         theme,
@@ -199,11 +177,7 @@ private fun DestinyTreesTab(screen: DestinyScreenState, theme: Theme, area: Cont
         dropKey = TreeListKey,
     )
     val ap = screen.apCaption()
-    var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.error) {
-        apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
-    }
-    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(216.dp, DESTINY_AP_TOP.dp))
+    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(216.dp, DESTINY_AP_TOP.dp))
 
     // fraDestinyAP, under the destinies to add (a captioned frame, as the Enhancements window's).
     GroupFrame(theme, "Perm Destiny Points", ADD_LEFT, PDP_TOP, area.width - ADD_LEFT, PDP_HEIGHT)
@@ -242,8 +216,8 @@ private const val ABILITY_TOTALS_TOP = SLOTS_HEIGHT + TIGHT
 /** The Destinies tab (picTab(1)): the chosen destiny's abilities, lists, details and totals. */
 @Composable
 private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     var comboOpen by remember { mutableStateOf(false) }
     val rows = screen.slotRows()
     val rightWidth = area.width - ABILITIES_LEFT
@@ -335,11 +309,7 @@ private fun DestiniesTab(screen: DestinyScreenState, theme: Theme, area: Content
     // The details box ends level with the slots.
     DetailsBox(theme, details?.lines ?: emptyList(), ABILITIES_LEFT, ABILITY_DETAILS_TOP, rightWidth, SLOTS_HEIGHT - ABILITY_DETAILS_TOP)
     val ap = screen.apCaption()
-    var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.error) {
-        apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
-    }
-    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(8.dp, ABILITY_TOTALS_TOP.dp))
+    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(8.dp, ABILITY_TOTALS_TOP.dp))
     Label(screen.spentCaption(), label, 264, ABILITY_TOTALS_TOP)
     if (details != null) {
         Label(details.ranks, label, ABILITIES_LEFT + 112, ABILITY_TOTALS_TOP)

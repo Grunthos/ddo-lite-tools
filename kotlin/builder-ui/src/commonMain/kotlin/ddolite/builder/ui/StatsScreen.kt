@@ -136,8 +136,8 @@ fun StatsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 @Composable
 private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme, area: ContentArea) {
     val build = rules.build
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     var openList by remember { mutableStateOf("") }
 
     // ---- Base Stats (fraGroup(0))
@@ -214,7 +214,7 @@ private fun StatsGroups(screen: StatsScreenState, rules: StatRules, theme: Theme
     for (i in templates.indices) {
         val template = templates[i]
         val top = ROW2_TOP + TEMPLATE_TOP + i * TEMPLATE_STEP
-        TemplateButton(theme, template.caption, TEMPLATES_LEFT + 28, top) { screen.applyTemplate(i) }
+        PushButton(theme, template.caption, TEMPLATES_LEFT + 28, top, 89, 29) { screen.applyTemplate(i) }
         var text = template.description
         var color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
         if (screen.warningIndex == i) {
@@ -288,7 +288,7 @@ private fun StatsColumn(screen: StatsScreenState, rules: StatRules, theme: Theme
     if (!included) {
         return
     }
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = labelStyle(theme)
     val cost = TextStyle(platformStyle = TEXT_RENDERING, fontSize = 10.sp, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_DIM), textAlign = TextAlign.Center)
     for (stat in Stat.entries) {
         val rowTop = top + 24 + stat.ordinal * 16
@@ -325,7 +325,7 @@ internal fun GroupFrame(theme: Theme, caption: String, left: Int, top: Int, widt
     Frame(theme, left, top + 8, width, height - 8)
     BasicText(
         caption,
-        style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)),
+        style = labelStyle(theme),
         modifier = Modifier.offset((left + 8).dp, top.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)),
     )
 }
@@ -338,23 +338,6 @@ private fun LinkLabel(theme: Theme, text: String, left: Int, top: Int, onClick: 
         style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_LINK), textDecoration = TextDecoration.Underline),
         modifier = Modifier.offset(left.dp, top.dp).background(theme.color(ColorGroup.WORKSPACE, ColorValue.BACKGROUND)).clickable(onClick = onClick),
     )
-}
-
-/** A graphical check box used as a push button (chkTemplate with UncheckButton), in the controls colours. */
-@Composable
-private fun TemplateButton(theme: Theme, caption: String, left: Int, top: Int, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier.offset(left.dp, top.dp).size(89.dp, 29.dp)
-            .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
-            .clickable(onClick = onClick),
-    ) {
-        BasicText(
-            caption,
-            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT), textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth().offset(0.dp, 6.dp),
-        )
-    }
 }
 
 /** The userCheckBox control: a box with a tick, and its caption. */

@@ -152,7 +152,7 @@ fun <T> UserList(
     widths[slotColumn] = right - lefts[slotColumn]
 
     // DrawColumnHeaders: headers may be wider than their columns.
-    val headerStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val headerStyle = labelStyle(theme)
     for (i in columns.indices) {
         val headerWidth = (textMeasurer.measure(columns[i].header, normal).size.width / scale).toInt()
         var hx = lefts[i]
@@ -174,7 +174,7 @@ fun <T> UserList(
                 for (r in 0 until rowCount) {
                     val row = r + 1
                     val rowTop = (slotHeight + marginY) * r + marginY
-                    var style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+                    var style = controlStyle(theme)
                     if (hoverRow == row) {
                         style = style.copy(fontWeight = FontWeight.Bold)
                     }

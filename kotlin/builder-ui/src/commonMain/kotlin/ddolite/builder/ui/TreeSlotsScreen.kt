@@ -53,7 +53,7 @@ fun PrototypeScreen(state: BuilderSession) {
                 TreeSlotsScreen(state.trees, state.skills)
             }
         }
-        DragGhost(state.trees.drag, state.skills)
+        TreeDragGhost(state.trees.drag, state.skills)
     }
 }
 
@@ -96,7 +96,7 @@ fun TreeSlotsWindowContent(state: BuilderSession) {
             // usrFooter: "< Previous" (Spells or Feats) and "Destiny >" (usrFooter_Click :1092).
             HeaderBar(theme, listOf("< Previous"), null, listOf("Destiny >"), isEnabled = { false }, onClick = {})
         }
-        DragGhost(trees.drag, state.skills)
+        TreeDragGhost(trees.drag, state.skills)
     }
 }
 
@@ -230,7 +230,7 @@ private fun TreeSlot(state: TreeSlotsState, skills: SkillsScreenState, index: In
 
 /** The name of the tree being dragged, following the pointer. */
 @Composable
-private fun DragGhost(drag: DragDropState<TreeDrag>, skills: SkillsScreenState) {
+private fun TreeDragGhost(drag: DragDropState<TreeDrag>, skills: SkillsScreenState) {
     val item = drag.dragging
     if (item == null) {
         return

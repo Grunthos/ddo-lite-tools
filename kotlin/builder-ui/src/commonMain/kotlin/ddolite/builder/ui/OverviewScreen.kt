@@ -194,8 +194,8 @@ object OverviewWindowKey
 private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: Theme, classIcons: Map<String, ImageBitmap>, area: ContentArea) {
     val overview = state.overview
     val build = rules.build
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     var alignmentListOpen by remember { mutableStateOf(false) }
 
     if (overview.notesTab) {
@@ -266,6 +266,30 @@ private fun OverviewBody(state: BuilderSession, rules: OverviewRules, theme: The
 
 // ---------------------------------------------------------------- simple controls
 
+/**
+ * A graphical CheckBox used as a push button, VB's pattern for chkBackToTrees, chkIgnore, chkChoose,
+ * chkColors, chkFormat and chkTemplate: a bordered box with its caption centred. A button that isn't
+ * [enabled] has a grey caption and ignores clicks.
+ */
+@Composable
+internal fun PushButton(theme: Theme, caption: String, left: Int, top: Int, width: Int, height: Int, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    var modifier = Modifier.offset(left.dp, top.dp).size(width.dp, height.dp)
+        .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
+        .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
+    if (enabled) {
+        modifier = modifier.clickable(onClick = onClick)
+    }
+    val color = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
+    Box(modifier = modifier) {
+        // The caption's line is 17 pixels, centred in the height.
+        BasicText(
+            caption,
+            style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center),
+            modifier = Modifier.fillMaxWidth().offset(0.dp, ((height - 17) / 2).dp),
+        )
+    }
+}
+
 @Composable
 internal fun Label(text: String, style: TextStyle, left: Int, top: Int) {
     BasicText(text, style = style, modifier = Modifier.offset(left.dp, top.dp))
@@ -283,7 +307,7 @@ internal fun Frame(theme: Theme, left: Int, top: Int, width: Int, height: Int) {
 /** A TextBox in the controls colours. */
 @Composable
 internal fun TextBox(theme: Theme, value: String, onChange: (String) -> Unit, left: Int, top: Int, width: Int, height: Int, singleLine: Boolean) {
-    val style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val style = controlStyle(theme)
     BasicTextField(
         value = value,
         onValueChange = onChange,

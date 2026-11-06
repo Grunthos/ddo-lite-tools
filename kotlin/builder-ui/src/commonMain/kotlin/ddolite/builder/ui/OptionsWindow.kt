@@ -68,8 +68,8 @@ fun OptionsWindowContent(state: BuilderSession) {
 private fun OptionsGroups(state: BuilderSession, theme: Theme, area: ContentArea) {
     val s = state.settings
     var open by remember { mutableStateOf("") }
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     val windowItems = listOf("Maximized", "Fill Desktop", "Last Position")
     val pointsItems = listOf("Adventurer", "Champion", "Hero", "Legend")
     val skillScreenItems = listOf("Alphabetical", "Native First")
@@ -146,7 +146,7 @@ private fun OptionsGroups(state: BuilderSession, theme: Theme, area: ContentArea
     )
     Label("Spaces", label, 180, ROW2_TOP + 110)
     // At the frame's bottom right.
-    OptionsButton(theme, "Colors", false, LEFT_FRAME_WIDTH - 12 - OPTIONS_BUTTON_WIDTH, ROW2_TOP + ROW2_HEIGHT - 45)
+    PushButton(theme, "Colors", LEFT_FRAME_WIDTH - 12 - OPTIONS_BUTTON_WIDTH, ROW2_TOP + ROW2_HEIGHT - 45, OPTIONS_BUTTON_WIDTH, BUTTON_HEIGHT, enabled = false)
 
     // Output (fraOutput)
     GroupFrame(theme, "Output", RIGHT_FRAME_LEFT, ROW2_TOP, rightWidth, ROW2_HEIGHT)
@@ -160,7 +160,7 @@ private fun OptionsGroups(state: BuilderSession, theme: Theme, area: ContentArea
         changed()
     }
     // chkFormat_Click (:626): OpenForm "frmFormat". At the frame's bottom right.
-    OptionsButton(theme, "BBCodes", true, RIGHT_FRAME_LEFT + rightWidth - 12 - OPTIONS_BUTTON_WIDTH, ROW2_TOP + ROW2_HEIGHT - 45) { state.format.open() }
+    PushButton(theme, "BBCodes", RIGHT_FRAME_LEFT + rightWidth - 12 - OPTIONS_BUTTON_WIDTH, ROW2_TOP + ROW2_HEIGHT - 45, OPTIONS_BUTTON_WIDTH, BUTTON_HEIGHT) { state.format.open() }
 
     // The open combo's list, over everything.
     when (open) {
@@ -200,20 +200,5 @@ private fun OptionsGroups(state: BuilderSession, theme: Theme, area: ContentArea
             changed()
             state.markOutputChanged() // GenerateOutput oeAll
         }
-    }
-}
-
-/** A graphical CheckBox used as a button (chkColors, chkFormat), 93 x 25; grey when not available. */
-@Composable
-private fun OptionsButton(theme: Theme, caption: String, enabled: Boolean, left: Int, top: Int, onClick: () -> Unit = {}) {
-    val color = theme.color(ColorGroup.CONTROLS, if (enabled) ColorValue.TEXT else ColorValue.TEXT_DIM)
-    var modifier = Modifier.offset(left.dp, top.dp).size(93.dp, 25.dp)
-        .background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
-        .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR))
-    if (enabled) {
-        modifier = modifier.clickable(onClick = onClick)
-    }
-    Box(modifier = modifier) {
-        BasicText(caption, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = color, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth().offset(0.dp, 4.dp))
     }
 }

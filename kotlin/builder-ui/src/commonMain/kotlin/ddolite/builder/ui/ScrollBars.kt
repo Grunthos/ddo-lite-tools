@@ -43,7 +43,7 @@ fun ScrollBar(theme: Theme, state: ScrollState, left: Int, top: Int, length: Int
     val density = LocalDensity.current.density
     val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
-    val arrowStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val arrowStyle = controlStyle(theme)
     val viewport = state.viewportSize.toFloat()
     val content = viewport + state.maxValue
     val track = length - SCROLL_BAR * 2
@@ -119,7 +119,7 @@ fun RowScrollBar(
     val density = LocalDensity.current.density
     val back = theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val border = theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)
-    val arrowStyle = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val arrowStyle = controlStyle(theme)
     val max = count - visible
     val track = length - SCROLL_BAR * 2
     var thumb = track * visible / count

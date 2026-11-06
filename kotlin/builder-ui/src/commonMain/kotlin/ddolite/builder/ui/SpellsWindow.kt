@@ -66,19 +66,12 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
     var pointer by remember { mutableStateOf(Offset.Zero) }
     var menuAt by remember { mutableStateOf<Offset?>(null) }
     var comboOpen by remember { mutableStateOf(false) }
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
 
     WindowFrame(
         theme, SPELLS_WIDTH, SPELLS_HEIGHT,
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    pointer = event.changes[0].position
-                }
-            }
-        },
+        modifier = Modifier.trackPointer { pointer = it },
         header = {
             HeaderBar(theme, emptyList(), null, listOf("Help"), isEnabled = { true }, onClick = { state.help.show("Spells") })
         },
@@ -87,7 +80,7 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
             HeaderBar(theme, listOf("< Feats"), null, listOf("Enhancements >"), isEnabled = { true }, onClick = { link -> onNavigate(link) })
         },
         overlay = {
-            SpellDragGhost(screen, theme, density)
+            SpellDragGhost(screen, theme)
             val at = menuAt
             if (at != null && screen.menuRow != 0) {
                 val items = screen.menuItems()
@@ -201,7 +194,7 @@ fun SpellsWindowContent(state: BuilderSession, onNavigate: (String) -> Unit) {
 
 /** The dragged spell next to the pointer (window coordinates). */
 @Composable
-private fun SpellDragGhost(screen: SpellsScreenState, theme: Theme, density: Float) {
+private fun SpellDragGhost(screen: SpellsScreenState, theme: Theme) {
     val dragging = screen.drag.dragging ?: return
     var text = ""
     if (dragging is SpellDrag.FromList) {
@@ -209,15 +202,5 @@ private fun SpellDragGhost(screen: SpellsScreenState, theme: Theme, density: Flo
     } else if (dragging is SpellDrag.FromSlot) {
         text = screen.rows().getOrNull(dragging.row - 1)?.spell ?: ""
     }
-    if (text.isEmpty()) {
-        return
-    }
-    val at = screen.drag.position
-    Box(
-        modifier = Modifier.offset((at.x / density + 12).dp, (at.y / density + 8).dp)
-            .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
-    }
+    DragGhost(theme, text, screen.drag.position)
 }

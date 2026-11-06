@@ -60,7 +60,7 @@ fun ExportWindowContent(state: BuilderSession, onCopy: (String) -> Unit, onSave:
     var sectionOpen by remember { mutableStateOf(false) }
     val nav = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT))
     val link = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.NAVIGATION, ColorValue.TEXT_LINK))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val control = controlStyle(theme)
     // Form_Resize: the text starts under the bar, half a bar lower when the bar and box are the same colour.
     val sameColour = theme.get(ColorGroup.NAVIGATION, ColorValue.BACKGROUND) == theme.get(ColorGroup.CONTROLS, ColorValue.BACKGROUND)
     val textTop = if (sameColour) 39 else 26
@@ -120,7 +120,7 @@ fun ExportWindowContent(state: BuilderSession, onCopy: (String) -> Unit, onSave:
             // picTooltip: " Copied! " under the link.
             BasicText(
                 " Copied! ",
-                style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT)),
+                style = controlStyle(theme),
                 modifier = Modifier.offset(50.dp, 22.dp).background(theme.color(ColorGroup.CONTROLS, ColorValue.BACKGROUND))
                     .border(1.dp, theme.color(ColorGroup.CONTROLS, ColorValue.BORDER_EXTERIOR)),
             )

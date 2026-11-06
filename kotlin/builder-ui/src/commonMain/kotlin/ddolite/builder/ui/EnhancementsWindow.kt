@@ -54,14 +54,7 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
 
     WindowFrame(
         theme, ENH_WIDTH, ENH_HEIGHT,
-        modifier = Modifier.pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                    pointer = event.changes[0].position
-                }
-            }
-        },
+        modifier = Modifier.trackPointer { pointer = it },
         header = {
             // usrHeader_Click (:1082); "Export" appears on the Leveling Guide tab (ShowTab, :1111).
             val right = if (screen.tab == 2) listOf("Export", "Help") else listOf("Help")
@@ -98,7 +91,10 @@ fun EnhancementsWindowContent(state: BuilderSession, onExportGuide: () -> Unit =
             )
         },
         overlay = {
-            EnhancementDragGhost(screen, theme)
+            val dragging = screen.drag.dragging
+            if (dragging != null) {
+                DragGhost(theme, screen.dragText(dragging), screen.drag.position)
+            }
             EnhancementMenus(screen, menuAt, density, onClose = { menuAt = null })
         },
     ) { area ->
@@ -134,18 +130,13 @@ private fun EnhancementMenus(screen: EnhancementsScreenState, at: Offset?, densi
         }, clientWidth = ENH_WIDTH)
     } else if (at != null && screen.tab == 2 && screen.guide.menuRow != 0) {
         // The guide's row menu (PopupGuideMenu, :3299).
-        val items = screen.guide.menuItems()
-        val captions = ArrayList<String>()
-        for (item in items) {
-            captions.add(item.caption)
-        }
-        PopupMenu(captions, -1, at, density, onChoose = { index ->
+        PopupMenu(screen.guide.menuItems(), at, density, onChoose = { index ->
             onClose()
             screen.guide.chooseMenu(index)
         }, onDismiss = {
             onClose()
             screen.guide.closeMenu()
-        }, clientWidth = ENH_WIDTH, enabled = { index -> items[index].enabled })
+        }, clientWidth = ENH_WIDTH)
     } else if (at != null && screen.slotMenuRow != 0) {
         PopupMenu(listOf("Clear this ability", "Reset tree"), -1, at, density, onChoose = { index ->
             onClose()
@@ -177,7 +168,7 @@ private const val AP_FRAME_HEIGHT = 157
 /** The Trees tab (picTab(0)): the build's trees, the trees it could add, the AP line, and the racial and universal AP. */
 @Composable
 private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
+    val label = labelStyle(theme)
     val rows = screen.treeRows()
     UserList(
         theme,
@@ -236,11 +227,7 @@ private fun TreesTab(screen: EnhancementsScreenState, theme: Theme, area: Conten
         itemColumn = ADD_TREES_CLASS_COLUMN,
     )
     val ap = screen.apCaption()
-    var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.error) {
-        apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
-    }
-    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(216.dp, TREES_AP_TOP.dp))
+    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(216.dp, TREES_AP_TOP.dp))
 
     // fraRacialAP, under the build's trees.
     GroupFrame(theme, "Racial Past Life AP", 0, AP_FRAMES_TOP, BUILD_TREES_WIDTH, AP_FRAME_HEIGHT)
@@ -297,8 +284,8 @@ private const val ABILITY_TOTALS_TOP = SLOTS_HEIGHT + TIGHT
 /** The Enhancements tab (picTab(1)): the chosen tree's abilities, the tree, ability and selector lists, details and totals. */
 @Composable
 private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, area: ContentArea, onMenu: () -> Unit) {
-    val label = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT))
-    val control = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.CONTROLS, ColorValue.TEXT))
+    val label = labelStyle(theme)
+    val control = controlStyle(theme)
     var comboOpen by remember { mutableStateOf(false) }
     val rows = screen.slotRows()
     val rightWidth = area.width - ABILITIES_LEFT
@@ -390,11 +377,7 @@ private fun AbilitiesTab(screen: EnhancementsScreenState, theme: Theme, area: Co
     // The details box ends level with the slots.
     DetailsBox(theme, details?.lines ?: emptyList(), ABILITIES_LEFT, ABILITY_DETAILS_TOP, rightWidth, SLOTS_HEIGHT - ABILITY_DETAILS_TOP)
     val ap = screen.apCaption()
-    var apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT)
-    if (ap.error) {
-        apColor = theme.color(ColorGroup.WORKSPACE, ColorValue.TEXT_ERROR)
-    }
-    BasicText(ap.text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = apColor), modifier = Modifier.offset(8.dp, ABILITY_TOTALS_TOP.dp))
+    BasicText(ap.text, style = captionStyle(theme, ap.error), modifier = Modifier.offset(8.dp, ABILITY_TOTALS_TOP.dp))
     Label(screen.spentCaption(), label, 280, ABILITY_TOTALS_TOP)
     if (details != null) {
         Label(details.ranks, label, ABILITIES_LEFT + 96, ABILITY_TOTALS_TOP)
@@ -417,21 +400,3 @@ private fun screenBuild(screen: EnhancementsScreenState) = screen.build()
 
 private fun universalMax(screen: EnhancementsScreenState): Int = screen.universalApMax()
 
-/** The tree or ability being dragged, next to the pointer. */
-@Composable
-private fun EnhancementDragGhost(screen: EnhancementsScreenState, theme: Theme) {
-    val item = screen.drag.dragging ?: return
-    val text = screen.dragText(item)
-    if (text.isEmpty()) {
-        return
-    }
-    val density = LocalDensity.current.density
-    val at = screen.drag.position
-    Box(
-        modifier = Modifier.offset((at.x / density + 12).dp, (at.y / density + 8).dp)
-            .background(theme.color(ColorGroup.DROP_SLOTS, ColorValue.BACKGROUND))
-            .border(1.dp, theme.color(ColorGroup.DROP_SLOTS, ColorValue.BORDER_EXTERIOR)),
-    ) {
-        BasicText(text, style = TextStyle(platformStyle = TEXT_RENDERING, fontSize = FONT_SIZE, color = theme.color(ColorGroup.DROP_SLOTS, ColorValue.TEXT)), modifier = Modifier.offset(4.dp, 1.dp))
-    }
-}
