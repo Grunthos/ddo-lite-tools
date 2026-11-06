@@ -67,6 +67,7 @@ class BuildRoundTripTest {
         assertTrue(sampleBuilds().containsAll(listOf("Bard Acolyte.build", "Kensei Warpriest.build", "TEST.build", "Warlock Blaster.build")))
         for (name in sampleBuilds()) {
             val (loaded, differences) = roundTrip(name)
+            val originalText = Windows1252.decode(SampleBuilds.file(name).readBytes())
             assertEquals(emptyList(), loaded.problems, name)
             val deprecations = loaded.deprecations
             var removedAbilities = 0
@@ -94,6 +95,9 @@ class BuildRoundTripTest {
                     removedGuide++
                 } else if (line.startsWith("-Standard: ")) {
                     removedFeats++
+                } else if (line == "-[LevelingGuide]" && !originalText.contains("\r\nGuide: ")) {
+                    // An empty guide heading: saved after a guide whose first step didn't resolve (its tree
+                    // was already added), and not written again (see saveLoadSaveIsStable; VB-BUGS 23a).
                 } else if (line.startsWith("-DestinyTier5: ")) {
                     // VB writes DestinyTier5 but LoadDestinyText never reads it (VB-BUGS 18f).
                 } else if (line.startsWith("+")) {

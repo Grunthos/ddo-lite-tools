@@ -294,6 +294,12 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
 
 ## Latent (work by luck, or dead code)
 
+23a. **An empty "[LevelingGuide]" section after a dropped guide.** `Modules/Build/basFormatLite.bas:1338`
+    `AddTreeLookup` adds a guide step's tree to `build.Guide` before the step is resolved, so when the
+    first step names an ability the data no longer has, the guide keeps that tree and no steps, and
+    `SaveLevelingGuideLite` (:546) writes the heading with nothing under it. Harmless: reading it back
+    gives no trees, and the next save leaves it out. *Fix:* add the tree only once the step resolves.
+
 24. `Modules/Build/basBuild.bas:3110` `GetAbilityMaxRanks` passes a `TreeStyleEnum` to `SeekTree`,
     which expects a `PointerEnum`; the numbers happen to pick the right list.
 25. `Modules/Build/basBuild.bas:2883` `CheckAbilityErrors`: inside the "no selector" branch,
