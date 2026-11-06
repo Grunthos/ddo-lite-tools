@@ -8,6 +8,11 @@ Builder Lite 4.15 next to it on the same build. Tick items off, or note what dif
 The most useful first pass: open each file in `Save/` in both, then go through the windows in order and
 look for anything different.
 
+Some differences are deliberate: layout (every window shares one frame and margins), fixed VB bugs and a
+few new features. They're listed in [KOTLIN-CHANGES.md](KOTLIN-CHANGES.md), so there's no need to note
+them here; anything else that differs is worth a note. Write results under an item as `TEST RESULT:`,
+and I'll answer questions there as `Reply:`.
+
 ## 0. Capturing VB's output (golden files, PLAN.md §6)
 
 With the 4.15 exe, VB's exports can be saved once and compared by the tests every time, which is
@@ -28,29 +33,55 @@ the Kotlin output with these files and list every difference.
 
 ## 1. Questions only VB can answer
 
-- [ ] **Stats › Schedule tab with a level-up chosen.** In VB, choose a stat for "All Levels" (or any
+- [X] **Stats › Schedule tab with a level-up chosen.** In VB, choose a stat for "All Levels" (or any
       level), then click Schedule. Does it crash ("Subscript out of range")? `DrawLevelupRow` runs to
       level 36 but the grid stops at 30. Kotlin stops at 30.
-- [ ] **Level 36 level-up.** Set "Level 36" to a stat on a level-30-or-more build: VB's code counts
-      level-ups only to level 32, so it shouldn't raise the score. Kotlin copies that.
-- [ ] **Skills right-click menu**: after choosing "Max Ranks (Full Ranks)" from the menu, a left-click on
+  - TEST RESULT: VB Does indeed crash
+  - Reply: thanks; confirmed in VB-BUGS #2. Kotlin's Schedule stops at level 30, so it doesn't crash.
+- [ ] **Level 36 level-up.** VB's code counts level-ups only to level 32 (VB-BUGS #9), so the one at
+      level 36 should never raise a stat. To check, in VB:
+      1. Open a build with Max Levels 36, or set Overview › Max Levels to 36.
+      2. In Stats › Levelups, note the Strength total in the main window's Stats section.
+      3. Set the "Level 36" box to Strength.
+      Does the Strength total go up by 1? I expect it doesn't (Kotlin copies VB: it doesn't either).
+  - TEST RESULT: Please give further info. This request is unclear.
+  - Reply: sorry; reworded above with the steps.
+- [X] **Skills right-click menu**: after choosing "Max Ranks (Full Ranks)" from the menu, a left-click on
       the same skill name should start again at Half Ranks (that's how I read the VB code, and what Kotlin
       does), rather than moving on to Even Levels.
+  - TEST RESULT: That is a correct behaviour.
 
 ## 2. Files
 
 - [ ] Open each `.build` in `Save/` in Kotlin: no errors, the main window's summary matches what VB shows.
+  - TEST RESULT: No. The files have errors. 
+  - Reply: expected for most of them: they were saved with older data, and 4.15 renamed or removed some of
+    their enhancements and feats, so VB drops them too (the Messages window lists them). Only
+    `Eresh WFWizRog-v4.15.build` is clean. Worth checking: do VB and Kotlin report the same errors for the
+    same file? Re-saving each sample in VB 4.15 (after re-adding what was dropped) gives clean test files.
 - [ ] Save from Kotlin, open the saved file in VB: same build.
-- [ ] Save a build in a current VB, then open and save it in Kotlin: the file should be byte for byte the
-      same (it is for `Eresh WFWizRog-v4.15.build`). More such files (casters, epic, Drow, multiclass, Iconic races)
-      make good automatic tests: drop them in `Save/` (or `kotlin/test-builds/` to commit them) and the
-      round-trip tests use them.
-- [ ] File › New, Close, Save As, and quitting with unsaved changes (Yes / No / Cancel) behave as in VB.
-- [ ] The title bar shows the build name, the file name if different, and `*` for unsaved changes.
+  - TEST RESULT: Done this with the one file the works. Seems to be correct. There should be a more thorough
+    way to test this. Open/SaveAs then diff? See next question: do we need both?
+  - Reply: Open, Save As, then compare is what the round-trip test does, automatically, for every `.build`
+    in `Save/` and `kotlin/test-builds/`: it opens the file, saves it, compares the two line by line, and
+    fails on any difference it can't explain (explained: something the data dropped, listed in Messages;
+    a renamed feat; VB's DestinyTier5 line; the level 36 Levelup line older versions didn't write). A
+    clean 4.15 file must come back unchanged. So this item only needs an occasional spot check in VB;
+    the next one is the way to add coverage.
+- [ ] More round-trip files: save builds in VB 4.15 (casters, epic, Drow, multiclass, Iconic races, one with
+      a leveling guide) and drop them in `Save/`, or `kotlin/test-builds/` to commit them. Each one becomes an
+      automatic test (Kotlin must save it byte for byte the same; it does for `Eresh WFWizRog-v4.15.build`).
+- [X] File › New, Close, Save As, and quitting with unsaved changes (Yes / No / Cancel) behave as in VB.
+  - TEST RESULT: Yes.
+- [X] The title bar shows the build name, the file name if different, and `*` for unsaved changes.
+  - TEST RESULT: Yes.
 
 ## 3. Overview
 
-- [ ] Layout, fonts and colours against VB at 100% scaling (fonts will differ: Verdana isn't bundled yet).
+- [ ] Colours and text against VB at 100% scaling (fonts will differ: Verdana isn't bundled yet).
+  - TEST RESULT: Is this still relevant with recent layout changes.
+  - Reply: only partly: positions now differ on purpose (KOTLIN-CHANGES.md §3), so compare colours, text
+    and what's shown, not where. Reworded.
 - [ ] Race list: mouse, Up/Down/PgUp/PgDn/Home/End/Enter/F4/Escape; the type headings; the current
       race highlighted.
 - [ ] Iconic races: on a new build, picking one sets the main class; Drow drops the Champion points.
@@ -130,6 +161,10 @@ the Kotlin output with these files and list every difference.
       "Spent: … / Max: … AP" line as VB; the racial and universal AP spinners' limits.
 - [ ] Trees: double-click a listed tree to add it; drag one onto a row (replace) or the empty row
       (add); drag a row onto another (swap); double-click a row to remove it; the right-click menu.
+- [ ] Trees tab, straight after opening the window: click a tree (it's selected) and right-click › Reset
+      (it resets). Neither worked until the tab had been redrawn (fixed 2026-11-06).
+- [ ] The Class column is as wide as the longest class name, and the add list's Class column starts after
+      its longest tree name (its caption only when a listed tree has a class).
 - [ ] Enhancements tab, for each tree: the same slots, AP, ranks and red (error) slots as VB.
       Note: the repository's sample builds were saved with older data, so several of their trees are
       short of AP now (renamed abilities are dropped on load); VB should show the same red slots.
@@ -149,6 +184,8 @@ the Kotlin output with these files and list every difference.
 - [ ] **VB bug to confirm:** a level 30 build (e.g. Kensei Warpriest) shows "Max: 0" in red (VB-BUGS 18d).
 - [ ] **VB bug to confirm:** the Destiny Trees list shows "5" under "Destiny" and nothing under "Tier" (22a).
 - [ ] Add (double-click / drag, at most 3), swap, double-click to remove, the menu.
+- [ ] Both tabs are now the Enhancements window's tabs (shared code): everything in §7 should work the
+      same here; the Destiny column is narrow (it shows the tier) and the slots wider.
 - [ ] Destinies tab: slots, ranks, red slots, abilities offered, selectors, details (no level
       requirements, as VB), adding by double-click and drag, clearing, the tier 5 question.
 
@@ -170,13 +207,19 @@ the Kotlin output with these files and list every difference.
 
 - [ ] Build a short guide in both on the same build (e.g. Kensei Warpriest: Kensei core with a
       selector, a few more, a Bank, a Reset): the same Level, Tier, Tree, AP and Prog columns, the
-      same red rows and error texts in the details, and the same "Cur. Level / Available / Spent".
+      same red rows and error texts in the details, and the same level, Available and Spent figures
+      (Kotlin writes "Level: 20 (Ftr 12/Clr 8)" for VB's "Cur. Level: 20").
 - [ ] The tree list (and Show All), "(Commands)", each filter's list, the selector list and
       "Back to Trees"; double-click to add; choosing rank 3 adds ranks 1-3.
 - [ ] Rows: click, Ctrl-click, Shift-click, drag down the Ability column; the right-click menu (Move
       Rows → Insert Rows Here, Delete Rows, Delete to End, Delete All with its question).
 - [ ] Save and reopen: the same guide.
 - [ ] **VB bug to confirm:** "Selected and Available" lists the same as "Show All" (VB-BUGS 18g).
+- [ ] Delete, move or insert rows with a tree selected: its ability list follows (a deleted ability is
+      offered again). **VB bug to confirm:** VB leaves the old list, with no tree selected (22j).
+- [ ] Take rank I of a multi-rank ability with a selector (e.g. Efficient Metamagic as Maximize): ranks II
+      and III are offered with the same selector. **VB bug to confirm:** VB offers every selector (22k).
+- [ ] With a tree selected, "Spent in <tree>: N AP" at the bottom left (new).
 
 ## 7d. Main window output
 
@@ -278,8 +321,15 @@ the Kotlin output with these files and list every difference.
 - [ ] Right-click menus near the bottom or right edge open upward or leftward, inside the window
       (e.g. the bottom row of the Leveling Guide grid); they were cut off.
 - [ ] Every window (Overview, Stats, Skills, Feats, Spells, Enhancements, Destinies, Messages, Options,
-      Output Format): content starts at the same corner      under the header bar,      captions and column headers on the first line, boxes a line below, right edges at the same
-      margin; drag and drop, right-click menus and drop-downs still land in the right place.
+      Output Format): content starts at the same corner under the header bar, captions and column
+      headers on the first line, boxes a line below, right edges at the same margin; drag and drop,
+      right-click menus and drop-downs still land in the right place.
+- [ ] Enhancements and Destinies, ability tabs: the slot list fills the window down to the totals line
+      (no scroll bar for the sample builds), and the totals are in the same places in both windows.
+- [ ] Disabled right-click menu items are grey and do nothing (Enhancements tree menu, Spells slot menu,
+      Leveling Guide row menu), as VB's.
+- [ ] Feats slots (now drawn by the same list as the other windows): hover, click, right-click menu,
+      double-click, and dragging still behave as before.
 - [ ] Feats: the Filter list is the same height as the details box. Main window: the output is inset
       a little all round.
 - [ ] Overview is 890 wide (VB 866) and Options 437 tall (VB 428), to fit inside the margins; Help,
