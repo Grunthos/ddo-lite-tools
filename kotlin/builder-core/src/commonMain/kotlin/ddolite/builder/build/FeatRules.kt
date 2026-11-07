@@ -1284,6 +1284,7 @@ class FeatRules(val rules: BuildRules) {
         entry.feat = feat
         entry.slot.featName = feat?.name ?: ""
         entry.slot.selector = selector
+        entry.slot.missing = null
         updateDisplayNames(entry)
     }
 
@@ -1301,6 +1302,7 @@ class FeatRules(val rules: BuildRules) {
             for (slot in build.feats(type)) {
                 slot.featName = ""
                 slot.selector = 0
+                slot.missing = null
             }
         }
         rules.initBuildFeats()

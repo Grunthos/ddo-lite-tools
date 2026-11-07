@@ -100,7 +100,13 @@ private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: 
         screen.chooseTab(1)
         screen.chooseComboTree("Kensei")
         val kenseiRows = screen.slotRows()
-        screen.clickSlot(kenseiRows.size, ddolite.builder.ui.PointerButton.PRIMARY)
+        var placeholderRow = 0
+        for (i in kenseiRows.indices) {
+            if (placeholderRow == 0 && kenseiRows[i].cost == "?") {
+                placeholderRow = i + 1
+            }
+        }
+        screen.clickSlot(placeholderRow, ddolite.builder.ui.PointerButton.PRIMARY)
         scene.render() // a first frame, so the slot list knows it overflows (its scroll bar)
         shot(scene, outDir.resolve("37-enh-placeholders.png"))
         screen.chooseTab(2)

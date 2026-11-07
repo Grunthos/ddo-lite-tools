@@ -138,8 +138,15 @@ class BuildRoundTripTest {
             }
             assertEquals(droppedAbilities, removedAbilities, "$name abilities")
             assertEquals(deprecations.reducedRanks.size, reduced, "$name reduced ranks")
-            // A renamed feat is written back under its new name in the same slot.
-            assertEquals(deprecations.feats.size + deprecations.nameChanges.size, removedFeats, "$name feats")
+            // A renamed feat is written back under its new name in the same slot; a missing one is
+            // kept as a placeholder and written back as read.
+            var droppedFeats = deprecations.nameChanges.size
+            for (f in deprecations.feats) {
+                if (!f.kept) {
+                    droppedFeats++
+                }
+            }
+            assertEquals(droppedFeats, removedFeats, "$name feats")
             val expectedAdded = ArrayList<String>()
             // Versions before MAX_LEVELUPS = 9 don't write the level 36 line (TEST.build and newer saves do).
             val original = Windows1252.decode(SampleBuilds.file(name).readBytes())
@@ -178,7 +185,10 @@ class BuildRoundTripTest {
             val reloaded = readBuildFile(first, data, BuildPoints.ADVENTURER)
             assertEquals(emptyList(), reloaded.problems, name)
             val d = reloaded.deprecations
-            assertTrue(d.feats.isEmpty() && d.nameChanges.isEmpty() && d.destinies.isEmpty(), "$name: ${d.feats}")
+            assertTrue(d.nameChanges.isEmpty() && d.destinies.isEmpty(), name)
+            for (f in d.feats) {
+                assertTrue(f.kept, "$name: $f") // placeholders come back as placeholders
+            }
             for (e in d.enhancements) {
                 assertTrue(e.kept, "$name: $e") // placeholders come back as placeholders
             }

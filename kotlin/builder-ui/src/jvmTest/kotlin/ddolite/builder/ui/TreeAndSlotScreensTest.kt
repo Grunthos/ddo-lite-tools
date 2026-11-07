@@ -5,6 +5,7 @@ import ddolite.builder.build.BuildFeatType
 import ddolite.builder.build.BuildTree
 import ddolite.builder.build.DropState
 import ddolite.builder.build.FeatTab
+import ddolite.builder.build.writeBuildText
 import ddolite.builder.model.TreeStyle
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -409,6 +410,39 @@ class TreeAndSlotScreensTest {
 
         undoAll(session)
         assertFalse(session.dirty)
+    }
+
+    @Test
+    fun featPlaceholdersShowExplainAndClear() {
+        // Warlock Blaster has a feat the data no longer has: its slot shows the old text in red.
+        val session = TestSession.open("Warlock Blaster.build")
+        val screen = session.feats
+        screen.opened()
+        var row = 0
+        for (tab in FeatTab.entries) {
+            screen.chooseTab(tab)
+            val rows = screen.rows()
+            for (i in rows.indices) {
+                if (screen.placeholder(rows[i]) != null) {
+                    row = i + 1
+                    break
+                }
+            }
+            if (row != 0) {
+                break
+            }
+        }
+        assertTrue(row > 0, "a placeholder slot")
+        val slot = screen.rows()[row - 1].slot
+        val text = slot.missing
+        screen.clickSlot(row, PointerButton.PRIMARY)
+        assertEquals("Not in the current data", screen.details.caption)
+        // Double-click clears it, and it's no longer saved; Undo brings it back.
+        screen.doubleClickSlot(row)
+        assertNull(screen.rows()[row - 1].slot.missing)
+        assertFalse(writeBuildText(session.rules!!).contains("\t" + text + "\r\n"))
+        session.undo()
+        assertEquals(text, screen.rows()[row - 1].slot.missing)
     }
 
     @Test

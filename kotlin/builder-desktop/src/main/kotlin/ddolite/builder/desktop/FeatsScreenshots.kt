@@ -73,6 +73,28 @@ fun featsScreenshots(prototype: BuilderSession, kensei: ByteArray, repoRoot: Pat
             shot(scene, outDir.resolve("26-feats-eresh.png"))
         }
     }
+    // Warlock Blaster: a feat the data no longer has, as a red placeholder, selected.
+    prototype.openBuild(readBuildFile(Files.readAllBytes(repoRoot.resolve("Save").resolve("Warlock Blaster.build")), prototype.data, BuildPoints.ADVENTURER))
+    feats.opened()
+    var placeholderRow = 0
+    for (tab in FeatTab.entries) {
+        feats.chooseTab(tab)
+        val rows = feats.rows()
+        for (i in rows.indices) {
+            if (feats.placeholder(rows[i]) != null) {
+                placeholderRow = i + 1
+                break
+            }
+        }
+        if (placeholderRow != 0) {
+            break
+        }
+    }
+    feats.clickSlot(placeholderRow, ddolite.builder.ui.PointerButton.PRIMARY)
+    ImageComposeScene(width = 815, height = 593, density = Density(1f)) { FeatsWindowContent(prototype) {} }.use { scene ->
+        scene.render()
+        shot(scene, outDir.resolve("27-feats-placeholder.png"))
+    }
 }
 
 private fun shot(scene: ImageComposeScene, file: Path) {

@@ -98,6 +98,13 @@ class BuildFeat(var type: BuildFeatType) {
     var child = 0
     var childType: BuildFeatType? = null
 
+    /**
+     * Kotlin only: the file's feat text when the current data hasn't the feat or its selector ("Weapon
+     * Group Specialization: Axes"). The slot is empty to the rules, shows the text as a red
+     * placeholder, and saves it back until a feat is put in or the slot is cleared. VB drops it.
+     */
+    var missing: String? = null
+
     fun copy(): BuildFeat {
         val result = BuildFeat(type)
         result.source = source
@@ -107,6 +114,7 @@ class BuildFeat(var type: BuildFeatType) {
         result.selector = selector
         result.child = child
         result.childType = childType
+        result.missing = missing
         return result
     }
 }

@@ -146,6 +146,20 @@ class FeatsScreenState(private val session: BuilderSession) {
         return list
     }
 
+    /** Kotlin only: the file's text for an empty slot whose feat the data hasn't, or null. */
+    fun placeholder(entry: FeatListEntry): String? = if (entry.feat == null) entry.slot.missing else null
+
+    /** What a placeholder slot says in the details box. */
+    private fun placeholderDetails(text: String): List<ddolite.builder.build.DetailLine> {
+        return listOf(
+            ddolite.builder.build.DetailLine(text, null, true),
+            ddolite.builder.build.DetailLine("", null, false),
+            ddolite.builder.build.DetailLine("The build file has this feat, but the current data hasn't (it, or its selector, may have been renamed or removed). The slot counts as empty, and anything that needed the feat shows an error.", null, false),
+            ddolite.builder.build.DetailLine("", null, false),
+            ddolite.builder.build.DetailLine("Drop a feat on it to replace it, or double-click it (or right-click › Clear This Feat) to remove it. Until then it's saved as it was read.", null, false),
+        )
+    }
+
     private fun entry(row: Int): FeatListEntry? {
         val rows = rows()
         if (row < 1 || row > rows.size) {
@@ -270,7 +284,12 @@ class FeatsScreenState(private val session: BuilderSession) {
             details = FeatDetails("Details", emptyList())
         } else {
             val e = entry(row)
-            showDetails(e?.feat, e?.selector ?: 0)
+            val text = if (e == null) null else placeholder(e)
+            if (text != null) {
+                details = FeatDetails("Not in the current data", placeholderDetails(text))
+            } else {
+                showDetails(e?.feat, e?.selector ?: 0)
+            }
         }
         if (tab != FeatTab.GRANTED) {
             showAvailable()
@@ -753,8 +772,13 @@ class FeatsScreenState(private val session: BuilderSession) {
         val two = entry(to) ?: return
         val feat = one.feat
         val selector = one.selector
+        val oneMissing = one.slot.missing
+        val twoMissing = two.slot.missing
         fr.setSlot(one, two.feat, two.selector)
         fr.setSlot(two, feat, selector)
+        // Kotlin only: placeholders move with the swap.
+        one.slot.missing = twoMissing
+        two.slot.missing = oneMissing
         fr.checkSlotErrors()
         active = 0
         showAvailable()

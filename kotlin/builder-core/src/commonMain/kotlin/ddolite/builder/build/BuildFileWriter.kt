@@ -301,6 +301,10 @@ private class BuildFileWriter(private val rules: BuildRules) {
         var added = false
         for (slot in slots) {
             var featText = slot.featName
+            val missing = slot.missing
+            if (featText.isEmpty() && missing != null) {
+                featText = missing // Kotlin only: a placeholder is saved back as read
+            }
             if (slot.selector > 0) {
                 val feat = rules.findFeatOrNull(featText)
                 if (feat != null && feat.selectors.size >= slot.selector) {

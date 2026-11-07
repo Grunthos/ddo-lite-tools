@@ -255,7 +255,14 @@ private fun FeatSlots(screen: FeatsScreenState, rules: BuildRules, theme: Theme,
         },
         slot = { row ->
             val entry = rows.getOrNull(row - 1)
-            if (entry == null) SlotContent("", false) else SlotContent(entry.display, entry.errorState)
+            val placeholder = if (entry == null) null else screen.placeholder(entry)
+            if (entry == null) {
+                SlotContent("", false)
+            } else if (placeholder != null) {
+                SlotContent(placeholder, true) // Kotlin only: a feat the data hasn't
+            } else {
+                SlotContent(entry.display, entry.errorState)
+            }
         },
         dropState = { row -> screen.dropStates.getOrNull(row - 1) ?: DropState.DEFAULT },
         hoverRow = screen.hoverRow,

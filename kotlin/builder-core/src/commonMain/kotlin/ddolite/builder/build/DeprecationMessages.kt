@@ -73,7 +73,9 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
     fun messages(): List<DeprecationMessage> {
         val result = ArrayList<DeprecationMessage>()
         for (i in deprecations.feats.indices) {
-            result.add(DeprecationMessage("Feats: " + featIssue(deprecations.feats[i]), MessageGroup.FEAT, i + 1))
+            val f = deprecations.feats[i]
+            val kept = if (f.kept) " (kept as a red slot)" else ""
+            result.add(DeprecationMessage("Feats: " + featIssue(f) + kept, MessageGroup.FEAT, i + 1))
         }
         for (i in deprecations.nameChanges.indices) {
             val change = deprecations.nameChanges[i]
@@ -376,6 +378,7 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             val slot = slots[deprecated.index]
             slot.featName = featName
             slot.selector = selector
+            slot.missing = null
         }
     }
 

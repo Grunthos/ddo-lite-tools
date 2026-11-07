@@ -27,8 +27,8 @@ class DeprecationMessagesTest {
         val loaded = open()
         val messages = DeprecationMessages(loaded.rules, loaded.deprecations)
         val list = messages.messages()
-        assertEquals("Feats: Empowered Spell not found (taken as a Heroic feat at level 9)", list[0].text)
-        assertEquals("Feats: Spell Focus: Conjurer not found (taken as a Heroic feat at level 12)", list[1].text)
+        assertEquals("Feats: Empowered Spell not found (taken as a Heroic feat at level 9) (kept as a red slot)", list[0].text)
+        assertEquals("Feats: Spell Focus: Conjurer not found (taken as a Heroic feat at level 12) (kept as a red slot)", list[1].text)
         assertEquals(MessageGroup.FEAT, list[1].group)
         assertEquals(2, list[1].index)
         val (issues, notices) = messages.countMessages()
@@ -79,10 +79,11 @@ class DeprecationMessagesTest {
         val slot = loaded.build.feats(BuildFeatType.STANDARD).first { it.level == 12 }
         assertEquals("Spell Focus", slot.featName)
         assertEquals(conjuration, slot.selector)
+        assertEquals(null, slot.missing) // the placeholder goes
         val before = messages.messages().size
         messages.resolve(list[1])
         assertEquals(before - 1, messages.messages().size)
-        assertEquals("Feats: Empowered Spell not found (taken as a Heroic feat at level 9)", messages.messages()[0].text)
+        assertEquals("Feats: Empowered Spell not found (taken as a Heroic feat at level 9) (kept as a red slot)", messages.messages()[0].text)
     }
 
     @Test

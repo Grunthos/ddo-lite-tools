@@ -16,6 +16,8 @@ data class DeprecatedFeat(
     val selectorName: String,
     val childType: BuildFeatType?,
     val childIndex: Int,
+    /** Kotlin only: kept in its slot as a placeholder. */
+    val kept: Boolean = false,
 )
 
 /**

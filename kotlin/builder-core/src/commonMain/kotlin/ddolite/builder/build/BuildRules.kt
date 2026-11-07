@@ -578,6 +578,7 @@ class BuildRules(val data: BuilderData, val build: Build) {
                     if (slot.level == oldSlot.level && slot.classLevel == oldSlot.classLevel) {
                         slot.featName = oldSlot.featName
                         slot.selector = oldSlot.selector
+                        slot.missing = oldSlot.missing
                         break
                     }
                 }

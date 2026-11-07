@@ -378,11 +378,13 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         }
         val raw = list[listMax]
         val found = findFeat(raw)
+        val slot = build.feats(type)[index]
         if (found.result != 1) {
-            deprecations.feats.add(DeprecatedFeat(type, index, found.featName, found.selectorName, childType, childIndex))
+            // Kotlin only: the text stays in the slot as a placeholder.
+            slot.missing = raw
+            deprecations.feats.add(DeprecatedFeat(type, index, found.featName, found.selectorName, childType, childIndex, kept = true))
             return
         }
-        val slot = build.feats(type)[index]
         slot.featName = found.featName
         slot.selector = found.selector
     }

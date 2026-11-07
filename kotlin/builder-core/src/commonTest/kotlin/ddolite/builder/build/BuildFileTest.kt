@@ -66,6 +66,31 @@ class BuildFileTest {
         // A missing selector and a missing feat leave the slot empty and are listed.
         assertEquals(listOf("Weapon Focus" to "Bludgeoning", "No Such Feat" to ""), result.deprecations.feats.map { it.featName to it.selectorName })
         assertEquals("", build.feats(BuildFeatType.CLASS1)[1].featName)
+        // Kotlin only: both stay in their slots as placeholders, saved back as read.
+        assertEquals("Weapon Focus: Bludgeoning", build.feats(BuildFeatType.CLASS1)[1].missing)
+        assertTrue(result.deprecations.feats.all { it.kept })
+        val saved = writeBuildText(result.rules)
+        assertTrue(saved.contains("Class: Fighter 2\tWeapon Focus: Bludgeoning\r\n"), saved)
+        assertTrue(saved.contains("Standard: Heroic 6\tNo Such Feat\r\n"), saved)
+    }
+
+    @Test
+    fun featPlaceholdersGoWhenTheSlotIsFilledOrCleared() {
+        val text = fighter + "[Feats]\n\nStandard: Heroic 1\tNo Such Feat\nAlternate: Heroic 1\tOther Missing Feat\n"
+        val result = read(text)
+        val slot = result.build.feats(BuildFeatType.STANDARD)[0]
+        assertEquals("No Such Feat", slot.missing)
+        // The alternate slot is kept too, with its placeholder.
+        assertTrue(writeBuildText(result.rules).contains("Alternate: Heroic 1\tOther Missing Feat\r\n"))
+        val fr = FeatRules(result.rules)
+        val entry = result.rules.featList.first { it.slot === slot }
+        fr.setSlot(entry, result.rules.findFeatOrNull("Toughness"), 0)
+        assertEquals(null, slot.missing)
+        assertTrue(writeBuildText(result.rules).contains("Standard: Heroic 1\tToughness\r\n"))
+        // Clear All Feats clears placeholders too.
+        val again = read(text)
+        FeatRules(again.rules).clearAllFeats()
+        assertFalse(writeBuildText(again.rules).contains("No Such Feat"))
     }
 
     @Test

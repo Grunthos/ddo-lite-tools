@@ -131,3 +131,24 @@ did nothing. Fixed.
 Coverage (lines / branches): DestinyScreenState 70% / 39%, FeatsScreenState 74% / 50%,
 EnhancementsScreenState 59% / 34%, GuideScreenState 66% / 35%, SpellsScreenState 46% / 24%;
 builder-ui overall 25% / 14% (was 15% / 7%; the window drawing itself isn't unit tested).
+
+## 5. Planned: behaviour on the model's items (after testing against VB 4.15)
+
+The model is VB's: plain records (`BuildAbility`, `BuildFeat`, `BuildGuideEnhancement`) with the
+behaviour in rules modules that look items up by number and branch on kind (`when (id)`,
+`if (style == …)`). That keeps the port line-for-line checkable against VB, which matters until the
+golden-file testing is done. Afterwards, moving behaviour onto the items (each knowing its caption,
+cost, errors and file line, with subtypes for the kinds) would collapse much of that branching.
+
+Placeholders are one reason: a file line the data no longer has is kept, shown red, costs nothing
+and is saved back, and that is now done three separate ways (2026-11-08):
+
+| Where | How it's held |
+|---|---|
+| Leveling guide steps | `BuildGuideEnhancement.missing` (and `missingTree`), id 0 |
+| Enhancement trees | `BuildTree.missing`, a separate list of `MissingAbility` (tier, text, the ability it came before), placed by `BuildTree.slots()` |
+| Feat slots | `BuildFeat.missing`, the slot otherwise empty |
+
+With behaviour on the items, a placeholder becomes one subtype per kind (cost 0, red caption, writes
+its text) instead of checks in each window, the writer and Messages. Until then, a fourth case
+(destiny abilities, VB-BUGS #1) should follow the nearest of the three.
