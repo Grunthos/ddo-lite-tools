@@ -1,6 +1,9 @@
 package ddolite.builder.ui
 
+import ddolite.builder.build.BLANK_ABILITY
 import ddolite.builder.build.BuildFeatType
+import ddolite.builder.build.BuildTree
+import ddolite.builder.build.DropState
 import ddolite.builder.build.FeatTab
 import ddolite.builder.model.TreeStyle
 import kotlin.test.Test
@@ -258,29 +261,89 @@ class TreeAndSlotScreensTest {
     @Test
     fun placeholderSlotsShowExplainAndClear() {
         // Kensei Warpriest's Kensei tree has four "Weapon Group Specialization: Axes" lines the data
-        // no longer has: red placeholder slots after the abilities.
+        // no longer has: red placeholder slots after the last ability of their tier.
         val session = TestSession.open("Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         screen.chooseTab(1)
         screen.chooseComboTree("Kensei")
-        val bt = session.rules!!.findBuildTree("Kensei").let { session.rules!!.build.trees[it - 1] }
+        fun kensei(): BuildTree = session.rules!!.build.trees[session.rules!!.findBuildTree("Kensei") - 1]
+        val bt = kensei()
         val abilities = bt.abilities.size
         val rows = screen.slotRows()
         assertEquals(abilities + bt.missing.size, rows.size)
-        val first = rows[abilities]
+        var row = 0
+        for (i in rows.indices) {
+            if (rows[i].cost == "?") {
+                row = i + 1
+                break
+            }
+        }
+        assertTrue(row in 1..abilities, "the first placeholder is among the abilities")
+        val first = rows[row - 1]
         assertEquals("Weapon Group Specialization: Axes", first.caption)
         assertTrue(first.error)
-        assertEquals("?", first.cost)
-        // Clicking it explains; double-clicking removes it (undoably).
-        screen.clickSlot(abilities + 1, PointerButton.PRIMARY)
+        // Where the file had it, in tier order: no ability before it has a higher tier, none after a lower one.
+        val tier = first.tier.toInt()
+        for (i in rows.indices) {
+            if (rows[i].cost != "?") {
+                assertTrue(if (i < row - 1) rows[i].tier.toInt() <= tier else rows[i].tier.toInt() >= tier, "row ${i + 1}")
+            }
+        }
+        // Clicking it explains; a right-click on it (selected) opens the menu rather than clearing it.
+        screen.clickSlot(row, PointerButton.PRIMARY)
         assertEquals("Not in the current data", screen.details?.caption)
         val count = bt.missing.size
-        screen.doubleClickSlot(abilities + 1)
+        screen.clickSlot(row, PointerButton.SECONDARY)
+        assertEquals(row, screen.slotMenuRow)
+        assertEquals(count, bt.missing.size)
+        screen.closeSlotMenu()
+        // Double-clicking removes it (undoably).
+        screen.doubleClickSlot(row)
         assertEquals(count - 1, bt.missing.size)
         assertEquals(abilities, bt.abilities.size)
         session.undo()
-        assertEquals(count, session.rules!!.build.trees[session.rules!!.findBuildTree("Kensei") - 1].missing.size)
+        assertEquals(count, kensei().missing.size)
+    }
+
+    @Test
+    fun abilityDroppedOnAPlaceholderReplacesIt() {
+        val session = TestSession.open("Kensei Warpriest.build")
+        val screen = session.enhancements
+        screen.opened()
+        screen.chooseTab(1)
+        screen.chooseComboTree("Kensei")
+        fun kensei(): BuildTree = session.rules!!.build.trees[session.rules!!.findBuildTree("Kensei") - 1]
+        val count = kensei().missing.size
+        val abilities = kensei().abilities.size
+        var chosen = -1
+        for (i in screen.abilities.indices) {
+            if (screen.clickAbility(i)) {
+                chosen = i
+                break
+            }
+        }
+        assertTrue(chosen >= 0, "an ability without selectors is offered")
+        val item = EnhancementDrag.ListAbility(screen.abilities[chosen].tier, screen.abilities[chosen].ability)
+        assertTrue(screen.startAbilityDrag(item))
+        // The placeholders light up as drop targets along with the blank slot.
+        val rows = screen.slotRows()
+        var target = 0
+        for (i in rows.indices) {
+            if (rows[i].cost == "?") {
+                assertTrue(screen.slotStates[i] != DropState.DEFAULT, "placeholder row ${i + 1}")
+                target = i + 1
+            }
+        }
+        screen.abilityDropped(item, AbilityRowKey(target))
+        assertEquals(count - 1, kensei().missing.size)
+        assertEquals(abilities + 1, kensei().abilities.size)
+        for (a in kensei().abilities) {
+            assertTrue(a.ability != BLANK_ABILITY)
+        }
+        session.undo()
+        assertEquals(count, kensei().missing.size)
+        assertEquals(abilities, kensei().abilities.size)
     }
 
     // ---------------------------------------------------------------- Feats slots

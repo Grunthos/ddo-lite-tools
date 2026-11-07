@@ -225,7 +225,8 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
     fun insertAbility(bt: BuildTree, tier: Int, ability: Int, ranks: Int, selector: Int, blank: Boolean): Int {
         val insert = enhancementRules.insertionPoint(bt, tier, ability)
         if (blank) {
-            bt.abilities.add(insert, BuildAbility(0, BLANK_ABILITY, 0, 0))
+            // Kotlin: the blank keeps the tier (VB: 0), so placeholders sit right around it ([BuildTree.slots]).
+            bt.abilities.add(insert, BuildAbility(tier, BLANK_ABILITY, 0, 0))
         } else {
             bt.abilities.add(insert, BuildAbility(tier, ability, ranks, selector))
             if (tier == 5) {

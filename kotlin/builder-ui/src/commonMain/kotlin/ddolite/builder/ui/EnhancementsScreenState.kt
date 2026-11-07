@@ -10,6 +10,7 @@ import ddolite.builder.build.TreeEdits
 import ddolite.builder.build.AbilityDetails
 import ddolite.builder.build.DetailLine
 import ddolite.builder.build.MissingAbility
+import ddolite.builder.build.TreeSlot
 import ddolite.builder.build.BLANK_ABILITY
 import ddolite.builder.build.BuildAbility
 import ddolite.builder.build.BuildTree
@@ -678,7 +679,14 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         }
         val spend = r.spentInTree(tree, bt)
         val rows = ArrayList<AbilitySlotRow>()
-        for (a in bt.abilities) {
+        for (slot in bt.slots()) {
+            if (slot.placeholder) {
+                // Kotlin only: a file ability the data hasn't, as a red placeholder.
+                val m = bt.missing[slot.index]
+                rows.add(AbilitySlotRow(m.tier.toString(), m.caption, "?", 0, 0, true))
+                continue
+            }
+            val a = bt.abilities[slot.index]
             if (a.ability == BLANK_ABILITY) {
                 rows.add(AbilitySlotRow("", "", "", 0, 0, false))
             } else {
@@ -686,10 +694,6 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
                 val error = r.abilityError(tree, bt, a, spend) != null
                 rows.add(AbilitySlotRow(a.tier.toString(), info.caption, info.cost.toString(), a.rank, info.maxRanks, error))
             }
-        }
-        // Kotlin only: the file's abilities the data hasn't, as red placeholders after the rest.
-        for (m in bt.missing) {
-            rows.add(AbilitySlotRow(m.tier.toString(), m.caption, "?", 0, 0, true))
         }
         return rows
     }
@@ -786,25 +790,58 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val bt = currentBuildTree()
         var slot: BuildAbility? = null
         if (slotRow != 0 && bt != null) {
-            slot = bt.abilities.getOrNull(slotRow - 1)
+            slot = abilityAt(bt, slotRow)
         }
         details = r.details(tree, bt, tier, ability, selector, slot)
     }
 
+    /** Kotlin only: slot list row [row] of [bt] (abilities and placeholders), or null. */
+    private fun slotAt(bt: BuildTree, row: Int): TreeSlot? = bt.slots().getOrNull(row - 1)
+
+    /** The index in [bt]'s abilities of a drag's blank slot, or -1. */
+    private fun blankSlot(bt: BuildTree): Int {
+        for (i in bt.abilities.indices) {
+            if (bt.abilities[i].ability == BLANK_ABILITY) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    /** The slot list row of ability [index] of [bt]. */
+    private fun rowOfAbility(bt: BuildTree, index: Int): Int {
+        val slots = bt.slots()
+        for (i in slots.indices) {
+            if (!slots[i].placeholder && slots[i].index == index) {
+                return i + 1
+            }
+        }
+        return 0
+    }
+
+    /** The ability in slot list row [row], or null for a placeholder. */
+    private fun abilityAt(bt: BuildTree, row: Int): BuildAbility? {
+        val slot = slotAt(bt, row) ?: return null
+        return if (slot.placeholder) null else bt.abilities[slot.index]
+    }
+
     /** The details for slot [row]: an ability's, or a placeholder's (Kotlin only). */
     private fun showSlotDetails(bt: BuildTree, row: Int) {
-        if (row > bt.abilities.size) {
-            val m = bt.missing.getOrNull(row - bt.abilities.size - 1) ?: return
+        val slot = slotAt(bt, row) ?: return
+        if (slot.placeholder) {
             details = AbilityDetails(
-                "Not in the current data", missingDetails(m), "", "", null,
+                "Not in the current data", missingDetails(bt.missing[slot.index]), "", "", null,
             )
             return
         }
-        val a = bt.abilities[row - 1]
+        val a = bt.abilities[slot.index]
         showDetails(a.tier, a.ability, a.selector, row)
     }
 
-    /** usrList_SlotClick (:1902). */
+    /**
+     * usrList_SlotClick (:1902). Kotlin change: a right-click always opens the menu (VB cleared a
+     * slot that was already selected).
+     */
     override fun clickSlot(row: Int, button: PointerButton) {
         val bt = currentBuildTree() ?: return
         selectorIndex = -1
@@ -814,11 +851,8 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
             changed()
             return
         }
-        if (selectedSlot() == row) {
+        if (button == PointerButton.PRIMARY && selectedSlot() == row) {
             noSelection()
-            if (button == PointerButton.SECONDARY) {
-                clearSlot(row)
-            }
         } else if (button == PointerButton.PRIMARY) {
             selectSlot(row)
             showSlotDetails(bt, row)
@@ -866,19 +900,16 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     private fun clearSlot(row: Int) {
         val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        if (row > bt.abilities.size) {
+        val slot = slotAt(bt, row) ?: return
+        if (slot.placeholder) {
             // A placeholder (Kotlin only): it goes, and isn't saved any more.
-            val index = row - bt.abilities.size - 1
-            if (index < 0 || index >= bt.missing.size) {
-                return
-            }
-            bt.missing.removeAt(index)
+            bt.missing.removeAt(slot.index)
             showAbilities()
             noSelection()
             treesChanged()
             return
         }
-        if (!edits.clearSlot(bt, row)) {
+        if (!edits.clearSlot(bt, slot.index + 1)) {
             return
         }
         showAbilities()
@@ -891,7 +922,11 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     override fun changeRank(row: Int, ranks: Int) {
         val edits = edits() ?: return
         val bt = currentBuildTree() ?: return
-        val a = edits.setRanks(bt, row, ranks) ?: return
+        val slot = slotAt(bt, row) ?: return
+        if (slot.placeholder) {
+            return
+        }
+        val a = edits.setRanks(bt, slot.index + 1, ranks) ?: return
         showAbilities()
         showAvailable()
         showDetails(a.tier, a.ability, a.selector, row)
@@ -999,7 +1034,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val ranks = tree.tiers[choice.tier][choice.ability].ranks
         val insert = edits.insertAbility(bt, choice.tier, choice.ability, ranks, choice.selector, blank)
         showAbilities()
-        slotHover = insert + 1
+        slotHover = rowOfAbility(bt, insert)
         return true
     }
 
@@ -1010,7 +1045,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
     override fun startAbilityDrag(item: EnhancementDrag): Boolean {
         if (item is EnhancementDrag.AbilityRow) {
             val bt = currentBuildTree() ?: return false
-            if (item.row > bt.abilities.size) {
+            if (abilityAt(bt, item.row) == null) {
                 return false
             }
             sourceRow = item.row
@@ -1024,13 +1059,15 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val tree = currentTree() ?: return false
         val bt = currentBuildTree() ?: return false
         val spend = r.spentInTree(tree, bt)
+        // The blank slot lights up; Kotlin only: so do placeholders, which a drop replaces.
+        val check = BuildAbility(choice.tier, choice.ability, 1, choice.selector)
+        val dropState = if (r.abilityError(tree, bt, check, spend) != null) DropState.CAN_DROP_ERROR else DropState.CAN_DROP
         val states = ArrayList<DropState>()
-        for (a in bt.abilities) {
-            if (a.ability != BLANK_ABILITY) {
-                states.add(DropState.DEFAULT)
+        for (slot in bt.slots()) {
+            if (slot.placeholder || bt.abilities[slot.index].ability == BLANK_ABILITY) {
+                states.add(dropState)
             } else {
-                val check = BuildAbility(choice.tier, choice.ability, 1, choice.selector)
-                states.add(if (r.abilityError(tree, bt, check, spend) != null) DropState.CAN_DROP_ERROR else DropState.CAN_DROP)
+                states.add(DropState.DEFAULT)
             }
         }
         slotStates = states
@@ -1059,11 +1096,18 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
             if (state != null && state != DropState.DEFAULT && confirmTier5()) {
                 val choice = userChoice()
                 val tree = currentTree()
-                if (choice != null && tree != null) {
+                val slot = slotAt(bt, target.row)
+                val blank = blankSlot(bt)
+                if (choice != null && tree != null && slot != null && blank >= 0) {
                     dragComplete = true
-                    TreeEdits(r, destinies = false).dropAbility(bt, target.row, choice.tier, choice.ability, tree.tiers[choice.tier][choice.ability].ranks, choice.selector)
+                    // Kotlin only: dropped on a placeholder, the ability takes the blank slot (its
+                    // place in tier order) and the placeholder goes.
+                    if (slot.placeholder) {
+                        bt.missing.removeAt(slot.index)
+                    }
+                    TreeEdits(r, destinies = false).dropAbility(bt, blank + 1, choice.tier, choice.ability, tree.tiers[choice.tier][choice.ability].ranks, choice.selector)
                     showAbilities()
-                    slotHover = target.row
+                    slotHover = rowOfAbility(bt, blank)
                     showAvailable()
                     treesChanged()
                 }

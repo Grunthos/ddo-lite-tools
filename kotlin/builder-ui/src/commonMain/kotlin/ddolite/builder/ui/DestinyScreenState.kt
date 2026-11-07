@@ -557,7 +557,10 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
         details = r.details(tree, bt, tier, ability, selector, slot)
     }
 
-    /** usrList_SlotClick (:1375). */
+    /**
+     * usrList_SlotClick (:1375). Kotlin change: a right-click always opens the menu (VB cleared a
+     * slot that was already selected).
+     */
     override fun clickSlot(row: Int, button: PointerButton) {
         val bt = currentBuildTree() ?: return
         selectorIndex = -1
@@ -567,11 +570,8 @@ class DestinyScreenState(private val session: BuilderSession) : TreeAbilitiesScr
             changed()
             return
         }
-        if (singleSelected(slotStates) == row) {
+        if (button == PointerButton.PRIMARY && singleSelected(slotStates) == row) {
             noSelection()
-            if (button == PointerButton.SECONDARY) {
-                clearSlot(row)
-            }
         } else if (button == PointerButton.PRIMARY) {
             slotStates = selectedStates(slotStates.size, row)
             val a = bt.abilities[row - 1]

@@ -170,6 +170,16 @@ class BuildFileTest {
         // Resetting the tree clears it too.
         TreeEdits(result.rules, destinies = false).resetAbilities(human)
         assertTrue(human.missing.isEmpty())
+
+        // One read before an ability of its own tier stays before it (in the slot list and the file).
+        val before = read(
+            fighter + "[Enhancements]\n\nTree: Human\nType: Race\n" +
+                "Ability: Tier 0: No Such Ability\nAbility: Tier 0: Versatility: Attack\n\n",
+        )
+        val slots = before.build.trees[0].slots()
+        assertTrue(slots[0].placeholder)
+        assertFalse(slots[1].placeholder)
+        assertTrue(writeBuildText(before.rules).contains("Ability: Tier 0: No Such Ability\r\nAbility: Tier 0: Versatility: Attack\r\n"))
     }
 
     @Test

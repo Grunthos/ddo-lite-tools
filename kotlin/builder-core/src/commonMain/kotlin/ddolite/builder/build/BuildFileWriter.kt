@@ -433,23 +433,12 @@ private class BuildFileWriter(private val rules: BuildRules) {
         if ((buildTree.abilities.isEmpty() && buildTree.missing.isEmpty()) || tree == null) {
             return
         }
-        // Kotlin only: placeholders go back where they were among the abilities.
-        for (i in buildTree.abilities.indices) {
-            addMissing(buildTree, i)
-            addLine(abilityLine(buildTree.abilities[i], tree))
-        }
-        for (m in buildTree.missing) {
-            if (m.position >= buildTree.abilities.size) {
-                addLine("Ability: " + m.text)
-            }
-        }
-    }
-
-    /** The placeholders that came before ability [index] in the file. */
-    private fun addMissing(buildTree: BuildTree, index: Int) {
-        for (m in buildTree.missing) {
-            if (m.position == index) {
-                addLine("Ability: " + m.text)
+        // Kotlin only: placeholders go in among the abilities, in the slot list's order.
+        for (slot in buildTree.slots()) {
+            if (slot.placeholder) {
+                addLine("Ability: " + buildTree.missing[slot.index].text)
+            } else {
+                addLine(abilityLine(buildTree.abilities[slot.index], tree))
             }
         }
     }

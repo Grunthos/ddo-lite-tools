@@ -164,8 +164,13 @@ the Kotlin output with these files and list every difference.
 - [ ] Trees tab, straight after opening the window: click a tree (it's selected) and right-click › Reset
       (it resets). Neither worked until the tab had been redrawn (fixed 2026-11-06).
 - [ ] Open the original `Save/Kensei Warpriest.build`, Enhancements tab, Kensei: the four "Weapon Group
-      Specialization: Axes" lines are red placeholder slots at the end (scroll down); selecting one explains it;
-      double-click removes it; Reset tree clears them; saving keeps those not removed.
+      Specialization: Axes" lines are red placeholder slots where the file had them (tiers 1-4); selecting
+      one explains it; right-clicking it (selected or not) opens the menu; double-click or Clear removes it;
+      Reset tree clears them; saving keeps those not removed, in the same places.
+- [ ] Drag an ability from the Abilities list: the blank slot and every placeholder light up; drop it on a
+      placeholder and the ability goes in (in tier order) and the placeholder goes. Undo brings it back.
+- [ ] Enhancements and Destinies: right-click a slot that's already selected: the menu opens (VB cleared
+      the slot without asking).
 - [ ] The Class column is as wide as the longest class name, and the add list's Class column starts after
       its longest tree name (its caption only when a listed tree has a class).
 - [ ] Enhancements tab, for each tree: the same slots, AP, ranks and red (error) slots as VB.

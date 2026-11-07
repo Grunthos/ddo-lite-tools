@@ -169,18 +169,55 @@ class BuildTree(var treeName: String) {
 
     /**
      * Kotlin only: the file's ability lines the current data hasn't (VB drops them). They show as red
-     * placeholder slots after the abilities, count for nothing in the rules (which only see
-     * [abilities]), and are saved back where they were until cleared.
+     * placeholder slots among the abilities (see [slots]), count for nothing in the rules (which only
+     * see [abilities]), and are saved back until cleared. In tier order.
      */
     val missing = ArrayList<MissingAbility>()
+
+    /**
+     * Kotlin only: the slot list's rows in order, [abilities] (kept in tier order) with each
+     * placeholder where the file had it: before the ability that followed it in its tier
+     * ([MissingAbility.before]), or else after the last ability of its tier.
+     */
+    fun slots(): List<TreeSlot> {
+        val result = ArrayList<TreeSlot>()
+        var m = 0
+        for (i in abilities.indices) {
+            val a = abilities[i]
+            while (m < missing.size && (missing[m].tier < a.tier || (missing[m].tier == a.tier && missing[m].before == a.ability))) {
+                result.add(TreeSlot(true, m))
+                m++
+            }
+            result.add(TreeSlot(false, i))
+        }
+        while (m < missing.size) {
+            result.add(TreeSlot(true, m))
+            m++
+        }
+        return result
+    }
+
+    /** Kotlin only: [placeholder] kept in tier order (after others of its tier). */
+    fun addMissing(placeholder: MissingAbility) {
+        var i = 0
+        while (i < missing.size && missing[i].tier <= placeholder.tier) {
+            i++
+        }
+        missing.add(i, placeholder)
+    }
 }
 
 /**
- * A tree's ability line the data hasn't: [text] as in the file ("Tier 1: Weapon Group Specialization:
- * Axes"), its [tier], and [position], how many of the tree's abilities came before it in the file
- * (where it's saved back).
+ * A row of a tree's slot list ([BuildTree.slots]): ability [index] of [BuildTree.abilities], or
+ * placeholder [index] of [BuildTree.missing] when [placeholder].
  */
-class MissingAbility(val tier: Int, val text: String, val position: Int) {
+class TreeSlot(val placeholder: Boolean, val index: Int)
+
+/**
+ * A tree's ability line the data hasn't: [text] as in the file ("Tier 1: Weapon Group Specialization:
+ * Axes") and its [tier]. [before] is the ability that followed it in its tier in the file, if any.
+ */
+class MissingAbility(val tier: Int, val text: String, var before: Int? = null) {
     /** The ability as the slot shows it: the text without its "Tier n: ". */
     val caption: String
         get() {

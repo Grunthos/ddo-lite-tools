@@ -598,7 +598,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         if (resolved == null) {
             // Kotlin only: an enhancement tree in the data keeps the line as a placeholder slot.
             if (!isDestiny && ability.parsed && data.findTree(buildTree.treeName) != null) {
-                buildTree.missing.add(MissingAbility(ability.tier, raw, buildTree.abilities.size))
+                buildTree.addMissing(MissingAbility(ability.tier, raw))
                 deprecations.enhancements.add(ability.copy(kept = true))
                 return
             }
@@ -609,6 +609,12 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
             deprecations.reducedRanks.add(ReducedRank(ability, resolved.rank))
         }
         buildTree.abilities.add(BuildAbility(ability.tier, resolved.ability, resolved.rank, resolved.selector))
+        // Kotlin only: placeholders read just before it in its tier stay before it.
+        for (m in buildTree.missing) {
+            if (m.tier == ability.tier && m.before == null) {
+                m.before = resolved.ability
+            }
+        }
     }
 
     /**
