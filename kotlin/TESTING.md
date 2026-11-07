@@ -169,6 +169,9 @@ the Kotlin output with these files and list every difference.
       Reset tree clears them; saving keeps those not removed, in the same places.
 - [ ] Drag an ability from the Abilities list: the blank slot and every placeholder light up; drop it on a
       placeholder and the ability goes in (in tier order) and the placeholder goes. Undo brings it back.
+- [ ] With a build whose Leveling Guide has red rows for a placeholder's ability (none of the samples
+      has): replacing the placeholder turns those rows into the new ability (ranks it hasn't stay red);
+      clearing the placeholder removes them; Undo restores either.
 - [ ] Enhancements and Destinies: right-click a slot that's already selected: the menu opens (VB cleared
       the slot without asking).
 - [ ] The Class column is as wide as the longest class name, and the add list's Class column starts after

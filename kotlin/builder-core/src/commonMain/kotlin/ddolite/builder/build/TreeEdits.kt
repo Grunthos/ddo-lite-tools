@@ -244,6 +244,72 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
         bt.abilities[row - 1] = BuildAbility(tier, ability, ranks, selector)
     }
 
+    /**
+     * Kotlin only: placeholder [index] of [bt] replaced by [ability] of [tier] with [selector] (the
+     * caller puts that in the tree). The leveling guide's red rows for the placeholder become the
+     * ability at their ranks; a rank beyond its [ranks] stays red.
+     */
+    fun replacePlaceholder(bt: BuildTree, index: Int, tier: Int, ability: Int, selector: Int, ranks: Int) {
+        val placeholder = bt.missing.removeAt(index)
+        val steps = build.guide.enhancements
+        for (i in steps.indices) {
+            val step = steps[i]
+            if (!guideStepFor(step, bt, placeholder)) {
+                continue
+            }
+            val rank = rankOf(step.missing ?: "")
+            if (rank > ranks) {
+                continue
+            }
+            val replaced = BuildGuideEnhancement(step.missingTree)
+            replaced.tier = tier
+            replaced.ability = ability
+            replaced.selector = selector
+            replaced.rank = rank
+            steps[i] = replaced
+        }
+    }
+
+    /** Kotlin only: placeholder [index] of [bt] cleared, and the leveling guide's red rows for it. */
+    fun clearPlaceholder(bt: BuildTree, index: Int) {
+        val placeholder = bt.missing.removeAt(index)
+        val steps = build.guide.enhancements
+        for (i in steps.size - 1 downTo 0) {
+            if (guideStepFor(steps[i], bt, placeholder)) {
+                steps.removeAt(i)
+            }
+        }
+    }
+
+    /** True if [step] is a red guide row for [placeholder] of [bt]: the same tree and ability, any rank. */
+    private fun guideStepFor(step: BuildGuideEnhancement, bt: BuildTree, placeholder: MissingAbility): Boolean {
+        val text = step.missing ?: return false
+        val guideTree = build.guide.trees.getOrNull(step.missingTree - 1) ?: return false
+        if (guideTree.treeName != bt.treeName) {
+            return false
+        }
+        if (guideTree.characterClass != null && guideTree.characterClass != bt.source) {
+            return false
+        }
+        // "<tree display> Tier 1: Name[: Selector][ (Rank 2)]" against "Tier 1: Name[: Selector][ (Rank 3)]".
+        return withoutRank(text).endsWith(" " + withoutRank(placeholder.text))
+    }
+
+    /** [text] without a trailing " (Rank n)". */
+    private fun withoutRank(text: String): String {
+        val at = text.lastIndexOf(" (Rank ")
+        return if (at >= 0 && text.endsWith(")")) text.substring(0, at) else text
+    }
+
+    /** The n of a trailing " (Rank n)", or 1. */
+    private fun rankOf(text: String): Int {
+        val at = text.lastIndexOf(" (Rank ")
+        if (at < 0 || !text.endsWith(")")) {
+            return 1
+        }
+        return text.substring(at + 7, text.length - 1).toIntOrNull() ?: 1
+    }
+
     /** The blank slots left by a drag that didn't land (RemoveBlanks). */
     fun removeBlanks(bt: BuildTree) {
         enhancementRules.removeBlanks(bt)

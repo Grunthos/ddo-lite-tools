@@ -792,6 +792,7 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
                 // The tree exists but the ability doesn't: kept as a red row.
                 val step = BuildGuideEnhancement(0)
                 step.missing = value
+                step.missingTree = lookup
                 build.guide.enhancements.add(step)
                 deprecations.guide.add(GuideDeprecation(ability, value, kept = true))
                 return

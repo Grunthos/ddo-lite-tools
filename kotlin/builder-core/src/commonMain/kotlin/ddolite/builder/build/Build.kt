@@ -248,6 +248,9 @@ class BuildGuideEnhancement(val id: Int) {
      * stops reading the guide at such a step.
      */
     var missing: String? = null
+
+    /** Kotlin only: for a [missing] step, its tree (1-based in [BuildGuide.trees]). */
+    var missingTree = 0
 }
 
 /** The leveling guide. Ported from `BuildGuideType` (basBuildDefs.bas:300). */
@@ -396,6 +399,7 @@ class Build {
             ce.selector = e.selector
             ce.rank = e.rank
             ce.missing = e.missing
+            ce.missingTree = e.missingTree
             c.guide.enhancements.add(ce)
         }
         c.tier5 = tier5

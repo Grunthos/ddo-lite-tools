@@ -902,8 +902,8 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val bt = currentBuildTree() ?: return
         val slot = slotAt(bt, row) ?: return
         if (slot.placeholder) {
-            // A placeholder (Kotlin only): it goes, and isn't saved any more.
-            bt.missing.removeAt(slot.index)
+            // A placeholder (Kotlin only): it goes, with its guide rows, and isn't saved any more.
+            edits.clearPlaceholder(bt, slot.index)
             showAbilities()
             noSelection()
             treesChanged()
@@ -1101,11 +1101,13 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
                 if (choice != null && tree != null && slot != null && blank >= 0) {
                     dragComplete = true
                     // Kotlin only: dropped on a placeholder, the ability takes the blank slot (its
-                    // place in tier order) and the placeholder goes.
+                    // place in tier order) and the placeholder goes; its guide rows take the ability.
+                    val edits = TreeEdits(r, destinies = false)
+                    val ranks = tree.tiers[choice.tier][choice.ability].ranks
                     if (slot.placeholder) {
-                        bt.missing.removeAt(slot.index)
+                        edits.replacePlaceholder(bt, slot.index, choice.tier, choice.ability, choice.selector, ranks)
                     }
-                    TreeEdits(r, destinies = false).dropAbility(bt, blank + 1, choice.tier, choice.ability, tree.tiers[choice.tier][choice.ability].ranks, choice.selector)
+                    edits.dropAbility(bt, blank + 1, choice.tier, choice.ability, ranks, choice.selector)
                     showAbilities()
                     slotHover = rowOfAbility(bt, blank)
                     showAvailable()

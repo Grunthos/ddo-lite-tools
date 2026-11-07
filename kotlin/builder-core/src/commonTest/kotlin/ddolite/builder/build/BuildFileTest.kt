@@ -205,6 +205,32 @@ class BuildFileTest {
     }
 
     @Test
+    fun replacingOrClearingAPlaceholderUpdatesItsGuideRows() {
+        val text = fighter + "[Enhancements]\n\nTree: Human\nType: Race\nAbility: Tier 1: Old Name (Rank 3)\n\n" +
+            "[LevelingGuide]\n\nGuide: Hum Tier 1: Old Name (Rank 1)\nGuide: Bank AP\nGuide: Hum Tier 1: Old Name (Rank 2)\n" +
+            "Guide: Hum Tier 1: Old Name (Rank 3)\nGuide: Hum Tier 1: Other Name\n"
+
+        // Replaced by Inflame: Energy Absorption (tier 1, ability 0), here with two ranks: rows for
+        // ranks 1 and 2 become it, rank 3 stays red, and another missing ability's row is untouched.
+        val replaced = read(text)
+        val human = replaced.build.trees[0]
+        TreeEdits(replaced.rules, destinies = false).replacePlaceholder(human, 0, 1, 0, 0, 2)
+        assertTrue(human.missing.isEmpty())
+        val steps = replaced.build.guide.enhancements
+        assertEquals(listOf(1, 200, 1, 0, 0), steps.map { it.id })
+        assertEquals(listOf(1, 0, 2), listOf(steps[0].rank, steps[1].rank, steps[2].rank))
+        assertEquals("Hum Tier 1: Old Name (Rank 3)", steps[3].missing)
+        assertTrue(writeBuildText(replaced.rules).contains("Guide: Hum Tier 1: Inflame: Energy Absorption (Rank 2)\r\n"))
+
+        // Cleared: its rows go too.
+        val cleared = read(text)
+        TreeEdits(cleared.rules, destinies = false).clearPlaceholder(cleared.build.trees[0], 0)
+        val left = cleared.build.guide.enhancements
+        assertEquals(listOf(200, 0), left.map { it.id })
+        assertEquals("Hum Tier 1: Other Name", left[1].missing)
+    }
+
+    @Test
     fun vbRunTimeErrorsBecomeProblems() {
         val result = read(
             "[Overview]\n\nName: Test\nRace: Human\nMaxLevels: 300\nClass: Fighter\n\n" +
