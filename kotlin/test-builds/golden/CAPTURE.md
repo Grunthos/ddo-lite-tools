@@ -31,20 +31,21 @@ Do this for A–D, and for `Save/Eresh WFWizRog-v4.15.build` (the one sample tha
    `Golden D Messages.png`.
 2. File > Save As `Golden <build name>.build` (for example `Golden A Three Class.build`). This is
    the golden .build.
-3. File > Export > to Forums. Section: All Sections. For each Format (Code Tags, DDO Forums,
-   Plain Text, Reddit, Something Awful, The Vault), Save to File as `Golden A forum-<format>.txt`
-   (for example `Golden A forum-Plain Text.txt`).
+3. File > Export > to Forums. Section: All Sections. Save to File as `Golden A forum-<format>.txt`
+   for DDO Forums (`Golden A forum-DDO Forums.txt`: it has every option on, so it covers the most),
+   and when there's time for the others (Code Tags, Plain Text, Reddit, Something Awful,
+   The Vault). Check the Format box shows the format you mean before saving.
 4. File > Export > to DDO Builder: `Golden A ddobuilder.ddocp`. (Skip to Ron's Planner: it fails
    in VB, VB-BUGS 6a.)
 5. File > Export > Leveling Guide > csv: `Golden A guide.csv`; > txt: `Golden A guide.txt`
    (builds with a guide).
-6. Screenshots, for the colours the text exports don't carry (one window at a time, default size):
-   the main window (`Golden A Main.png`), Feats (`Golden A Feats.png`), Enhancements on a tree
-   with red slots, or the tier 5 tree if none (`Golden A Enhancements.png`), and Destinies for
-   B and D (`Golden B Destinies.png`).
-7. File > Close, then File > Open the Golden build again. If anything differs (Messages, empty
+6. File > Close, then File > Open the Golden build again. If anything differs (Messages, empty
    slots), note it in `Golden A reopen.txt`. Build D is expected to lose its deity feats here
    (VB-BUGS #7), and to show "Max: 0" in red on the Destinies window (VB-BUGS 18d).
 
-Skip a step that doesn't apply. The tests will compare Kotlin with everything here except the
-screenshots, which are for comparing by eye.
+Skip a step that doesn't apply. `VbGoldenTest` compares Kotlin with every file here (the
+screenshot excepted) as soon as it's in the folder; forum colours come from VB's theme, so it
+checks only that each colour is used consistently.
+
+Captured so far (2026-11-08): A–D's .build, DDO Forums, DDO Builder and guide csv. Still to do:
+the guide txt files, the other forum formats, and Eresh.

@@ -1,0 +1,107 @@
+[b]Golden D Errors[/b]
+12/8 Fighter/Cleric, Epic 10
+Lawful Good Dwarf
+
+
+[u]Level Order[/u]
+
+[font=courier]1. Fighter[color=#222222]. . . . . .[/color]6. [color=#FFF176]Cleric[/color][color=#222222]. . . . . .[/color]11. Fighter[color=#222222] . . . . .[/color]16. [color=#FFF176]Cleric[/color]
+2. [color=#FFF176]Cleric[/color][color=#222222]. . . . . . [/color]7. Fighter[color=#222222] . . . . .[/color]12. [color=#FFF176]Cleric[/color][color=#222222] . . . . . [/color]17. Fighter
+3. Fighter[color=#222222]. . . . . .[/color]8. [color=#FFF176]Cleric[/color][color=#222222]. . . . . .[/color]13. Fighter[color=#222222] . . . . .[/color]18. Fighter
+4. [color=#FFF176]Cleric[/color][color=#222222]. . . . . . [/color]9. Fighter[color=#222222] . . . . .[/color]14. [color=#FFF176]Cleric[/color][color=#222222] . . . . . [/color]19. Fighter
+5. Fighter[color=#222222]. . . . . [/color]10. [color=#FFF176]Cleric[/color][color=#222222]. . . . . .[/color]15. Fighter[color=#222222] . . . . .[/color]20. Fighter[/font]
+
+
+[u]Stats[/u]
+[font=courier][color=#222222]. . . . . . . .[/color][color=#FFFFFF]28pt[/color][color=#222222] . . [/color]Level Up
+[color=#222222]. . . . . . . .[/color][color=#FFFFFF]----[/color][color=#222222] . . [/color]--------
+Strength[color=#222222]. . . . [/color][color=#FFFFFF]18[/color][color=#222222]. . . .[/color]4: STR
+Dexterity[color=#222222] . . . .[/color][color=#FFFFFF]8[/color][color=#222222]. . . .[/color]8: STR
+Constitution[color=#222222]. . [/color][color=#FFFFFF]17[/color][color=#222222]. . . [/color]12: STR
+Intelligence[color=#222222]. . .[/color][color=#FFFFFF]8[/color][color=#222222]. . . [/color]16: STR
+Wisdom[color=#222222]. . . . . [/color][color=#FFFFFF]12[/color][color=#222222]. . . [/color]20: STR
+Charisma[color=#222222]. . . . .[/color][color=#FFFFFF]6[/color][color=#222222]. . . [/color]24: STR
+[color=#222222]. . . . . . . . . . . . [/color]28: STR
+
+[u]Skills[/u] [color=#FFB0B0](Errors)[/color]
+[font=courier][color=#222222]. . . . . [/color]F[color=#222222]. [/color][color=#FFF176]C[/color][color=#222222] .[/color]F[color=#222222] .[/color][color=#FFF176]C[/color][color=#222222]. [/color]F[color=#222222]. [/color][color=#FFF176]C[/color][color=#222222] .[/color]F[color=#222222] .[/color][color=#FFF176]C[/color][color=#222222]. [/color]F[color=#222222]. [/color][color=#FFF176]C[/color][color=#222222] .[/color]F[color=#222222] .[/color][color=#FFF176]C[/color][color=#222222]. [/color]F[color=#222222]. [/color][color=#FFF176]C[/color][color=#222222] .[/color]F[color=#222222] .[/color][color=#FFF176]C[/color][color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F
+[color=#222222]. . . . . [/color]1[color=#222222]. [/color][color=#FFF176]2[/color][color=#222222] .[/color]3[color=#222222] .[/color][color=#FFF176]4[/color][color=#222222]. [/color]5[color=#222222]. [/color][color=#FFF176]6[/color][color=#222222] .[/color]7[color=#222222] .[/color][color=#FFF176]8[/color][color=#222222]. [/color]9 [color=#FFF176]10[/color] 11 [color=#FFF176]12[/color] 13 [color=#FFF176]14[/color] 15 [color=#FFF176]16[/color] 17 18 19 20
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+Intim[color=#222222] . . [/color]9[color=#222222]. [/color][color=#FFF176]½[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]½[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]½[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]½[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]½[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]½[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]½[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]½[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]24
+Jump[color=#222222]. . . . .[/color][color=#FFF176]1½[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]1½
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+[color=#222222]. . . . . [/color]9[color=#222222]. [/color][color=#FFF176]4[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1
+Max[color=#222222] . . . [/color]4[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#FFF176]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#FFF176]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[/font]
+
+
+[u]Feats[/u] [color=#FFB0B0](Errors)[/color]
+
+[font=courier][color=#222222].[/color]1 Heroic : [/font]Power Attack
+[font=courier][color=#222222].[/color]1 Fighter: [/font]Weapon Focus: Slashing
+[font=courier][color=#222222].[/color]3 Heroic : [/font]Greater Two Handed Fighting [color=#C0C0C0]OR[/color] Purity of Heart
+[font=courier][color=#222222].[/color]3 Fighter: [/font]Improved Critical: Slashing
+[font=courier][color=#222222].[/color]6 Heroic : [/font]Two Handed Fighting
+[font=courier][color=#222222].[/color]7 Fighter: [/font]Weapon Specialization: Slashing
+[font=courier][color=#222222].[/color]9 Heroic : [/font]Improved Two Handed Fighting
+[font=courier]11 Fighter: [/font]Stunning Blow
+[font=courier]12 Heroic : [/font]Cleave
+[font=courier]15 Heroic : [/font]Great Cleave
+[font=courier]15 Fighter: [/font]Greater Weapon Focus: Slashing
+[font=courier]18 Heroic : [/font]Toughness
+[font=courier]18 Fighter: [/font]Heavy Armor Training
+[font=courier]20 Fighter: [/font]Greater Weapon Specialization: Slashing
+[font=courier]21 Epic[color=#222222] . [/color]: [/font]Overwhelming Critical
+[font=courier]22 Destiny: [/font]Perfect Two Handed Fighting
+[font=courier]24 Epic[color=#222222] . [/color]: [/font]Great Ability: Strength
+[font=courier]25 Destiny: [/font]
+[font=courier]27 Epic[color=#222222] . [/color]: [/font]
+[font=courier]28 Destiny: [/font]
+[font=courier]30 Epic[color=#222222] . [/color]: [/font]
+[font=courier]30 Legend : [/font]Scion of: Mechanus
+
+[font=courier][color=#222222].[/color]4 Cleric : [/font]Strength Domain
+
+[font=courier][color=#222222].[/color]2 Deity[color=#222222]. [/color]: [/font]Follower of: Onatar
+[font=courier]12 Deity[color=#222222]. [/color]: [/font]Deity Ability: Onatar's Forge
+
+
+[u]Spells[/u]
+
+[list=1][*]Cure Light Wounds (2), Bane (2), Bless (2), Cause Fear (4), Command (8), Divine Favor (14)
+[*]Cure Moderate Wounds (6), Aid (6), Bear's Endurance (6), Bull's Strength (8), Close Wounds (12)
+[*]Cure Serious Wounds (10), Bestow Curse (10), Blindness (10), Contagion (12), Dispel Magic (16)
+[*]Cure Critical Wounds (14), Chaos Hammer (14), Death Ward (14), Dismissal (16)[/list]
+
+[u]Enhancements[/u] (Spent: 83 +1r +0u / Max: 80 +1r +0u AP) [color=#FFB0B0]Errors[/color]
+
+[color=#EF9A9A]Kensei (37 AP)[list][*]Kensei Focus: Axes, Spiritual Bond[list=1][*]Weapon Group Specialization I: Axes, Extra Action Boost III, Exotic Weapon Mastery: Axes, Haste Boost, Reed in the Wind
+[*]Tactics III, Weapon Group Specialization II: Axes, Blunted Edges, Ascetic Training: Conditioning III, Improved Dodge III
+[*]Critical Mastery III, Weapon Group Specialization III: Axes, Shattering Strike, Strength
+[*]Weapon Group Specialization IV: Axes, Opportunity Attack, Strength
+[*]Weapon Master[/list][/list][/color]
+[color=#FFF176]Warpriest (33 AP)[list][*]Smite Foe: Melee, Resilience of Battle[list=1][*]Divine Might, Toughness III, Righteous Weapons I, Sacred Touch III
+[*]Smite Weakness, Wall of Steel III, Righteous Weapons II
+[*]Magic Backlash III, Righteous Weapons III, Strength
+[*]Righteous Weapons IV, Ameliorating Strike, Strength
+[*]Divine Power[/list][/list][/color]
+Stalwart Defender (13 AP)[list][*]Toughness, Stalwart Defense, Overbalance, Stand Fast[list=1][*]Item Defense III, Durable Defense III, Stalwart Defensive Mastery III[/list][/list]
+[color=#BDBDBD]Dwarf (1 AP)[list][*]Dwarven Toughness[/list][/color]
+Leveling Guide [color=#FFB0B0](Errors)[/color][list=1][*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*][color=#EF9A9A]Ken3 Critical Mastery I;[/color] [color=#BDBDBD]Dwf0 Dwarven Toughness;[/color] [color=#EF9A9A]Ken0 Kensei Focus: Axes[/color]
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*][color=#FFF176]War5 Divine Power;[/color] [color=#EF9A9A]Ken1 Extra Action Boost I[/color][/list]
+
+[u]Destinies[/u] (Spent: 13 (1 +12pdp) / Max: 12 (0 +12pdp) AP) [color=#FFB0B0]Errors[/color]
+
+Legendary Dreadnought (13 AP)[list][*]Fearless, Weaponmaster, Thick Skinned[list=1][*]Push Through The Line III, Dire Charge, Shrug Off Punishment III
+[*](none)
+[*]Strike Twice III[/list][/list]
+

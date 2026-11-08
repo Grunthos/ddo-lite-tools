@@ -1,0 +1,1218 @@
+<DDOCharacterData>
+   <Character>
+      <Name>Golden A Three Class</Name>
+      <Alignment>Lawful Good</Alignment>
+      <Race>Human</Race>
+      <AbilitySpend>
+         <AvailableSpend>32</AvailableSpend>
+         <StrSpend>2</StrSpend>
+         <DexSpend>6</DexSpend>
+         <ConSpend>7</ConSpend>
+         <IntSpend>10</IntSpend>
+         <WisSpend>0</WisSpend>
+         <ChaSpend>0</ChaSpend>
+      </AbilitySpend>
+      <GuildLevel>0</GuildLevel>
+      <StrTome>3</StrTome>
+      <DexTome>5</DexTome>
+      <ConTome>7</ConTome>
+      <IntTome>8</IntTome>
+      <WisTome>1</WisTome>
+      <ChaTome>2</ChaTome>
+      <TomeOfFate>0</TomeOfFate>
+      <SkillTomes>
+         <Balance>0</Balance>
+         <Bluff>0</Bluff>
+         <Concentration>0</Concentration>
+         <Diplomacy>0</Diplomacy>
+         <DisableDevice>0</DisableDevice>
+         <Haggle>0</Haggle>
+         <Heal>0</Heal>
+         <Hide>0</Hide>
+         <Intimidate>0</Intimidate>
+         <Jump>0</Jump>
+         <Listen>0</Listen>
+         <MoveSilently>0</MoveSilently>
+         <OpenLock>0</OpenLock>
+         <Perform>0</Perform>
+         <Repair>0</Repair>
+         <Search>0</Search>
+         <SpellCraft>0</SpellCraft>
+         <Spot>0</Spot>
+         <Swim>0</Swim>
+         <Tumble>0</Tumble>
+         <UMD>0</UMD>
+      </SkillTomes>
+      <SpecialFeats/>
+      <ActiveStances/>
+      <Level4>Intelligence</Level4>
+      <Level8>Intelligence</Level8>
+      <Level12>Intelligence</Level12>
+      <Level16>Intelligence</Level16>
+      <Level20>Intelligence</Level20>
+      <Level24>Strength</Level24>
+      <Level28>Strength</Level28>
+      <Level32>Strength</Level32>
+      <Level36>Strength</Level36>
+      <Class1>Wizard</Class1>
+      <Class2>Rogue</Class2>
+      <Class3>Fighter</Class3>
+      <SelectedEnhancementTrees>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+      </SelectedEnhancementTrees>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>52</SkillPointsAvailable>
+         <SkillPointsSpent>52</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Toughness</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>0</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Least Dragonmark of Passage</FeatName>
+               <Type>HumanBonus</Type>
+               <LevelTrainedAt>0</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Balance</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Balance</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Balance</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Balance</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Hide</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Hide</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Hide</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Hide</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Intimidate</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Intimidate</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Intimidate</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Intimidate</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Jump</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Jump</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Jump</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Jump</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Move Silently</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Move Silently</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Move Silently</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Move Silently</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>8</SkillPointsAvailable>
+         <SkillPointsSpent>8</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Spell Focus: Evocation</FeatName>
+               <Type>Metamagic</Type>
+               <LevelTrainedAt>1</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Fighter</Class>
+         <SkillPointsAvailable>8</SkillPointsAvailable>
+         <SkillPointsSpent>8</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Two Weapon Fighting</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>2</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Weapon Focus: Piercing Weapons</FeatName>
+               <Type>FighterBonus</Type>
+               <LevelTrainedAt>2</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Fighter</Class>
+         <SkillPointsAvailable>9</SkillPointsAvailable>
+         <SkillPointsSpent>9</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Power Attack</FeatName>
+               <Type>FighterBonus</Type>
+               <LevelTrainedAt>3</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>9</SkillPointsAvailable>
+         <SkillPointsSpent>9</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>15</SkillPointsAvailable>
+         <SkillPointsSpent>15</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Extend Spell</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>5</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>9</SkillPointsAvailable>
+         <SkillPointsSpent>9</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Fighter</Class>
+         <SkillPointsAvailable>10</SkillPointsAvailable>
+         <SkillPointsSpent>10</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>10</SkillPointsAvailable>
+         <SkillPointsSpent>10</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Maximize</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>8</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>16</SkillPointsAvailable>
+         <SkillPointsSpent>16</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>10</SkillPointsAvailable>
+         <SkillPointsSpent>10</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Quicken</FeatName>
+               <Type>Metamagic</Type>
+               <LevelTrainedAt>10</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Fighter</Class>
+         <SkillPointsAvailable>11</SkillPointsAvailable>
+         <SkillPointsSpent>11</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Improved Critical: Piercing Weapons</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>11</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Precision</FeatName>
+               <Type>FighterBonus</Type>
+               <LevelTrainedAt>11</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>17</SkillPointsAvailable>
+         <SkillPointsSpent>17</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>11</SkillPointsAvailable>
+         <SkillPointsSpent>11</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>17</SkillPointsAvailable>
+         <SkillPointsSpent>17</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Toughness</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>14</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>12</SkillPointsAvailable>
+         <SkillPointsSpent>12</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Rogue</Class>
+         <SkillPointsAvailable>18</SkillPointsAvailable>
+         <SkillPointsSpent>18</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spellcraft</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>12</SkillPointsAvailable>
+         <SkillPointsSpent>12</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Heighten</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>17</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>12</SkillPointsAvailable>
+         <SkillPointsSpent>12</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Wizard</Class>
+         <SkillPointsAvailable>13</SkillPointsAvailable>
+         <SkillPointsSpent>13</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Enlarge Spell</FeatName>
+               <Type>Metamagic</Type>
+               <LevelTrainedAt>19</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Disable Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Open Lock</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Search</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Spot</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Tumble</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Use Magic Device</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <ActiveEpicDestiny/>
+      <FatePoints>5</FatePoints>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <ActiveGear>Standard</ActiveGear>
+      <EquippedGear>
+         <Name>Standard</Name>
+      </EquippedGear>
+   </Character>
+</DDOCharacterData>

@@ -1,0 +1,512 @@
+<DDOCharacterData>
+   <Character>
+      <Name>Golden B Epic Caster</Name>
+      <Alignment>Lawful Good</Alignment>
+      <Race>Aasimar</Race>
+      <AbilitySpend>
+         <AvailableSpend>36</AvailableSpend>
+         <StrSpend>2</StrSpend>
+         <DexSpend>2</DexSpend>
+         <ConSpend>8</ConSpend>
+         <IntSpend>0</IntSpend>
+         <WisSpend>10</WisSpend>
+         <ChaSpend>6</ChaSpend>
+      </AbilitySpend>
+      <GuildLevel>0</GuildLevel>
+      <StrTome>0</StrTome>
+      <DexTome>0</DexTome>
+      <ConTome>6</ConTome>
+      <IntTome>0</IntTome>
+      <WisTome>8</WisTome>
+      <ChaTome>4</ChaTome>
+      <TomeOfFate>0</TomeOfFate>
+      <SkillTomes>
+         <Balance>0</Balance>
+         <Bluff>0</Bluff>
+         <Concentration>0</Concentration>
+         <Diplomacy>0</Diplomacy>
+         <DisableDevice>0</DisableDevice>
+         <Haggle>0</Haggle>
+         <Heal>0</Heal>
+         <Hide>0</Hide>
+         <Intimidate>0</Intimidate>
+         <Jump>0</Jump>
+         <Listen>0</Listen>
+         <MoveSilently>0</MoveSilently>
+         <OpenLock>0</OpenLock>
+         <Perform>0</Perform>
+         <Repair>0</Repair>
+         <Search>0</Search>
+         <SpellCraft>0</SpellCraft>
+         <Spot>0</Spot>
+         <Swim>0</Swim>
+         <Tumble>0</Tumble>
+         <UMD>0</UMD>
+      </SkillTomes>
+      <SpecialFeats>
+         <TrainedFeat>
+            <FeatName>Past Life: Cleric</FeatName>
+            <Type>Special</Type>
+            <LevelTrainedAt>0</LevelTrainedAt>
+         </TrainedFeat>
+         <TrainedFeat>
+            <FeatName>Past Life: Favored Soul</FeatName>
+            <Type>Special</Type>
+            <LevelTrainedAt>0</LevelTrainedAt>
+         </TrainedFeat>
+      </SpecialFeats>
+      <ActiveStances/>
+      <Level4>Wisdom</Level4>
+      <Level8>Wisdom</Level8>
+      <Level12>Wisdom</Level12>
+      <Level16>Wisdom</Level16>
+      <Level20>Wisdom</Level20>
+      <Level24>Wisdom</Level24>
+      <Level28>Wisdom</Level28>
+      <Level32>Wisdom</Level32>
+      <Level36>Strength</Level36>
+      <Class1>Favored Soul</Class1>
+      <Class2>Warlock</Class2>
+      <Class3>Unknown</Class3>
+      <SelectedEnhancementTrees>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+         <TreeName>No Selection</TreeName>
+      </SelectedEnhancementTrees>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>4</SkillPointsAvailable>
+         <SkillPointsSpent>4</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Maximize</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>0</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Bond of the Protector</FeatName>
+               <Type>AasimarBond</Type>
+               <LevelTrainedAt>0</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Follower of the Silver Flame</FeatName>
+               <Type>FollowerOf</Type>
+               <LevelTrainedAt>0</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Grace of Battle</FeatName>
+               <Type>FavoredSoulBattle</Type>
+               <LevelTrainedAt>1</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Past Life: Initiate of the Faith</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>2</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Energy Absorption: Fire</FeatName>
+               <Type>EnergyResistance</Type>
+               <LevelTrainedAt>4</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Empower Healing Spell</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>5</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Silver Flame Exorcism</FeatName>
+               <Type>Deity</Type>
+               <LevelTrainedAt>5</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Warlock</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Warlock</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Augment Summoning</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>8</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Purity of Heart</FeatName>
+               <Type>FavoredSoulHeart</Type>
+               <LevelTrainedAt>8</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Empower Spell</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>11</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Energy Absorption: Cold</FeatName>
+               <Type>EnergyResistance</Type>
+               <LevelTrainedAt>11</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Spell Focus: Evocation</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>14</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Energy Absorption: Electricity</FeatName>
+               <Type>EnergyResistance</Type>
+               <LevelTrainedAt>16</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Heighten</FeatName>
+               <Type>Standard</Type>
+               <LevelTrainedAt>17</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Favored Soul</Class>
+         <SkillPointsAvailable>1</SkillPointsAvailable>
+         <SkillPointsSpent>1</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+         <TrainedSkill>
+            <Skill>Concentration</Skill>
+         </TrainedSkill>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Great Wisdom</FeatName>
+               <Type>EpicFeat</Type>
+               <LevelTrainedAt>20</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Epic Spell Power: Light</FeatName>
+               <Type>EpicDestinyFeat</Type>
+               <LevelTrainedAt>21</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Intensify Spell</FeatName>
+               <Type>EpicFeat</Type>
+               <LevelTrainedAt>23</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Epic Spell Power: Positive</FeatName>
+               <Type>EpicDestinyFeat</Type>
+               <LevelTrainedAt>24</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Great Wisdom</FeatName>
+               <Type>EpicFeat</Type>
+               <LevelTrainedAt>26</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Fount of Life</FeatName>
+               <Type>EpicDestinyFeat</Type>
+               <LevelTrainedAt>27</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats/>
+      </LevelTraining>
+      <LevelTraining>
+         <Class>Epic</Class>
+         <SkillPointsAvailable>0</SkillPointsAvailable>
+         <SkillPointsSpent>0</SkillPointsSpent>
+         <AutomaticFeats/>
+         <TrainedFeats>
+            <TrainedFeat>
+               <FeatName>Master of Fire and Light</FeatName>
+               <Type>EpicFeat</Type>
+               <LevelTrainedAt>29</LevelTrainedAt>
+            </TrainedFeat>
+            <TrainedFeat>
+               <FeatName>Scion of Celestia</FeatName>
+               <Type>Legendary</Type>
+               <LevelTrainedAt>29</LevelTrainedAt>
+            </TrainedFeat>
+         </TrainedFeats>
+      </LevelTraining>
+      <ActiveEpicDestiny/>
+      <FatePoints>5</FatePoints>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <TwistOfFate>
+         <Tier>0</Tier>
+      </TwistOfFate>
+      <ActiveGear>Standard</ActiveGear>
+      <EquippedGear>
+         <Name>Standard</Name>
+      </EquippedGear>
+   </Character>
+</DDOCharacterData>

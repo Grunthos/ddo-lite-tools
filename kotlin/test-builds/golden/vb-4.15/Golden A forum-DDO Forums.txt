@@ -1,0 +1,89 @@
+[b]Golden A Three Class[/b]
+10/6/4 Wizard/Rogue/Fighter
+Lawful Good Human
+
+
+[u]Level Order[/u]
+
+[font=courier]1. [color=#EF9A9A]Rogue[/color][color=#222222] . . . . . . [/color]6. [color=#EF9A9A]Rogue[/color][color=#222222]. . . . . . [/color]11. Wizard[color=#222222] . . . . . [/color]16. Wizard
+2. Wizard[color=#222222] . . . . . .[/color]7. Wizard[color=#222222] . . . . . [/color]12. [color=#90CAF9]Fighter[/color][color=#222222] . . . . .[/color]17. [color=#EF9A9A]Rogue[/color]
+3. [color=#90CAF9]Fighter[/color][color=#222222] . . . . . [/color]8. [color=#90CAF9]Fighter[/color][color=#222222]. . . . . [/color]13. [color=#EF9A9A]Rogue[/color][color=#222222] . . . . . .[/color]18. Wizard
+4. [color=#90CAF9]Fighter[/color][color=#222222] . . . . . [/color]9. Wizard[color=#222222]. . . . . .[/color]14. Wizard[color=#222222]. . . . . .[/color]19. Wizard
+5. Wizard[color=#222222] . . . . . [/color]10. [color=#EF9A9A]Rogue[/color][color=#222222] . . . . . .[/color]15. [color=#EF9A9A]Rogue[/color][color=#222222]. . . . . . [/color]20. Wizard[/font]
+
+
+[u]Stats[/u]
+[font=courier][color=#222222]. . . . . . . .[/color][color=#C0C0C0]28pt[/color][color=#222222] . . [/color][color=#FFFFFF]32pt[/color][color=#222222]. . .[/color][color=#C0C0C0]34pt[/color][color=#222222] . . [/color][color=#C0C0C0]36pt[/color][color=#222222]. . .[/color]Tome[color=#222222]. . .[/color]Level Up
+[color=#222222]. . . . . . . .[/color][color=#C0C0C0]----[/color][color=#222222] . . [/color][color=#FFFFFF]----[/color][color=#222222]. . .[/color][color=#C0C0C0]----[/color][color=#222222] . . [/color][color=#C0C0C0]----[/color][color=#222222]. . .[/color][color=#FFFFFF]----[/color][color=#222222] . . [/color]--------
+Strength[color=#222222]. . . . .[/color][color=#C0C0C0]8[/color][color=#222222]. . . .[/color][color=#FFFFFF]10[/color][color=#222222] . . . [/color][color=#C0C0C0]10[/color][color=#222222]. . . .[/color][color=#C0C0C0]10[/color][color=#222222] . . . [/color]+3[color=#222222] . . . [/color]4: INT
+Dexterity[color=#222222] . . . [/color][color=#C0C0C0]14[/color][color=#222222]. . . .[/color][color=#FFFFFF]14[/color][color=#222222] . . . [/color][color=#C0C0C0]15[/color][color=#222222]. . . .[/color][color=#C0C0C0]15[/color][color=#222222] . . . [/color]+5[color=#222222] . . . [/color]8: INT
+Constitution[color=#222222]. . [/color][color=#C0C0C0]14[/color][color=#222222]. . . .[/color][color=#FFFFFF]15[/color][color=#222222] . . . [/color][color=#C0C0C0]15[/color][color=#222222]. . . .[/color][color=#C0C0C0]16[/color][color=#222222] . . . [/color]+7[color=#222222] . . .[/color]12: INT
+Intelligence[color=#222222]. . [/color][color=#C0C0C0]18[/color][color=#222222]. . . .[/color][color=#FFFFFF]18[/color][color=#222222] . . . [/color][color=#C0C0C0]18[/color][color=#222222]. . . .[/color][color=#C0C0C0]18[/color][color=#222222] . . . [/color]+7[color=#222222] . . .[/color]16: INT
+Wisdom[color=#222222]. . . . . .[/color][color=#C0C0C0]8[/color][color=#222222]. . . . [/color][color=#FFFFFF]8[/color][color=#222222] . . . .[/color][color=#C0C0C0]8[/color][color=#222222]. . . . [/color][color=#C0C0C0]8[/color][color=#222222] . . . [/color]+1[color=#222222] . . .[/color]20: INT
+Charisma[color=#222222]. . . . .[/color][color=#C0C0C0]8[/color][color=#222222]. . . . [/color][color=#FFFFFF]8[/color][color=#222222] . . . .[/color][color=#C0C0C0]8[/color][color=#222222]. . . . [/color][color=#C0C0C0]8[/color][color=#222222] . . . [/color]+2
+
+[u]Skills[/u]
+[font=courier][color=#222222]. . . . . [/color][color=#EF9A9A]R[/color][color=#222222] .[/color]W[color=#222222] .[/color][color=#90CAF9]F[/color][color=#222222]. [/color][color=#90CAF9]F[/color][color=#222222] .[/color]W[color=#222222] .[/color][color=#EF9A9A]R[/color][color=#222222]. [/color]W[color=#222222]. [/color][color=#90CAF9]F[/color][color=#222222] .[/color]W[color=#222222] .[/color][color=#EF9A9A]R[/color][color=#222222]. [/color]W[color=#222222]. [/color][color=#90CAF9]F[/color][color=#222222] .[/color][color=#EF9A9A]R[/color][color=#222222]. [/color]W[color=#222222]. [/color][color=#EF9A9A]R[/color][color=#222222] .[/color]W[color=#222222] .[/color][color=#EF9A9A]R[/color][color=#222222]. [/color]W[color=#222222]. [/color]W[color=#222222]. [/color]W
+[color=#222222]. . . . . [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]2[color=#222222] .[/color][color=#90CAF9]3[/color][color=#222222]. [/color][color=#90CAF9]4[/color][color=#222222] .[/color]5[color=#222222] .[/color][color=#EF9A9A]6[/color][color=#222222]. [/color]7[color=#222222]. [/color][color=#90CAF9]8[/color][color=#222222] .[/color]9 [color=#EF9A9A]10[/color] 11 [color=#90CAF9]12[/color] [color=#EF9A9A]13[/color] 14 [color=#EF9A9A]15[/color] 16 [color=#EF9A9A]17[/color] 18 19 20
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+Disable[color=#222222] . [/color][color=#EF9A9A]4[/color][color=#222222] . . . .[/color][color=#90CAF9]½[/color][color=#222222]. [/color]½[color=#222222]. [/color][color=#EF9A9A]4[/color][color=#222222] .[/color]½[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1½[/color] [color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+Open Lo[color=#222222] . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . .[/color][color=#EF9A9A]5[/color][color=#222222]. . . . . .[/color][color=#EF9A9A]4[/color][color=#222222]. . . . [/color][color=#EF9A9A]3[/color][color=#222222] .[/color]½[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color]1[color=#222222] .[/color]1½ 23
+Search[color=#222222]. . [/color][color=#EF9A9A]4[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+Spot[color=#222222]. . . [/color][color=#EF9A9A]4[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+Tumble[color=#222222]. . [/color][color=#EF9A9A]4[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+UMD[color=#222222] . . . [/color][color=#EF9A9A]4[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#EF9A9A]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#EF9A9A]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+Spellcr[color=#222222] . [/color][color=#EF9A9A]2[/color][color=#222222] . . . . . . .[/color][color=#EF9A9A]1[/color][color=#222222]. . . . . .[/color][color=#EF9A9A]3½[/color][color=#222222] . . . [/color][color=#EF9A9A]4½[/color][color=#222222]. . [/color][color=#EF9A9A]5½[/color][color=#222222]. . [/color][color=#EF9A9A]3½[/color][color=#222222]. . . . . [/color]20
+Concent[color=#222222] . [/color][color=#EF9A9A]2[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . [/color][color=#EF9A9A]2½[/color][color=#222222]. . . . . .[/color]4½
+Intim[color=#222222] . . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]4
+Balance[color=#222222] . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]4
+Jump[color=#222222]. . . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]4
+Hide[color=#222222]. . . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]4
+Move Si[color=#222222] . [/color][color=#EF9A9A]4[/color][color=#222222] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .[/color]4
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+[color=#222222]. . . . .[/color][color=#EF9A9A]52[/color][color=#222222] .[/color]8[color=#222222] .[/color][color=#90CAF9]8[/color][color=#222222]. [/color][color=#90CAF9]9[/color][color=#222222] .[/color]9 [color=#EF9A9A]15[/color][color=#222222] .[/color]9 [color=#90CAF9]10[/color] 10 [color=#EF9A9A]16[/color] 10 [color=#90CAF9]11[/color] [color=#EF9A9A]17[/color] 11 [color=#EF9A9A]17[/color] 12 [color=#EF9A9A]18[/color] 12 12 13[/font]
+
+
+[u]Feats[/u]
+
+[font=courier][color=#222222].[/color]1 Heroic : [/font]Toughness [color=#C0C0C0]OR[/color] Dodge
+[font=courier][color=#222222].[/color]1 Human[color=#222222]. [/color]: [/font]Least Dragonmark: Passage
+[font=courier][color=#222222].[/color]2 Wizard : [/font]Spell Focus: Evocation
+[font=courier][color=#222222].[/color]3 Heroic : [/font]Two Weapon Fighting
+[font=courier][color=#222222].[/color]3 Fighter: [/font]Weapon Focus: Piercing
+[font=courier][color=#222222].[/color]4 Fighter: [/font]Power Attack
+[font=courier][color=#222222].[/color]6 Heroic : [/font]Empower Spell
+[font=courier][color=#222222].[/color]9 Heroic : [/font]Maximize Spell
+[font=courier]11 Wizard : [/font]Quicken Spell
+[font=courier]12 Heroic : [/font]Improved Critical: Piercing
+[font=courier]12 Fighter: [/font]Precision
+[font=courier]15 Heroic : [/font]Toughness
+[font=courier]15 [color=#90CAF9]Swap[/color][color=#222222]. .[/color]: [/font]Extend Spell [color=#C0C0C0]replaces[/color] Empower Spell
+[font=courier]18 Heroic : [/font]Heighten Spell [color=#C0C0C0]OR[/color] Spell Penetration
+[font=courier]20 Wizard : [/font]Enlarge Spell
+
+
+[u]Spells[/u]
+
+[list=1][*]Acid Spray (2), Burning Hands (2), Charm Person (2), Cause Fear (5), Chill Touch (16)
+[*]Bear's Endurance (7), Blindness (7), Blur (9), Bull's Strength (14), Cat's Grace (19)
+[*]Acid Blast (11), Chain Missiles (11), Deep Slumber (14), Dispel Magic (18)
+[*]Acid Rain (16), Bestow Curse (16), Burning Blood (18), Charm Monster (20)
+[*]Ball Lightning (19), Break Enchantment (19), Cloudkill (20)[/list]
+
+[u]Enhancements[/u] (Spent: 62 +3r +3u / Max: 80 +3r +4u AP)
+
+[color=#90CAF9]Archmage (40 AP)[list][*]Archmage Specialization: Evocation, Archmage Specialization II: Evocation[list=1][*]Energy of the Scholar III, Spell Critical, Wand and Scroll Mastery III, Subtle Spellcasting III
+[*]Efficient Maximize III, Spell Critical II, Spellcraft III
+[*]Spell Critical III, Spell Penetration III, Intelligence
+[*]Spell Critical IV, Intelligence, School Mastery: Evocation, Efficient Heighten II
+[*]Arcane Supremacy, Spell Mastery[/list][/list][/color]
+[color=#81C784]Thief-Acrobat (14 AP)[list][*]Staff Control, Stick Fighting[list=1][*]Thief Acrobatics III, Fast Movement, Charming III
+[*]Haste Boost, Subtlety II[/list][/list][/color]
+[color=#EF9A9A]Kensei (7 AP)[list][*]Kensei Focus: Light Blades[list=1][*]Weapon Group Specialization I: Light Blades, Haste Boost, Extra Action Boost II[/list][/list][/color]
+[color=#BDBDBD]Human (4 AP)[list][*]Human Spell Power Boost[list=1][*]Orien Dragonmark Focus III[/list][/list][/color]
+[color=#FFF176]Falconry (3 AP)[list][*]Summon Avian Companion: Raven[list=1][*]Hunter's Knowledge, Rugged I[/list][/list][/color]
+Leveling Guide[list=1][*][color=#BDBDBD]Hum0 Human Spell Power Boost;[/color] [color=#81C784]TA0 Staff Control;[/color] [color=#BDBDBD]Hum1 Orien Dragonmark Focus I[/color]
+[*][color=#90CAF9]AM0 Archmage Specialization: Evocation; AM1 Energy of the Scholar I, II[/color]
+[*][color=#EF9A9A]Ken0 Kensei Focus: Light Blades; Ken1 Haste Boost;[/color] (Bank 6 AP)
+[*]Reset Kensei[color=#90CAF9][list][*]Archmage[list=1][*]Spell Critical[/list][/list][/color][color=#FFF176][list][*]Falconry: Summon Avian Companion: Raven[/list][/color][*]Reset All Trees[color=#90CAF9][list][*]Archmage: Archmage Specialization: Evocation[list=1][*]Spell Critical[/list][/list][/color][/list]
+

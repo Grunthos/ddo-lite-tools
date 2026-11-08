@@ -1,0 +1,115 @@
+[b]Golden B Epic Caster[/b]
+18/2 Favored Soul/Warlock, Epic 14
+Lawful Good Aasimar
+
+
+[u]Level Order[/u]
+
+[font=courier]1. Favored Soul[color=#222222] . . .[/color]6. Favored Soul[color=#222222] . . [/color]11. Favored Soul[color=#222222] . . [/color]16. Favored Soul
+2. Favored Soul[color=#222222] . . .[/color]7. [color=#CE93D8]Warlock[/color][color=#222222] . . . . .[/color]12. Favored Soul[color=#222222]. . .[/color]17. Favored Soul
+3. Favored Soul[color=#222222] . . .[/color]8. [color=#CE93D8]Warlock[/color][color=#222222] . . . . .[/color]13. Favored Soul[color=#222222]. . .[/color]18. Favored Soul
+4. Favored Soul[color=#222222] . . .[/color]9. Favored Soul[color=#222222] . . [/color]14. Favored Soul[color=#222222] . . [/color]19. Favored Soul
+5. Favored Soul[color=#222222] . . [/color]10. Favored Soul[color=#222222] . . [/color]15. Favored Soul[color=#222222] . . [/color]20. Favored Soul[/font]
+
+
+[u]Stats[/u]
+[font=courier][color=#222222]. . . . . . . .[/color][color=#FFFFFF]36pt[/color][color=#222222] . . [/color]Tome[color=#222222] . . [/color]Level Up
+[color=#222222]. . . . . . . .[/color][color=#FFFFFF]----[/color][color=#222222] . . [/color][color=#FFFFFF]----[/color][color=#222222]. . .[/color]--------
+Strength[color=#222222]. . . . [/color][color=#FFFFFF]10[/color][color=#222222]. . . . . . . . [/color]4: WIS
+Dexterity[color=#222222] . . . [/color][color=#FFFFFF]10[/color][color=#222222]. . . . . . . . [/color]8: WIS
+Constitution[color=#222222]. . [/color][color=#FFFFFF]16[/color][color=#222222]. . . .[/color]+6[color=#222222]. . . [/color]12: WIS
+Intelligence[color=#222222]. . .[/color][color=#FFFFFF]8[/color][color=#222222]. . . . . . . .[/color]16: WIS
+Wisdom[color=#222222]. . . . . [/color][color=#FFFFFF]20[/color][color=#222222]. . . .[/color]+8[color=#222222]. . . [/color]20: WIS
+Charisma[color=#222222]. . . . [/color][color=#FFFFFF]14[/color][color=#222222]. . . .[/color]+4[color=#222222]. . . [/color]24: WIS
+[color=#222222]. . . . . . . . . . . . . . . . .[/color]28: WIS
+[color=#222222]. . . . . . . . . . . . . . . . .[/color]32: WIS
+
+[u]Skills[/u]
+[font=courier][color=#222222]. . . . . [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color][color=#CE93D8]W[/color][color=#222222] .[/color][color=#CE93D8]W[/color][color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F[color=#222222]. [/color]F
+[color=#222222]. . . . . [/color]1[color=#222222]. [/color]2[color=#222222]. [/color]3[color=#222222]. [/color]4[color=#222222]. [/color]5[color=#222222]. [/color]6[color=#222222]. [/color][color=#CE93D8]7[/color][color=#222222] .[/color][color=#CE93D8]8[/color][color=#222222]. [/color]9 10 11 12 13 14 15 16 17 18 19 20
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+Concent[color=#222222] . [/color]4[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color][color=#CE93D8]1[/color][color=#222222] .[/color][color=#CE93D8]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]23
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+[color=#222222]. . . . . [/color]4[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color][color=#CE93D8]1[/color][color=#222222] .[/color][color=#CE93D8]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[/font]
+
+
+[u]Feats[/u]
+
+[font=courier][color=#222222].[/color]1 Heroic : [/font]Maximize Spell
+[font=courier][color=#222222].[/color]3 Heroic : [/font]Past Life: Cleric
+[font=courier][color=#222222].[/color]6 Heroic : [/font]Empower Healing Spell
+[font=courier][color=#222222].[/color]9 Heroic : [/font]Quicken Spell
+[font=courier]12 Heroic : [/font]Empower Spell
+[font=courier]15 Heroic : [/font]Spell Focus: Evocation
+[font=courier]18 Heroic : [/font]Heighten Spell
+[font=courier]18 [color=#90CAF9]Swap[/color][color=#222222]. .[/color]: [/font]Augment Summoning [color=#C0C0C0]replaces[/color] Quicken Spell
+[font=courier]21 Epic[color=#222222] . [/color]: [/font]Great Ability: Wisdom [color=#C0C0C0]OR[/color] Charisma
+[font=courier]22 Destiny: [/font]Epic Spell Power: Light and Alignment
+[font=courier]24 Epic[color=#222222] . [/color]: [/font]Intensify Spell
+[font=courier]25 Destiny: [/font]Epic Spell Power: Positive
+[font=courier]27 Epic[color=#222222] . [/color]: [/font]Great Ability: Wisdom
+[font=courier]28 Destiny: [/font]Fount of Life
+[font=courier]30 Epic[color=#222222] . [/color]: [/font]Master of Fire and Light
+[font=courier]30 Legend : [/font]Scion of: Celestia
+[font=courier]31 Destiny: [/font]Guardian Angel
+[font=courier]33 Epic[color=#222222] . [/color]: [/font]Embolden Spell
+[font=courier]34 Destiny: [/font]Deific Warding
+
+[font=courier][color=#222222].[/color]1 Aasimar: [/font]Bond: Bond of the Protector
+
+[font=courier][color=#222222].[/color]7 Warlock: [/font]Pact: Celestial
+
+[font=courier][color=#222222].[/color]2 FavSoul: [/font]Grace of Battle
+[font=courier][color=#222222].[/color]9 FavSoul: [/font]Purity of Heart
+
+[font=courier][color=#222222].[/color]5 FavSoul: [/font]Energy Absorption: Fire
+[font=courier]12 FavSoul: [/font]Energy Absorption: Cold
+[font=courier]17 FavSoul: [/font]Energy Absorption: Electricity
+
+[font=courier][color=#222222].[/color]1 Deity[color=#222222]. [/color]: [/font]Follower of: Silver Flame
+[font=courier][color=#222222].[/color]6 Deity[color=#222222]. [/color]: [/font]Deity Ability: Silver Flame Exorcism
+
+
+[u]Spells[/u]
+
+Favored Soul[list=1][*]Bane (1), Bless (1), Cause Fear (2), Command (3)
+[*]Aid (4), Bear's Endurance (5), Bull's Strength (9), Close Wounds (11)
+[*]Bestow Curse (6), Blindness (9), Contagion (11), Cure Serious Wounds (13)
+[*]Chaos Hammer (10), Cure Critical Wounds (11), Death Ward (13), Dismissal (15)
+[*]Break Enchantment (12), Divine Punishment (13), Flame Strike (15), Greater Command (17)
+[*]Banishment (14), Blade Barrier (15), Cometfall (17)
+[*]Destruction (16), Greater Restoration (17), Mass Cure Serious Wounds (19)
+[*]Death Pact (18), Fire Storm (19)
+[*]Celestial Bombardment (20)[/list]
+Warlock[list=1][*]Bane (7), Cause Fear (8), Bless (8)[/list]
+
+[u]Enhancements[/u] (Spent: 73 +2r +0u / Max: 80 +2r +0u AP)
+
+[color=#FFF176]Beacon of Hope (41 AP)[list][*]Pleasant Disposition, Beacon of Grace, Shining Light, Beacon of Hope, Flight of Glory[list=1][*]Spell Critical, Spell Points III, Divine Durability III, Good Hope
+[*]Spell Critical II, Close Wounds, Might's Reward: Wisdom, Divine Durability III
+[*]Spell Critical III, Efficient Empower Healing, Wisdom
+[*]Spell Critical IV, Wisdom, Optimism, Death Ward
+[*]Hope for Success, Heal, Undying Beacon, Raise Dead[/list][/list][/color]
+[color=#EF9A9A]Angel of Vengeance (20 AP)[list][*]Font of Power, Shield of Condemnation[list=1][*]Nimbus of Light, Scourge III, Angelic Resistance II, Inquisition II
+[*]Spell Power Boost, Efficient Maximize I, Just Reward III, Wand and Scroll Mastery III[/list][/list][/color]
+[color=#BDBDBD]Aasimar (8 AP)[list][*]Stronger Bonds, Stronger Bonds II: Protector[list=1][*]Fight the Wicked, Counsel III, True Resilience: Protector II[/list][/list][/color]
+[color=#CE93D8]Tainted Scholar (6 AP)[list][*]Tainted Spellcasting[list=1][*]Planar Power III, Eldritch Focus II[/list][/list][/color]
+Leveling Guide[list=1][*][color=#BDBDBD]Aas0 Stronger Bonds[/color]
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*](Bank AP)
+[*][color=#CE93D8]TS0 Tainted Spellcasting;[/color] [color=#BDBDBD]Aas1 Counsel I;[/color] [color=#FFF176]BoH0 Pleasant Disposition; BoH1 Spell Critical;[/color] [color=#EF9A9A]AoV0 Font of Power;[/color] (Bank 23 AP)
+[*][color=#FFF176]BoH1 Divine Durability I[/color][/list]
+
+[u]Destinies[/u] (Spent: 53 (38 +15pdp) / Max: 71 (56 +15pdp) AP)
+
+Exalted Angel (44 AP)[list][*]Astral Touch, Deepening Faith, Angelic Charge, Heavenly Blessing[list=1][*]Subtle Flame III, Born By Flame III, Angelic Form, Healing Pillar
+[*]Divine Protection III, Saving Grace III, Angelic Body
+[*]Evocation III, Sun Bolt, Angelic Soul, Purity of Mind and Soul III
+[*]Blood and Radiance, Holy Presence, Empower III
+[*]Enhanced Angelic Spell Focus III, Holy Fireball, Ascendance, Intensify[/list][/list]
+Divine Crusader (8 AP)[list][*]Just Cause, Confront any Foe[list=1][*]Spear of Light III, Consecration, Shield of Justice II[/list][/list]
+Unyielding Sentinel (1 AP)[list][*]Unyielding[/list]
+

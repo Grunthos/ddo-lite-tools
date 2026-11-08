@@ -1,0 +1,83 @@
+[b]Golden C Iconic Divine Artificer[/b]
+13/7 Cleric/Artificer
+Lawful Neutral Purple Dragon Knight
+
+
+[u]Level Order[/u]
+
+[font=courier]1. Cleric[color=#222222] . . . . . .[/color]6. Cleric[color=#222222] . . . . . [/color]11. [color=#90CAF9]Artificer[/color][color=#222222] . . . .[/color]16. Cleric
+2. Cleric[color=#222222] . . . . . .[/color]7. [color=#90CAF9]Artificer[/color][color=#222222] . . . .[/color]12. Cleric[color=#222222]. . . . . .[/color]17. [color=#90CAF9]Artificer[/color]
+3. Cleric[color=#222222] . . . . . .[/color]8. Cleric[color=#222222] . . . . . [/color]13. [color=#90CAF9]Artificer[/color][color=#222222] . . . .[/color]18. Cleric
+4. Cleric[color=#222222] . . . . . .[/color]9. [color=#90CAF9]Artificer[/color][color=#222222] . . . .[/color]14. Cleric[color=#222222]. . . . . .[/color]19. [color=#90CAF9]Artificer[/color]
+5. Cleric[color=#222222] . . . . . [/color]10. Cleric[color=#222222] . . . . . [/color]15. [color=#90CAF9]Artificer[/color][color=#222222] . . . .[/color]20. Cleric[/font]
+
+
+[u]Stats[/u]
+[font=courier][color=#222222]. . . . . . . .[/color][color=#FFFFFF]34pt[/color][color=#222222] . . [/color]Tome[color=#222222] . . [/color]Level Up
+[color=#222222]. . . . . . . .[/color][color=#FFFFFF]----[/color][color=#222222] . . [/color][color=#FFFFFF]----[/color][color=#222222]. . .[/color]--------
+Strength[color=#222222]. . . . [/color][color=#FFFFFF]10[/color][color=#222222]. . . . . . . . [/color]4: WIS
+Dexterity[color=#222222] . . . .[/color][color=#FFFFFF]8[/color][color=#222222]. . . . . . . . [/color]8: WIS
+Constitution[color=#222222]. . [/color][color=#FFFFFF]15[/color][color=#222222]. . . . . . . .[/color]12: WIS
+Intelligence[color=#222222]. . [/color][color=#FFFFFF]15[/color][color=#222222]. . . . . . . .[/color]16: WIS
+Wisdom[color=#222222]. . . . . [/color][color=#FFFFFF]18[/color][color=#222222]. . . .[/color]+3[color=#222222]. . . [/color]20: WIS
+Charisma[color=#222222]. . . . .[/color][color=#FFFFFF]8[/color]
+
+[u]Skills[/u]
+[font=courier][color=#222222]. . . . . [/color]C[color=#222222]. [/color]C[color=#222222]. [/color]C[color=#222222]. [/color]C[color=#222222]. [/color]C[color=#222222]. [/color]C[color=#222222]. [/color][color=#90CAF9]A[/color][color=#222222] .[/color]C[color=#222222] .[/color][color=#90CAF9]A[/color][color=#222222]. [/color]C[color=#222222]. [/color][color=#90CAF9]A[/color][color=#222222] .[/color]C[color=#222222] .[/color][color=#90CAF9]A[/color][color=#222222]. [/color]C[color=#222222]. [/color][color=#90CAF9]A[/color][color=#222222] .[/color]C[color=#222222] .[/color][color=#90CAF9]A[/color][color=#222222]. [/color]C[color=#222222]. [/color][color=#90CAF9]A[/color][color=#222222] .[/color]C
+[color=#222222]. . . . . [/color]1[color=#222222]. [/color]2[color=#222222]. [/color]3[color=#222222]. [/color]4[color=#222222]. [/color]5[color=#222222]. [/color]6[color=#222222]. [/color][color=#90CAF9]7[/color][color=#222222] .[/color]8[color=#222222] .[/color][color=#90CAF9]9[/color] 10 [color=#90CAF9]11[/color] 12 [color=#90CAF9]13[/color] 14 [color=#90CAF9]15[/color] 16 [color=#90CAF9]17[/color] 18 [color=#90CAF9]19[/color] 20
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+Concent[color=#222222] . [/color]4[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color]23
+Spellcr[color=#222222] . [/color]4[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color]23
+UMD[color=#222222] . . . [/color]2[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color][color=#90CAF9]5[/color][color=#222222] .[/color]1½ [color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]1[color=#222222] .[/color][color=#90CAF9]1[/color][color=#222222]. [/color]1[color=#222222]. [/color]23
+Repair[color=#222222]. . [/color]2[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. . . . [/color][color=#90CAF9]4[/color][color=#222222] .[/color]½[color=#222222] .[/color][color=#90CAF9]4[/color][color=#222222]. [/color]½[color=#222222]. [/color][color=#90CAF9]2[/color][color=#222222] .[/color]½[color=#222222] .[/color][color=#90CAF9]2[/color][color=#222222]. [/color]½[color=#222222]. [/color][color=#90CAF9]1[/color][color=#222222] .[/color]½[color=#222222] .[/color][color=#90CAF9]2[/color][color=#222222]. [/color]½[color=#222222]. [/color]22½
+Disable[color=#222222] . . . . . . . . . . . . . . . . . . . [/color][color=#90CAF9]2[/color][color=#222222] . . [/color][color=#90CAF9]2[/color][color=#222222] . . [/color][color=#90CAF9]3[/color][color=#222222] . . [/color][color=#90CAF9]2[/color][color=#222222] . . .[/color]9
+Search[color=#222222]. . [/color]2[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. [/color]½[color=#222222]. . . . . . . . . . . . . . . . . . . . . . .[/color]4½
+[color=#222222]. . . . .[/color]------------------------------------------------------------
+[color=#222222]. . . . .[/color]20[color=#222222]. [/color]5[color=#222222]. [/color]5[color=#222222]. [/color]5[color=#222222]. [/color]5[color=#222222]. [/color]5[color=#222222]. [/color][color=#90CAF9]7[/color][color=#222222] .[/color]5[color=#222222] .[/color][color=#90CAF9]7[/color][color=#222222]. [/color]5[color=#222222]. [/color][color=#90CAF9]7[/color][color=#222222] .[/color]5[color=#222222] .[/color][color=#90CAF9]7[/color][color=#222222]. [/color]5[color=#222222]. [/color][color=#90CAF9]7[/color][color=#222222] .[/color]5[color=#222222] .[/color][color=#90CAF9]7[/color][color=#222222]. [/color]5[color=#222222]. [/color][color=#90CAF9]7[/color][color=#222222] .[/color]5[/font]
+
+
+[u]Feats[/u]
+
+[font=courier][color=#222222].[/color]1 Heroic : [/font]Empower Healing Spell
+[font=courier][color=#222222].[/color]1 PDK[color=#222222]. . [/color]: [/font]Extra Turning
+[font=courier][color=#222222].[/color]3 Heroic : [/font]Maximize Spell
+[font=courier][color=#222222].[/color]6 Heroic : [/font]Quicken Spell
+[font=courier][color=#222222].[/color]9 Heroic : [/font]Improved Turning
+[font=courier]12 Heroic : [/font]Construct Essence
+[font=courier]13 Arti[color=#222222] . [/color]: [/font]Heighten Spell
+[font=courier]15 Heroic : [/font]Spell Penetration
+[font=courier]18 Heroic : [/font]Empower Spell
+
+[font=courier][color=#222222].[/color]2 Cleric : [/font]Healing Domain
+
+[font=courier][color=#222222].[/color]1 Deity[color=#222222]. [/color]: [/font]Follower of: Helm
+[font=courier][color=#222222].[/color]6 Deity[color=#222222]. [/color]: [/font]Deity Ability: Ever Watchful
+
+
+[u]Spells[/u]
+
+Cleric[list=1][*]Cure Light Wounds (1), Bane (1), Bless (1), Cause Fear (2), Command (4), Divine Favor (8)
+[*]Cure Moderate Wounds (3), Aid (3), Bear's Endurance (3), Bull's Strength (4), Close Wounds (6), Deific Vengeance (12)
+[*]Cure Serious Wounds (5), Bestow Curse (5), Blindness (5), Contagion (6), Dispel Magic (10), Glyph of Warding (16)
+[*]Cure Critical Wounds (8), Chaos Hammer (8), Death Ward (8), Dismissal (10), Divine Power (14), Freedom of Movement (20)
+[*]Mass Cure Light Wounds (12), Break Enchantment (12), Divine Punishment (12), Flame Strike (14), Greater Command (18)
+[*]Mass Cure Moderate Wounds (16), Banishment (16), Blade Barrier (16), Cometfall (18)
+[*]Mass Cure Serious Wounds (20), Destruction (20), Greater Restoration (20)[/list]
+Artificer[list=1][*]Ablative Armor (7), Admixture: Cure Light Wounds (7), Conjure Bolts (9)
+[*]Admixture: Cure Moderate Wounds (11), Bear's Endurance (13)
+[*]Admixture: Cure Serious Wounds (17), Admixture: Remove Disease (19)[/list]
+
+[u]Enhancements[/u] (Spent: 60 +0r +0u / Max: 80 +0r +0u AP)
+
+[color=#FFF176]Radiant Servant (41 AP)[list][*]Healing Power, Cure Moderate Wounds, Positive Energy Burst, Improved Empower Healing[list=1][*]Divine Aid I, Bliss III, Altruism III, Wand and Scroll Mastery III
+[*]Efficient Empower Healing III, Divine Healing III, Improved Turning III, Mighty Turning
+[*]Divine Aid II, Intense Healing III, Wisdom
+[*]Divine Aid III, Incredible Healing III, Wisdom, Divine Health
+[*]Positive Energy Aura, Cure Focus, Radiance[/list][/list][/color]
+[color=#90CAF9]Arcanotechnician (14 AP)[list][*]Arcanotechnician, Palliative Admixture, Thaumaturgical Battery[list=1][*]Energy of Creation III, Spell Critical, Arcane Skills II
+[*]Spell Critical II, Empower I[/list][/list][/color]
+[color=#BDBDBD]Purple Dragon Knight (3 AP)[list][*]Human Spell Power Boost[list=1][*]Action Surge: Wisdom II[/list][/list][/color]
+[color=#EF9A9A]Battle Engineer (2 AP)[list][*]Battle Engineer[list=1][*]Field Engineer I[/list][/list][/color]
+Leveling Guide
+[color=#FFF176][list][*]Radiant Servant: Healing Power[list=1][*]Divine Aid I, Bliss III[/list][/list][/color][color=#BDBDBD][list][*]Purple Dragon Knight: Human Spell Power Boost[/list][/color][color=#90CAF9][list][*]Arcanotechnician: Arcanotechnician[/list][/color][color=#EF9A9A][list][*]Battle Engineer: Battle Engineer[/list][/color]15. Reset Battle Engineer[color=#90CAF9][list][*]Arcanotechnician[list=1][*]Spell Critical[/list][/list][/color]
+

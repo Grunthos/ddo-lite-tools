@@ -1,0 +1,20 @@
+"Level","Tree","Tier","Enhancement","AP","Prog","Order"
+1,"Human","Core 1","Human Spell Power Boost",1,1,1
+1,"ThiefAcro","Core 1","Staff Control",1,1,2
+1,"Human","Tier 1","Orien Dragonmark Focus I",1,2,3
+,,,,,,4
+2,"Archmage","Core 1","Archmage Specialization: Evocation",1,1,5
+2,"Archmage","Tier 1","Energy of the Scholar I",1,2,6
+2,"Archmage","Tier 1","Energy of the Scholar II",1,3,7
+,,,,,,8
+3,"Kensei","Core 1","Kensei Focus: Light Blades",1,1,9
+3,"Kensei","Tier 1","Haste Boost",1,2,10
+3,,,"Bank 6 AP",,,11
+,,,,,,12
+4,,,"Reset Kensei",,,13
+4,"Archmage","Tier 1","Spell Critical",2,5,14
+4,"Falconry","Core 1","Summon Avian Companion: Raven",1,1,15
+,,,,,,16
+5,,,"Reset All Trees",,,17
+5,"Archmage","Core 1","Archmage Specialization: Evocation",1,1,18
+5,"Archmage","Tier 1","Spell Critical",2,3,19
