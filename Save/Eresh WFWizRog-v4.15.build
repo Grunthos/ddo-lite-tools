@@ -1,0 +1,209 @@
+[Overview]
+
+Name: Eresh WF/Wiz/Rog
+Race: Warforged
+Alignment: True Neutral
+MaxLevels: 36
+MaxLevels: 36
+
+Class: Rogue
+Class: Wizard
+
+Level: 1	Rogue
+Level: 2	Wizard
+Level: 3	Wizard
+Level: 4	Wizard
+Level: 5	Wizard
+Level: 6	Wizard
+Level: 7	Wizard
+Level: 8	Wizard
+Level: 9	Wizard
+Level: 10	Wizard
+Level: 11	Wizard
+Level: 12	Wizard
+Level: 13	Wizard
+Level: 14	Wizard
+Level: 15	Rogue
+Level: 16	Wizard
+Level: 17	Wizard
+Level: 18	Wizard
+Level: 19	Wizard
+Level: 20	Wizard
+
+
+[Stats]
+
+Preferred: Adventurer
+
+;    Advn  Chmp  Hero  Lgnd  Tome
+;    ----  ----  ----  ----  ----
+STR:                           8
+DEX:   4     4     4     4     8
+CON:   8     8    10    10     8
+INT:  16    16    16    16     8
+WIS:         2     2     2     8
+CHA:         2     2     4     8
+;    ----  ----  ----  ----
+;     28    32    34    36   
+
+Levelup: 0	Intelligence
+Levelup: 4	Intelligence
+Levelup: 8	Intelligence
+Levelup: 12	Intelligence
+Levelup: 16	Intelligence
+Levelup: 20	Intelligence
+Levelup: 24	Intelligence
+Levelup: 28	Intelligence
+Levelup: 32	Intelligence
+Levelup: 36	Intelligence
+
+
+[Skills]
+
+;         1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  Tome
+;        ------------------------------------------------------------------------------------
+Balance:  4                                                   1   2       2   5   4         
+Bluff  :  4                                                                                 
+Concent:                                                                          1         
+Diplo  :  4                                                                                 
+Disable:  4   2   2   2   2   2   2   2   2   2   2   2   2   2   1   2   2   2   2   2     
+Haggle :                                                                                    
+Heal   :                                                                                    
+Hide   :  4                                                                                 
+Intim  :                                                                                    
+Jump   :  4                                                                                 
+Listen :  3                                                                                 
+Move Si:  4                                                                                 
+Open Lo:  4   2   2   2   2   2   2   2   2   2   2   2   2   2   1   2   2   2   2   2     
+Perform:                                                                                    
+Repair :                                                                                    
+Search :  4   1   1   1   1   1   1   1   1   1   1               3   2   1           1     
+Spellcr:      1   1   2   1   1   1   1   1   1   1   1   1   2       1   2   2   1   2     
+Spot   :  4               1   1   1   2   2   2   2   3   3   1   3   3   1       1   3     
+Swim   :                                                                                    
+Tumble :  1                                                                                 
+UMD    :  4   1   1   1   1   1   1   1   1   1   1   2   2   2   6   1   1           2     
+
+
+[Feats]
+
+Standard: Heroic 1	Insightful Reflexes
+Standard: Heroic 3	Empower Spell
+Standard: Heroic 6	Quicken Spell
+Standard: Heroic 9	Improved Mental Toughness
+Standard: Heroic 12	Heighten Spell
+Standard: Heroic 15	Piercing Cold
+Standard: Heroic 18	Greater Spell Focus: Evocation
+Standard: Epic 21	Epic Spell Focus
+Standard: Destiny 22	Epic Spell Power: Force
+Standard: Epic 24	Master of the Storm
+Standard: Destiny 25	Epic Mage Armor
+Standard: Epic 27	Burst of Glacial Wrath
+Standard: Destiny 28	Deific Warding
+Standard: Epic 30	Master of Knowledge
+Standard: Destiny 31	Spell Specialty: Enchantment
+Standard: Epic 33	Legendary Spell Focus
+Standard: Destiny 34	Channel Power
+Standard: Epic 36	Embolden Spell
+
+Legend: Legend 30	Scion of: Plane of Water
+
+Class: Wizard 1	Maximize Spell
+Class: Wizard 5	Mental Toughness
+Class: Wizard 10	Extend Spell
+Class: Wizard 15	Spell Focus: Evocation
+
+
+[Enhancements]
+
+Tier5: Archmage
+RacialAP: 3
+UniversalAP: 1
+
+Tree: Warforged
+Type: Race
+ClassLevels: 36
+
+Tree: Archmage
+Type: Class
+Source: Wizard
+ClassLevels: 18
+Ability: Tier 0: Archmage Specialization: Evocation
+Ability: Tier 0: Archmage Specialization II: Evocation
+Ability: Tier 0: Archmage Specialization III: Evocation
+Ability: Tier 0: Archmage Specialization IV: Evocation
+Ability: Tier 0: Archmage Specialization V: Evocation
+Ability: Tier 1: Traditionalist Caster (Rank 2)
+Ability: Tier 1: Spell Critical
+Ability: Tier 2: Efficient Metamagic: Efficient Maximize (Rank 3)
+Ability: Tier 2: Efficient Metamagic 2: Efficient Quicken (Rank 3)
+Ability: Tier 3: Intelligence
+Ability: Tier 4: Efficient Heighten (Rank 2)
+Ability: Tier 4: School Mastery: Evocation
+Ability: Tier 4: Intelligence
+Ability: Tier 5: Arcane Supremacy
+Ability: Tier 5: School Mastery II: Evocation
+
+Tree: Pale Master
+Type: Class
+Source: Wizard
+ClassLevels: 18
+
+Tree: Eldritch Knight (Wizard)
+Type: Class
+Source: Wizard
+ClassLevels: 18
+
+
+[Destiny]
+
+PermDestinyPoints: 12
+Destiny: Machrotechnic
+Type: Destiny
+Ability: Tier 0: Maker's Touch
+Ability: Tier 0: Metamagic Capacitors
+Ability: Tier 0: Warding Inscriptions
+Ability: Tier 0: Armored Augmentation
+Ability: Tier 1: Solid Footing (Rank 1)
+Ability: Tier 1: Tinker Tailoring (Rank 1)
+Ability: Tier 1: Epic Strike: Galvanic Blast
+Ability: Tier 1: Blast Shields (Rank 3)
+Ability: Tier 2: Rune Arm Use
+Ability: Tier 2: Forcefield Generation
+Ability: Tier 3: Technique Drive: Efficiency Drive (Rank 1)
+Ability: Tier 3: Storm Core (Rank 3)
+Ability: Tier 3: Improved Aegis
+Ability: Tier 4: Strike Drive: Blast Drive
+Ability: Tier 4: Boost Drive: Spark Drive
+Ability: Tier 4: Epic Improved Metamagics: Epic Improved Maximize (Rank 3)
+Ability: Tier 4: Magical Recoil
+Ability: Tier 5: Machrotechnic Spell DCs (Rank 3)
+Ability: Tier 5: Armor of Legends
+Ability: Tier 5: Maximum Overdrive
+Ability: Tier 5: Forcefield Generator
+
+Destiny: Draconic Incarnation
+Type: Destiny
+Ability: Tier 0: Draconic Bloodline: Blue
+Ability: Tier 0: Draconic Heritage
+Ability: Tier 0: Elemental Blood
+Ability: Tier 1: Dragonhide (Rank 3)
+Ability: Tier 1: Dragon Breath
+Ability: Tier 1: Dragonscales (Rank 1)
+Ability: Tier 1: Arcane Studies (Rank 3)
+Ability: Tier 2: Coalescence (Rank 3)
+Ability: Tier 3: Scales of the Dragon
+Ability: Tier 3: Draconic Spell Focus: Evocation (Rank 3)
+Ability: Tier 4: Improve Dragon Breath: Gaping Maw
+Ability: Tier 4: Epic Improved Metamagic 2: Maximize (Rank 1)
+
+Destiny: Fatesinger
+Type: Destiny
+Ability: Tier 0: Fatesinger's Repertoire
+Ability: Tier 0: Intoxicating Presence
+Ability: Tier 0: Glitter of Fame
+Ability: Tier 1: Jack of all trades (Rank 2)
+Ability: Tier 1: Tune of the Weave (Rank 3)
+Ability: Tier 2: Pianissimo (Rank 3)
+Ability: Tier 3: Fatesinger Spell Focus: Enchantment (Rank 3)
+
