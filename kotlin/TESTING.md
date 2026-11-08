@@ -55,6 +55,12 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
     their enhancements and feats, so VB drops them too (the Messages window lists them). Only
     `Eresh WFWizRog-v4.15.build` is clean. Worth checking: do VB and Kotlin report the same errors for the
     same file? Re-saving each sample in VB 4.15 (after re-adding what was dropped) gives clean test files.
+  - Reply (2026-11-08): Kensei Warpriest, Warlock Blaster and Bard Acolyte in `Save/` are now updated to 4.15's
+    names (Kensei from your NG copy), and open with no Messages. The old versions are kept in
+    `kotlin/test-builds/old-data/` for the tests of outdated builds and for the items below that need them.
+    Still red, because 4.15 changed the trees: Warlock Blaster's Soul Eater and Bard Acolyte's Spellsinger
+    are short of AP spent (abilities that went from 3 ranks to 1), and Kensei Warpriest's destinies (level 30,
+    VB-BUGS 18d).
 - [ ] Save from Kotlin, open the saved file in VB: same build.
   - TEST RESULT: Done this with the one file the works. Seems to be correct. There should be a more thorough
     way to test this. Open/SaveAs then diff? See next question: do we need both?
@@ -160,14 +166,14 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
       (add); drag a row onto another (swap); double-click a row to remove it; the right-click menu.
 - [ ] Trees tab, straight after opening the window: click a tree (it's selected) and right-click › Reset
       (it resets). Neither worked until the tab had been redrawn (fixed 2026-11-06).
-- [ ] Open the original `Save/Kensei Warpriest.build`, Enhancements tab, Kensei: the four "Weapon Group
-      Specialization: Axes" lines are red placeholder slots where the file had them (tiers 1-4); selecting
-      one explains it; right-clicking it (selected or not) opens the menu; double-click or Clear removes it;
+- [ ] Open `kotlin/test-builds/old-data/Kensei Warpriest.build` (the original), Enhancements tab, Kensei:
+      the four "Weapon Group Specialization: Axes" lines are red placeholder slots where the file had them
+      (tiers 1-4); selecting one explains it; right-clicking it (selected or not) opens the menu; double-click or Clear removes it;
       Reset tree clears them; saving keeps those not removed, in the same places.
 - [ ] Drag an ability from the Abilities list: the blank slot and every placeholder light up; drop it on a
       placeholder and the ability goes in (in tier order) and the placeholder goes. Undo brings it back.
-- [ ] Feats, `Save/Warlock Blaster.build`: Epic 21 shows "Epic Eldritch Blast" in red; selecting it explains;
-      dropping a feat on it replaces it; double-click clears it; dragging it onto another slot swaps them;
+- [ ] Feats, `kotlin/test-builds/old-data/Warlock Blaster.build`: Epic 21 shows "Epic Eldritch Blast" in red;
+      selecting it explains; dropping a feat on it replaces it; double-click clears it; dragging it onto another slot swaps them;
       saving keeps it until then (and Messages says "kept as a red slot"). Undo restores it.
 - [ ] With a build whose Leveling Guide has red rows for a placeholder's ability (none of the samples
       has): replacing the placeholder turns those rows into the new ability (ranks it hasn't stay red);
@@ -177,8 +183,8 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
 - [ ] The Class column is as wide as the longest class name, and the add list's Class column starts after
       its longest tree name (its caption only when a listed tree has a class).
 - [ ] Enhancements tab, for each tree: the same slots, AP, ranks and red (error) slots as VB.
-      Note: the repository's sample builds were saved with older data, so several of their trees are
-      short of AP now (renamed abilities are dropped on load); VB should show the same red slots.
+      Note: the original samples in `kotlin/test-builds/old-data/` were saved with older data, so several of
+      their trees are short of AP now (renamed abilities are dropped on load); VB should show the same red slots.
 - [ ] The abilities offered (and with Show All), the selectors, and the details text, ranks, cost and
       "N AP spent in tree".
 - [ ] Add an ability by double-click and by drag (onto the yellow/pink blank slot); drag a slot onto
@@ -236,8 +242,8 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
 - [ ] Take rank I of a multi-rank ability with a selector (e.g. Efficient Metamagic as Maximize): ranks II
       and III are offered with the same selector. **VB bug to confirm:** VB offers every selector (22k).
 - [ ] With a tree selected, "Spent in <tree>: N AP" at the bottom left (new).
-- [ ] Open the original `Save/Kensei Warpriest.build`: its guide loads, with the steps the data no longer has
-      as red rows (e.g. "Human Versatility: Damage Boost"; AP and Prog "?"); selecting one explains it;
+- [ ] Open `kotlin/test-builds/old-data/Kensei Warpriest.build` (the original): its guide loads, with the
+      steps the data no longer has as red rows (e.g. "Human Versatility: Damage Boost"; AP and Prog "?"); selecting one explains it;
       Messages lists each; Delete Row removes one; saving keeps those not deleted (new; VB drops the
       whole guide at the first such step).
 

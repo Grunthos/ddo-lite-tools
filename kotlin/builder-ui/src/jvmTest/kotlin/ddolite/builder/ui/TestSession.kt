@@ -25,13 +25,20 @@ object TestSession {
         override fun chooseLevel(min: Int, max: Int): Int? = null
     }
 
-    /** A new session with [buildName] (a file in Save/) open, its text changed by [edit] first. */
+    /**
+     * A new session with [buildName] open (a file in Save/, or "old-data/<name>" in
+     * kotlin/test-builds/old-data), its text changed by [edit] first.
+     */
     fun open(buildName: String, edit: (String) -> String = { it }): BuilderSession {
         val file = dataDir.resolveSibling("Settings").resolve("Black.screen")
         val theme = loadTheme(decodeText(Files.readAllBytes(file)).text, "Black", ThemeFileKind.SCREEN).theme
         val skills = SkillsScreenState(data, listOf(theme), prototypePresets())
         val session = BuilderSession(data, skills, TreeSlotsState(data, readTreeHeaders(source), skills), YesPrompts)
-        val build = Path.of(System.getProperty("ddolite.saveDir")).resolve(buildName)
+        val build = if (buildName.startsWith("old-data/")) {
+            Path.of(System.getProperty("ddolite.testBuildsDir")).resolve(buildName)
+        } else {
+            Path.of(System.getProperty("ddolite.saveDir")).resolve(buildName)
+        }
         val text = edit(Windows1252.decode(Files.readAllBytes(build)))
         session.openBuild(readBuildFile(Windows1252.encode(text), data, BuildPoints.ADVENTURER))
         return session

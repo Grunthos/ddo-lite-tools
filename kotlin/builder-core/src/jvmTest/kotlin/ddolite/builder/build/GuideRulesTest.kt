@@ -20,7 +20,7 @@ class GuideRulesTest {
      * red rows, so the tests start from the guide's Delete All.
      */
     private fun open(): BuildRules {
-        val rules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+        val rules = readBuildFile(SampleBuilds.file("old-data/Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
         GuideRules(rules).clear()
         rules.initLevelingGuide()
         return rules

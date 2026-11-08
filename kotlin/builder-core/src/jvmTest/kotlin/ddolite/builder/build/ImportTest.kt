@@ -189,7 +189,7 @@ class ImportTest {
     fun forumQuirks() {
         // VB quirk: "Destinies" isn't a heading (VB looks for "Destiny"), so the destinies are read as
         // more tiers of the last tree, which runs past its tiers: the whole import fails.
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val text = BuildOutput(rules, OutputFormat.builtIn("Plain Text"), OutputSettings()).export { "112233" }
         assertNull(ForumImport(data, BuildPoints.ADVENTURER, OutputSettings()).translate(text))
         // VB quirk: the output's Level Order columns are wider than the import's, so only levels 1-5 come back.

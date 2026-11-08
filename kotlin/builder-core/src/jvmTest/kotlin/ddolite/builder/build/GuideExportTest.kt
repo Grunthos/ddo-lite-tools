@@ -14,7 +14,7 @@ class GuideExportTest {
     private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
 
     private fun guide(): BuildRules {
-        val rules = readBuildFile(SampleBuilds.file("Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
+        val rules = readBuildFile(SampleBuilds.file("old-data/Kensei Warpriest.build").readBytes(), data, BuildPoints.ADVENTURER).rules
         // From an empty guide (the saved one's missing steps load as red rows).
         GuideRules(rules).clear()
         rules.initLevelingGuide()

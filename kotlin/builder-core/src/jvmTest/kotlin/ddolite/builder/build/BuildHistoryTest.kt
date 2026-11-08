@@ -46,7 +46,7 @@ class BuildHistoryTest {
 
     @Test
     fun copiesAreIndependent() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val copy = rules.build.deepCopy()
         val before = writeBuildFile(BuildRules(data, copy))
         rules.build.skills[0][0] = 9
@@ -58,7 +58,7 @@ class BuildHistoryTest {
 
     @Test
     fun newChangeDropsTheRedoStatesAndTheLimitHolds() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val history = BuildHistory(data, limit = 3)
         history.reset(rules.build)
         for (i in 1..5) {

@@ -74,7 +74,7 @@ fun featsScreenshots(prototype: BuilderSession, kensei: ByteArray, repoRoot: Pat
         }
     }
     // Warlock Blaster: a feat the data no longer has, as a red placeholder, selected.
-    prototype.openBuild(readBuildFile(Files.readAllBytes(repoRoot.resolve("Save").resolve("Warlock Blaster.build")), prototype.data, BuildPoints.ADVENTURER))
+    prototype.openBuild(readBuildFile(Files.readAllBytes(oldData(repoRoot).resolve("Warlock Blaster.build")), prototype.data, BuildPoints.ADVENTURER))
     feats.opened()
     var placeholderRow = 0
     for (tab in FeatTab.entries) {

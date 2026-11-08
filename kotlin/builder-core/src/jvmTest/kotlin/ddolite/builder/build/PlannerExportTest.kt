@@ -19,7 +19,7 @@ class PlannerExportTest {
 
     @Test
     fun ron() {
-        val text = PlannerExport(open("Kensei Warpriest.build")).ronFile()
+        val text = PlannerExport(open("old-data/Kensei Warpriest.build")).ronFile()
         File(System.getProperty("java.io.tmpdir"), "kensei-ron.txt").writeText(text)
         val lines = text.split("\r\n")
         assertEquals("VERSION: 4.36.104;", lines[0])
@@ -37,7 +37,7 @@ class PlannerExportTest {
 
     @Test
     fun builder() {
-        val text = PlannerExport(open("Kensei Warpriest.build")).builderFile()
+        val text = PlannerExport(open("old-data/Kensei Warpriest.build")).builderFile()
         File(System.getProperty("java.io.tmpdir"), "kensei.ddocp").writeText(text)
         val lines = text.split("\r\n")
         assertEquals("<DDOCharacterData>", lines[0])
@@ -51,7 +51,7 @@ class PlannerExportTest {
 
     @Test
     fun alignmentWithNoneChosen() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         rules.build.alignment = null
         // Fighter and Cleric allow True Neutral.
         assertEquals(Alignment.TRUE_NEUTRAL, PlannerExport(rules).exportAlignment())

@@ -20,7 +20,7 @@ class EnhancementRulesTest {
 
     @Test
     fun apTotalsUseRacialAndUniversalPoolsFirst() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val totals = EnhancementRules(rules).apTotals()
         // Tabaxi (racial) 13 AP from the racial pool; Feydark Illusionist (global) 2 from the universal pool.
         // (Stricken and Steal Life Force, Rank 3 in the file, now have one rank: kept at rank 1.)
@@ -30,7 +30,7 @@ class EnhancementRulesTest {
 
     @Test
     fun spentInTreeIsCumulativeByTier() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val er = EnhancementRules(rules)
         val spend = er.spentInTree(data.findTree("Soul Eater"), buildTree(rules, "Soul Eater"))
         assertEquals(34, spend.total)
@@ -43,7 +43,7 @@ class EnhancementRulesTest {
 
     @Test
     fun requirementTables() {
-        val er = EnhancementRules(open("Warlock Blaster.build"))
+        val er = EnhancementRules(open("old-data/Warlock Blaster.build"))
         // Class trees: core 4 needs 20 AP spent and 12 class levels; tier 5 needs 30 AP and 12 character levels.
         assertEquals(20, er.spentReq(TreeStyle.CLASS, 0, 4))
         assertEquals(LevelReqs(0, 12), er.levelReqs(TreeStyle.CLASS, 0, 4))
@@ -62,7 +62,7 @@ class EnhancementRulesTest {
     fun abilityErrors() {
         // Kensei Warpriest was saved with older data: renamed abilities are dropped when it's read,
         // so the tree no longer has the AP its tier 5 abilities need.
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val er = EnhancementRules(rules)
         val tree = data.findTree("Kensei")!!
         val bt = buildTree(rules, "Kensei")
@@ -75,7 +75,7 @@ class EnhancementRulesTest {
 
     @Test
     fun maxTierAndTier5() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val er = EnhancementRules(rules)
         assertEquals(5, er.maxTier(buildTree(rules, "Soul Eater")))
         assertEquals(4, er.maxTier(buildTree(rules, "Tabaxi")))
@@ -92,7 +92,7 @@ class EnhancementRulesTest {
 
     @Test
     fun insertionPointKeepsTierOrder() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val er = EnhancementRules(rules)
         val bt = buildTree(rules, "Soul Eater")
         val at = er.insertionPoint(bt, 2, 0)
@@ -111,7 +111,7 @@ class EnhancementRulesTest {
 
     @Test
     fun availableAbilitiesAreNotTakenAndFit() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val er = EnhancementRules(rules)
         val tree = data.findTree("Soul Eater")!!
         val bt = buildTree(rules, "Soul Eater")
@@ -128,7 +128,7 @@ class EnhancementRulesTest {
     @Test
     fun destinyTotals() {
         // Kensei Warpriest is level 30: VB's GetEpicLevels has no case for exactly 30, so no base destiny AP.
-        val kensei = open("Kensei Warpriest.build")
+        val kensei = open("old-data/Kensei Warpriest.build")
         val er = EnhancementRules(kensei)
         assertEquals(0, er.epicLevels())
         val totals = er.destinyTotals()
@@ -142,7 +142,7 @@ class EnhancementRulesTest {
 
     @Test
     fun destinyDetailsHaveNoLevelSection() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val er = EnhancementRules(rules)
         val tree = data.findDestiny("Legendary Dreadnought")!!
         val details = er.details(tree, rules.build.destinies[0], 0, 0, 0, null)
@@ -152,7 +152,7 @@ class EnhancementRulesTest {
 
     @Test
     fun destinyTier5() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val er = EnhancementRules(rules)
         val first = rules.build.destinies[0].treeName
         val second = rules.build.destinies[1].treeName
@@ -166,7 +166,7 @@ class EnhancementRulesTest {
 
     @Test
     fun details() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         val er = EnhancementRules(rules)
         val tree = data.findTree("Soul Eater")!!
         val details = er.details(tree, buildTree(rules, "Soul Eater"), 0, 1, 0, null)

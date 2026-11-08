@@ -20,7 +20,7 @@ import java.nio.file.Path
 fun messagesScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
     val save = repoRoot.resolve("Save")
     val builds = ArrayList<Pair<String, ByteArray>>()
-    var text = String(Files.readAllBytes(save.resolve("Warlock Blaster.build")), Charsets.ISO_8859_1)
+    var text = String(Files.readAllBytes(oldData(repoRoot).resolve("Warlock Blaster.build")), Charsets.ISO_8859_1)
     text = text.replace("\tEmpower Spell\r\n", "\tEmpowered Spell\r\n").replace("\tToughness\r\n", "\tToughness: Extra\r\n")
     builds.add(Pair("warlock-renamed", text.toByteArray(Charsets.ISO_8859_1)))
     Files.newDirectoryStream(save, "*old*.build").use { files ->

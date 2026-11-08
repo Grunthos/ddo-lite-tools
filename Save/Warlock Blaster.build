@@ -36,6 +36,7 @@ Levelup: 20	Charisma
 Levelup: 24	Charisma
 Levelup: 28	Charisma
 Levelup: 32	
+Levelup: 36	
 
 
 [Skills]
@@ -68,14 +69,12 @@ UMD    :  4   1   1   1   1   1   1   1   1
 [Feats]
 
 Standard: Heroic 1	Quicken Spell
-Standard: Heroic 3	Completionist
 Standard: Heroic 6	Enlarge Spell
 Standard: Heroic 9	Empower Spell
 Standard: Heroic 12	Spell Focus: Conjuration
 Standard: Heroic 15	Spell Penetration
 Standard: Heroic 18	Greater Spell Focus: Conjuration
-Standard: Epic 21	Epic Eldritch Blast
-Standard: Destiny 22	Epic Arcane Eldritch Blast
+Standard: Destiny 22	Epic Pact Dice
 Standard: Epic 24	Greater Spell Penetration
 Standard: Destiny 25	Crush Weakness
 Standard: Epic 27	Ruin
@@ -104,13 +103,13 @@ Ability: Tier 0: Inhuman Nature II
 Ability: Tier 0: Eldritch Seeker
 Ability: Tier 1: Consume
 Ability: Tier 1: Hungry for Destruction (Rank 3)
-Ability: Tier 2: Stricken (Rank 3)
+Ability: Tier 2: Stricken
 Ability: Tier 2: Feeding Frenzy
 Ability: Tier 2: Hungry for Destruction (Rank 3)
 Ability: Tier 3: Eldritch Cone Shape
 Ability: Tier 3: Charisma
 Ability: Tier 4: Greater Hunger
-Ability: Tier 4: Steal Life Force (Rank 3)
+Ability: Tier 4: Steal Life Force
 Ability: Tier 4: Immortal Will
 Ability: Tier 4: Charisma
 Ability: Tier 5: Eldritch Wave
@@ -127,15 +126,15 @@ Ability: Tier 0: Stanch
 Ability: Tier 0: Tainted Lore II
 Ability: Tier 1: Planar Power (Rank 2)
 Ability: Tier 1: Feigned Health (Rank 3)
-Ability: Tier 1: Strong Pact
+Ability: Tier 1: Strong Pact I
 Ability: Tier 1: Eldritch Focus (Rank 3)
 Ability: Tier 2: Utterdark Blast
 Ability: Tier 2: Eldritch Chain Shape
-Ability: Tier 2: Strong Pact
+Ability: Tier 2: Strong Pact II
 Ability: Tier 2: Wand and Scroll Mastery (Rank 1)
-Ability: Tier 3: Strong Pact
+Ability: Tier 3: Strong Pact III
 Ability: Tier 3: Stat: Charisma
-Ability: Tier 4: Strong Pact
+Ability: Tier 4: Strong Pact IV
 Ability: Tier 4: Stat: Charisma
 
 Tree: Enlightened Spirit
@@ -158,10 +157,10 @@ Ability: Tier 1: Study the Arcane (Rank 1)
 Tree: Tabaxi
 Type: Race
 ClassLevels: 30
-Ability: Tier 0: Nimble Cat
-Ability: Tier 0: Ability Score Increase: Charisma
+Ability: Tier 0: Nimble Cat I
+Ability: Tier 0: Ability Increase I: Charisma
 Ability: Tier 0: Nimble Cat II
-Ability: Tier 0: Ability Score Increase II: Charisma
+Ability: Tier 0: Ability Increase II: Charisma
 Ability: Tier 0: Nimble Cat III
 Ability: Tier 1: Sharp Claws (Rank 3)
 Ability: Tier 1: Land On Your Feet

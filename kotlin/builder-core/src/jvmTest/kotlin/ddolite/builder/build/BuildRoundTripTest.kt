@@ -63,8 +63,12 @@ class BuildRoundTripTest {
      */
     @Test
     fun differencesFromVbAreExplained() {
-        // The repository's samples, plus any others saved there.
-        assertTrue(sampleBuilds().containsAll(listOf("Bard Acolyte.build", "Kensei Warpriest.build", "TEST.build", "Warlock Blaster.build")))
+        // The repository's samples (fixed for 4.15, and as they were in old-data/), plus any others saved there.
+        val samples = listOf("Bard Acolyte.build", "Kensei Warpriest.build", "Warlock Blaster.build")
+        for (sample in samples) {
+            assertTrue(sampleBuilds().containsAll(listOf(sample, "old-data/$sample")), sample)
+        }
+        assertTrue(sampleBuilds().contains("TEST.build"))
         for (name in sampleBuilds()) {
             val (loaded, differences) = roundTrip(name)
             val originalText = Windows1252.decode(SampleBuilds.file(name).readBytes())
@@ -214,7 +218,7 @@ class BuildRoundTripTest {
 
     @Test
     fun kenseiWarpriestSpotChecks() {
-        val (loaded, _) = roundTrip("Kensei Warpriest.build")
+        val (loaded, _) = roundTrip("old-data/Kensei Warpriest.build")
         val build = loaded.build
         assertEquals("Kensei Warpriest", build.buildName)
         assertEquals("Human", build.race?.name)

@@ -24,7 +24,7 @@ class BuildOutputTest {
 
     @Test
     fun plainText() {
-        val text = export("Kensei Warpriest.build", "Plain Text")
+        val text = export("old-data/Kensei Warpriest.build", "Plain Text")
         val lines = text.split("\r\n")
         assertEquals(listOf("Kensei Warpriest", "12/8 Fighter/Cleric, Epic 10", "Human", "", "", "Level Order", ""), lines.subList(0, 7))
         assertEquals("1. Fighter           6. Fighter          11. Cleric           16. Fighter", lines[7])
@@ -39,7 +39,7 @@ class BuildOutputTest {
 
     @Test
     fun forumCodes() {
-        val text = export("Kensei Warpriest.build", "Default")
+        val text = export("old-data/Kensei Warpriest.build", "Default")
         assertTrue(text.startsWith("[b]Kensei Warpriest[/b]\r\n"))
         assertTrue(text.contains("[u]Level Order[/u]"))
         // Runs of spaces become dots in the background colour; lists use [list] and [*].
@@ -51,7 +51,7 @@ class BuildOutputTest {
 
     @Test
     fun reddit() {
-        val text = export("Kensei Warpriest.build", "Reddit")
+        val text = export("old-data/Kensei Warpriest.build", "Reddit")
         val lines = text.split("\r\n")
         assertEquals(listOf("|Kensei Warpriest|", "|:--|:--", "|12/8 Fighter/Cleric, Epic 10|", "|Human|"), lines.subList(0, 4))
         assertTrue(lines.contains("|Strength|**16**|18|18|18|4: STR|"))
@@ -60,7 +60,7 @@ class BuildOutputTest {
 
     @Test
     fun screenShowsTheActiveWindowsSections() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val all = BuildOutput(rules, OutputFormat.DEFAULT, OutputSettings()).display(OutputView.ALL)
         val feats = BuildOutput(rules, OutputFormat.DEFAULT, OutputSettings()).display(OutputView.FEATS)
         fun texts(lines: List<ddolite.builder.output.DisplayLine>): List<String> = lines.map { l -> (l.prefix?.text ?: "") + l.runs.joinToString("") { it.text } }
@@ -75,7 +75,7 @@ class BuildOutputTest {
 
     @Test
     fun errorMarksLinkToTheirWindows() {
-        val lines = BuildOutput(open("Kensei Warpriest.build"), OutputFormat.DEFAULT, OutputSettings()).display(OutputView.ALL)
+        val lines = BuildOutput(open("old-data/Kensei Warpriest.build"), OutputFormat.DEFAULT, OutputSettings()).display(OutputView.ALL)
         val links = ArrayList<String>()
         for (line in lines) {
             for (run in line.runs) {

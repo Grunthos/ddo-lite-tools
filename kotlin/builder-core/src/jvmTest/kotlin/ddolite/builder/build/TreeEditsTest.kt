@@ -29,7 +29,7 @@ class TreeEditsTest {
 
     @Test
     fun theRaceTreeCantBeRemoved() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val edits = TreeEdits(rules, destinies = false)
         val race = raceRow(rules)
         assertTrue(race > 0)
@@ -44,7 +44,7 @@ class TreeEditsTest {
 
     @Test
     fun swapAndRanks() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val edits = TreeEdits(rules, destinies = false)
         val first = rules.build.trees[0].treeName
         val second = rules.build.trees[1].treeName
@@ -60,7 +60,7 @@ class TreeEditsTest {
 
     @Test
     fun clearingTheLastTier5AbilityClearsTheTier5Tree() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val edits = TreeEdits(rules, destinies = false)
         val tier5 = rules.build.tier5
         assertTrue(tier5.isNotEmpty())
@@ -81,7 +81,7 @@ class TreeEditsTest {
 
     @Test
     fun aTier5AbilityAddedMakesItsTreeTheTier5Tree() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val edits = TreeEdits(rules, destinies = false)
         val other = rules.build.trees.first { it.treeName != rules.build.tier5 && it.treeType != TreeStyle.RACE }
         val question = edits.tier5Question(other, 5)
@@ -101,7 +101,7 @@ class TreeEditsTest {
 
     @Test
     fun destinies() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val edits = TreeEdits(rules, destinies = true)
         val count = rules.build.destinies.size
         assertTrue(count > 0)
@@ -117,7 +117,7 @@ class TreeEditsTest {
 
     @Test
     fun loadLimitsDropTheTier5TreeOnLowLevelBuilds() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         rules.build.maxLevels = 11
         TreeEdits(rules, destinies = false).loadDataLimits()
         assertEquals("", rules.build.tier5)

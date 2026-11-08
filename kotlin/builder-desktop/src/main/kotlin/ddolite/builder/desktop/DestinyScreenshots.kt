@@ -19,7 +19,7 @@ import java.nio.file.Path
 fun destinyScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
     val screen = prototype.destiny
     // TEST.build (level 36) is kept in kotlin/test-builds since it left Save/.
-    val builds = listOf(repoRoot.resolve("Save").resolve("Kensei Warpriest.build"), repoRoot.resolve("kotlin").resolve("test-builds").resolve("TEST.build"))
+    val builds = listOf(oldData(repoRoot).resolve("Kensei Warpriest.build"), repoRoot.resolve("kotlin").resolve("test-builds").resolve("TEST.build"))
     for (path in builds) {
         val name = path.fileName.toString().removeSuffix(".build")
         prototype.openBuild(readBuildFile(Files.readAllBytes(path), prototype.data, BuildPoints.ADVENTURER))

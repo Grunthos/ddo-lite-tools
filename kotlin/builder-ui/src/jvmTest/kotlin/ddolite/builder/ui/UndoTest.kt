@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 
 /** Edit › Undo and Redo through the session, as the windows use them. */
 class UndoTest {
-    private fun session(): BuilderSession = TestSession.open("Kensei Warpriest.build")
+    private fun session(): BuilderSession = TestSession.open("old-data/Kensei Warpriest.build")
 
     @Test
     fun undoAndRedoAChange() {

@@ -27,7 +27,7 @@ class FeatRulesTest {
 
     @Test
     fun kenseiSlotsSourcesAndTabs() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         assertEquals("Least Dragonmark: Passage", slot(rules, 1, "Human").display)
         assertEquals("Cleave", slot(rules, 1, "Fighter").display)
         assertEquals("Strength Domain", slot(rules, 5, "Cleric").display)
@@ -49,7 +49,7 @@ class FeatRulesTest {
 
     @Test
     fun slotChecks() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val fr = FeatRules(rules)
         val heroic3 = slot(rules, 3, "Heroic").slot
         // A destiny feat can't go in a heroic slot.
@@ -69,7 +69,7 @@ class FeatRulesTest {
 
     @Test
     fun takenFeats() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val fr = FeatRules(rules)
         val all = fr.identifyTakenFeats(0)
         assertEquals(1, all.of(data.findFeat("Power Attack")).times)
@@ -81,7 +81,7 @@ class FeatRulesTest {
 
     @Test
     fun availableFeatsForAnEmptyDestinySlot() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val fr = FeatRules(rules)
         val destiny22 = slot(rules, 22, "Destiny")
         assertNull(destiny22.feat)
@@ -94,7 +94,7 @@ class FeatRulesTest {
 
     @Test
     fun alternatesAndExchanges() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val fr = FeatRules(rules)
         val before = rules.featList.size
         val heroic1 = slot(rules, 1, "Heroic")
@@ -116,7 +116,7 @@ class FeatRulesTest {
     @Test
     fun addSpecialFeatMovesBackOnlyOnePlace() {
         // VB quirk: the insertion compares shifted entries, so the new slot moves back at most one place.
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val fr = FeatRules(rules)
         val heroic9 = slot(rules, 9, "Heroic")
         val heroic3 = slot(rules, 3, "Heroic")
@@ -134,7 +134,7 @@ class FeatRulesTest {
 
     @Test
     fun detailsLines() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         val details = FeatRules(rules).details(data.findFeat("Great Cleave"), 0, null)
         assertEquals("Great Cleave", details.caption)
         val texts = details.lines.map { it.text }

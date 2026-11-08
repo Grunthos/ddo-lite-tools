@@ -16,7 +16,7 @@ class DeprecationMessagesTest {
     private val data = loadBuilderData(DirectoryDataSource(Path.of(System.getProperty("ddolite.dataDir"))), LoadLog())
 
     private fun open(): BuildLoadResult {
-        var text = String(SampleBuilds.file("Warlock Blaster.build").readBytes(), Charsets.ISO_8859_1)
+        var text = String(SampleBuilds.file("old-data/Warlock Blaster.build").readBytes(), Charsets.ISO_8859_1)
         text = text.replace("\tEmpower Spell\r\n", "\tEmpowered Spell\r\n")
         text = text.replace("\tSpell Focus: Conjuration\r\n", "\tSpell Focus: Conjurer\r\n")
         return readBuildFile(text.toByteArray(Charsets.ISO_8859_1), data, BuildPoints.ADVENTURER)

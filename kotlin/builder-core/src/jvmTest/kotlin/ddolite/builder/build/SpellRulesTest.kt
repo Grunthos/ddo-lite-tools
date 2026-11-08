@@ -16,7 +16,7 @@ class SpellRulesTest {
 
     @Test
     fun warlockPactSlotAfterTheWindowOpens() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         // As frmSpells.Form_Load: InitBuildSpells again, now that the feats are listed.
         rules.initBuildSpells()
         val sr = SpellRules(rules)
@@ -35,7 +35,7 @@ class SpellRulesTest {
 
     @Test
     fun rareScrollsAreIndented() {
-        val rules = open("Bard Acolyte.build")
+        val rules = open("old-data/Bard Acolyte.build")
         val sr = SpellRules(rules)
         val wizard = data.findClass("Wizard")!!
         assertEquals("Acid Fog", sr.cleanSpellName("  Acid Fog*"))
@@ -46,7 +46,7 @@ class SpellRulesTest {
 
     @Test
     fun freeSlotsAddAndRemove() {
-        val rules = open("Warlock Blaster.build")
+        val rules = open("old-data/Warlock Blaster.build")
         rules.initBuildSpells()
         val sr = SpellRules(rules)
         val warlock = data.findClass("Warlock")!!
@@ -67,7 +67,7 @@ class SpellRulesTest {
 
     @Test
     fun clearClassSpellsKeepsPactAndCureSlots() {
-        val rules = open("Kensei Warpriest.build")
+        val rules = open("old-data/Kensei Warpriest.build")
         rules.initBuildSpells()
         val sr = SpellRules(rules)
         val cleric = data.findClass("Cleric")!!
@@ -83,7 +83,7 @@ class SpellRulesTest {
 
     @Test
     fun details() {
-        val sr = SpellRules(open("Warlock Blaster.build"))
+        val sr = SpellRules(open("old-data/Warlock Blaster.build"))
         val details = sr.details("  Acid Fog*")
         assertEquals("Acid Fog", details.caption)
         assertTrue(details.lines.last().text.endsWith("(Wiki)"))

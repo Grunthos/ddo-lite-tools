@@ -61,7 +61,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun destinyTreesRemoveAddSwapAndUndo() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.destiny
         screen.opened()
         val before = destinyNames(session)
@@ -107,7 +107,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun destinyTreeMenuResetsAndDeletes() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.destiny
         screen.opened()
         val names = destinyNames(session)
@@ -132,7 +132,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun permanentDestinyPoints() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.destiny
         screen.opened()
         val before = screen.pdp()
@@ -148,7 +148,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun destinyAbilitiesAddRankClearAndUndo() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.destiny
         screen.opened()
         screen.chooseTab(1)
@@ -206,7 +206,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun enhancementTreesAddSwapRemoveAndUndo() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         val before = treeNames(session)
@@ -240,7 +240,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun enhancementTreeMenuReset() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         // A tree that isn't the race tree: Reset leaves it with no abilities.
@@ -263,7 +263,7 @@ class TreeAndSlotScreensTest {
     fun placeholderSlotsShowExplainAndClear() {
         // Kensei Warpriest's Kensei tree has four "Weapon Group Specialization: Axes" lines the data
         // no longer has: red placeholder slots after the last ability of their tier.
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         screen.chooseTab(1)
@@ -309,7 +309,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun abilityDroppedOnAPlaceholderReplacesIt() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         screen.chooseTab(1)
@@ -351,7 +351,7 @@ class TreeAndSlotScreensTest {
     fun destinyPlaceholderSlotsExplainClearAndTakeADrop() {
         // A destiny ability the data hasn't (VB stops loading: VB-BUGS #1) is a red placeholder slot,
         // as in an enhancement tree.
-        val session = TestSession.open("Kensei Warpriest.build") {
+        val session = TestSession.open("old-data/Kensei Warpriest.build") {
             it.replace("Ability: Tier 0: Thick Skinned\r\n", "Ability: Tier 0: Thin Skinned\r\n")
         }
         val screen = session.destiny
@@ -416,7 +416,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun featsDragFromListSwapAndDragBack() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.feats
         screen.opened()
 
@@ -469,7 +469,7 @@ class TreeAndSlotScreensTest {
     @Test
     fun featPlaceholdersShowExplainAndClear() {
         // Warlock Blaster has a feat the data no longer has: its slot shows the old text in red.
-        val session = TestSession.open("Warlock Blaster.build")
+        val session = TestSession.open("old-data/Warlock Blaster.build")
         val screen = session.feats
         screen.opened()
         var row = 0
@@ -501,7 +501,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun featsSlotMenu() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.feats
         screen.opened()
         val row = filledRow(screen)
@@ -534,7 +534,7 @@ class TreeAndSlotScreensTest {
 
     @Test
     fun featsGrantedTabIsReadOnly() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.feats
         screen.opened()
         screen.chooseTab(FeatTab.GRANTED)

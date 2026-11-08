@@ -20,7 +20,7 @@ import java.nio.file.Path
  */
 fun spellsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
     val save = repoRoot.resolve("Save")
-    prototype.openBuild(readBuildFile(Files.readAllBytes(save.resolve("Warlock Blaster.build")), prototype.data, BuildPoints.ADVENTURER))
+    prototype.openBuild(readBuildFile(Files.readAllBytes(oldData(repoRoot).resolve("Warlock Blaster.build")), prototype.data, BuildPoints.ADVENTURER))
     val screen = prototype.spells
     screen.opened()
     ImageComposeScene(width = 815, height = 518, density = Density(1f)) { SpellsWindowContent(prototype) {} }.use { scene ->

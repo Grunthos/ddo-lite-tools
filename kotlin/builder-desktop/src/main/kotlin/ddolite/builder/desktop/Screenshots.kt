@@ -116,7 +116,7 @@ fun main(args: Array<String>) {
     }
 
     // A real build from Save/: the main window's summary, its skills and its trees.
-    val bytes = Files.readAllBytes(repoRoot.resolve("Save").resolve("Kensei Warpriest.build"))
+    val bytes = Files.readAllBytes(oldData(repoRoot).resolve("Kensei Warpriest.build"))
     prototype.openBuild(readBuildFile(bytes, data, BuildPoints.ADVENTURER))
     ImageComposeScene(width = 900, height = 1500, density = Density(1f)) { MainWindowContent(prototype) }.use { scene ->
         save(scene, outDir.resolve("7-opened-main.png"))
@@ -186,6 +186,12 @@ fun main(args: Array<String>) {
 
 // Positions for the simulated clicks, measured from the rendered screen at density 1
 // (two bars of controls above the grid, then the grid's two header rows).
+/**
+ * kotlin/test-builds/old-data: Save/'s samples as they were before 4.15 renamed some of their feats and
+ * abilities. The screenshots use them, so they show placeholders and red slots as before.
+ */
+internal fun oldData(repoRoot: Path): Path = repoRoot.resolve("kotlin").resolve("test-builds").resolve("old-data")
+
 private fun findGridTop(scene: ImageComposeScene): Float = 84f // measured from 1-start.png
 
 private fun nameColumnWidth(): Float = 136f

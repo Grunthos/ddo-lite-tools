@@ -26,7 +26,7 @@ import java.nio.file.Path
  * the window's mouse handlers. Part of the screenshots tool.
  */
 fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
-    val file = repoRoot.resolve("Save").resolve("Warlock Blaster.build")
+    val file = oldData(repoRoot).resolve("Warlock Blaster.build")
     prototype.openBuild(readBuildFile(Files.readAllBytes(file), prototype.data, BuildPoints.ADVENTURER))
     val screen = prototype.enhancements
     screen.opened()
@@ -90,7 +90,7 @@ fun enhancementsScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: P
  */
 @OptIn(ExperimentalComposeUiApi::class)
 private fun guideScreenshots(prototype: BuilderSession, repoRoot: Path, outDir: Path) {
-    val file = repoRoot.resolve("Save").resolve("Kensei Warpriest.build")
+    val file = oldData(repoRoot).resolve("Kensei Warpriest.build")
     prototype.openBuild(readBuildFile(Files.readAllBytes(file), prototype.data, BuildPoints.ADVENTURER))
     val screen = prototype.enhancements
     screen.opened()

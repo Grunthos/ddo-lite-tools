@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class ScreenStateTest {
     @Test
     fun enhancementsAddRankClearAndUndo() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         screen.chooseTab(1)
@@ -70,7 +70,7 @@ class ScreenStateTest {
 
     @Test
     fun theRaceTreeCantBeRemovedFromTheTreesTab() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.enhancements
         screen.opened()
         val trees = screen.treeRows()
@@ -89,7 +89,7 @@ class ScreenStateTest {
 
     @Test
     fun featsFillAnEmptySlotFromTheList() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.feats
         screen.opened()
         // The first empty slot offering a feat without selectors (a Deity slot's feats all have them).
@@ -123,7 +123,7 @@ class ScreenStateTest {
 
     @Test
     fun guideListFollowsADeletedRow() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         // From an empty guide (the saved one's missing steps load as red rows).
         val rules = session.rules!!
         ddolite.builder.build.GuideRules(rules).clear()
@@ -172,7 +172,7 @@ class ScreenStateTest {
 
     @Test
     fun spellsClearAndChooseASpell() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val screen = session.spells
         screen.opened()
         assertTrue(screen.classes.isNotEmpty())
@@ -197,7 +197,7 @@ class ScreenStateTest {
 
     @Test
     fun skillsLevelHeaderRightClickOpensAMenu() {
-        val session = TestSession.open("Kensei Warpriest.build")
+        val session = TestSession.open("old-data/Kensei Warpriest.build")
         val skills = session.skills
         fun level1(): Int {
             var total = 0
