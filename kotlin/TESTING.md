@@ -15,21 +15,17 @@ and I'll answer questions there as `Reply:`.
 
 ## 0. Capturing VB's output (golden files, PLAN.md §6)
 
-With the 4.15 exe, VB's exports can be saved once and compared by the tests every time, which is
-far more thorough than comparing by eye. For each build in `Save/` (and any others worth keeping):
+With the 4.15 exe, VB's saves and exports can be captured once and compared by the tests every time,
+which is far more thorough than comparing by eye. The builds to capture, and the steps, are in
+[test-builds/golden/CAPTURE.md](test-builds/golden/CAPTURE.md).
 
-- [ ] Open it in VB 4.15 (or start `CharacterBuilderLite.exe "<file>"`).
-- [ ] File › Export › to Forums: for each format (DDO Forums, Code Tags, Plain Text, Reddit, and any
-      other `.bbcodes` in Settings), Section "All Sections", Save to File as
-      `kotlin/golden/snapshot-4.15/builds/<build name>/forum-<format>.txt`.
-- [ ] File › Export › to DDO Builder → `ddobuilder.ddocp` in the same folder (to Ron's Planner fails
-      in VB, VB-BUGS 6a). File › Export › Leveling Guide › csv and txt → `guide.csv`, `guide.txt`
-      (builds with a guide only).
-- [ ] Once: start VB with "Show Error Log on startup" on and copy its `Error.log` to
-      `kotlin/golden/snapshot-4.15/error.log`.
+- [ ] Capture done (`kotlin/golden/snapshot-4.15/`).
 
-Put a copy of the `.build` beside its exports as `input.build`. I'll then write the tests that compare
-the Kotlin output with these files and list every difference.
+Once the tests compare against the capture, they cover the content of these items, so they only need
+a look at colours (red slots, highlights) against the capture's screenshots: §2's round trip and
+"more round-trip files", the "same slots / red slots as VB" items in §6, §6a, §7, §7a and §7c, all
+of §7d, and the file contents in §7e. What's left is how the windows behave (clicks, drag and drop,
+menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which only VB can answer.
 
 ## 1. Questions only VB can answer
 

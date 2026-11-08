@@ -14,26 +14,32 @@ what VB writes becomes the golden.
 
 ## Once per snapshot
 
-1. Make a folder `kotlin/golden/snapshot-<yyyy-mm-dd>/`.
-2. Note the VB version (4.15.0) and the commit of `Data/` used, in `manifest.txt`.
-3. Screenshot Tools > Options so the output settings (feat order, skill order …) are recorded;
-   the exports depend on them. Leave them at their defaults if possible.
+1. Make the folder `kotlin/golden/snapshot-4.15/` (git keeps everything under `kotlin/golden/`
+   byte for byte).
+2. In `manifest.txt` there, note the VB version (4.15.0) and the commit of `Data/` used.
+3. Leave Tools > Options at their defaults (the exports depend on feat order, skill order …), or
+   screenshot it if not: `options.png`.
+4. Start VB with "Show Error Log on startup" on; if it shows a log, copy `Error.log` to `error.log`.
 
 ## For each build
 
+Do this for A–D, and for `Save/Eresh WFWizRog-v4.15.build` (the one sample that is clean in 4.15).
 Put everything in `builds/<build name>/` in the snapshot folder.
 
 1. File > Open the build. If Messages appear (Tools > Messages), screenshot the list: `messages.png`.
 2. File > Save As `saved.build`. This is the golden .build.
-3. File > Export > to Forums. Section: the whole build. For each Format in the list, Save to
-   File as `forum-<format>.txt` (for example `forum-Plain Text.txt`, `forum-DDO Forums.txt`).
-4. File > Export > to Ron's Planner: `ronsplanner.txt`. File > Export > to DDO Builder: `ddobuilder.txt`.
-5. File > Export > Leveling Guide > csv: `guide.csv`; > txt: `guide.txt`.
-6. Screenshots (one window at a time, at its default size): the main window's output, then
-   Edit > Overview, Stats, Skills, Feats, Spells, Enhancements (Trees tab and Leveling Guide tab)
-   and Destiny where the build has them. Name them after the window: `stats.png`, `enhancements-guide.png` ….
-7. Tools > Error Log: if anything was logged, save it as `error.log`.
-8. File > Close, then File > Open `saved.build` again. If anything differs (Messages, empty slots),
-   note it in `reopen.txt`. Build D is expected to lose its deity feats here.
+3. File > Export > to Forums. Section: All Sections. For each Format (Code Tags, DDO Forums,
+   Plain Text, Reddit, Something Awful, The Vault), Save to File as `forum-<format>.txt`
+   (for example `forum-Plain Text.txt`).
+4. File > Export > to DDO Builder: `ddobuilder.ddocp`. (Skip to Ron's Planner: it fails in VB,
+   VB-BUGS 6a.)
+5. File > Export > Leveling Guide > csv: `guide.csv`; > txt: `guide.txt` (builds with a guide).
+6. Screenshots, for the colours the text exports don't carry (one window at a time, default size):
+   the main window (`main.png`), Feats (`feats.png`), Enhancements on a tree with red slots, or
+   the tier 5 tree if none (`enhancements.png`), and Destinies for B and D (`destinies.png`).
+7. File > Close, then File > Open `saved.build` again. If anything differs (Messages, empty slots),
+   note it in `reopen.txt`. Build D is expected to lose its deity feats here (VB-BUGS #7), and to
+   show "Max: 0" in red on the Destinies window (VB-BUGS 18d).
 
-Skip a step that doesn't apply (A and C have no destinies; nothing to screenshot if a window can't open).
+Skip a step that doesn't apply. The tests will compare Kotlin with everything here except the
+screenshots, which are for comparing by eye.
