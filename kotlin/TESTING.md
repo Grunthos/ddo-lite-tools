@@ -199,6 +199,11 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
       same here; the Destiny column is narrow (it shows the tier) and the slots wider.
 - [ ] Destinies tab: slots, ranks, red slots, abilities offered, selectors, details (no level
       requirements, as VB), adding by double-click and drag, clearing, the tier 5 question.
+- [ ] A destiny ability the data no longer has (new; VB stops loading): rename one in a copy of a build
+      (e.g. Kensei Warpriest's "Ability: Tier 0: Thick Skinned" under Legendary Dreadnought to "Thin
+      Skinned"). It opens; Messages lists "Destinies: … (kept as a red slot)"; on the Destinies tab it's a
+      red slot where the file had it; selecting it explains; double-click clears it; an ability dragged
+      onto it replaces it; saving keeps it until then.
 
 ## 7b. Messages (builds with feats or enhancements the data no longer has)
 

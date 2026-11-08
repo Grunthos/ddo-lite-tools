@@ -251,6 +251,9 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
      */
     fun replacePlaceholder(bt: BuildTree, index: Int, tier: Int, ability: Int, selector: Int, ranks: Int) {
         val placeholder = bt.missing.removeAt(index)
+        if (destinies) {
+            return // the leveling guide has no destinies
+        }
         val steps = build.guide.enhancements
         for (i in steps.indices) {
             val step = steps[i]
@@ -273,6 +276,9 @@ class TreeEdits(private val rules: BuildRules, private val destinies: Boolean) {
     /** Kotlin only: placeholder [index] of [bt] cleared, and the leveling guide's red rows for it. */
     fun clearPlaceholder(bt: BuildTree, index: Int) {
         val placeholder = bt.missing.removeAt(index)
+        if (destinies) {
+            return
+        }
         val steps = build.guide.enhancements
         for (i in steps.size - 1 downTo 0) {
             if (guideStepFor(steps[i], bt, placeholder)) {

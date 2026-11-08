@@ -830,7 +830,7 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         val slot = slotAt(bt, row) ?: return
         if (slot.placeholder) {
             details = AbilityDetails(
-                "Not in the current data", missingDetails(bt.missing[slot.index]), "", "", null,
+                "Not in the current data", missingAbilityDetails(bt.missing[slot.index]), "", "", null,
             )
             return
         }
@@ -1122,15 +1122,15 @@ class EnhancementsScreenState(private val session: BuilderSession) : TreeAbiliti
         }
         dragComplete = false
     }
+}
 
-    /** What a placeholder slot says in the details box. */
-    private fun missingDetails(m: MissingAbility): List<DetailLine> {
-        return listOf(
-            DetailLine("Tier " + m.tier + ": " + m.caption, null, true),
-            DetailLine("", null, false),
-            DetailLine("The build file has this ability, but the current data hasn't (it may have been renamed or removed). It costs nothing, and anything that needed it shows an error.", null, false),
-            DetailLine("", null, false),
-            DetailLine("Double-click it (or right-click › Clear this ability) to remove it, then add what it became, if anything. Until then it's saved as it was read.", null, false),
-        )
-    }
+/** What a placeholder slot (Kotlin only) says in the Enhancements or Destinies details box. */
+internal fun missingAbilityDetails(m: MissingAbility): List<DetailLine> {
+    return listOf(
+        DetailLine("Tier " + m.tier + ": " + m.caption, null, true),
+        DetailLine("", null, false),
+        DetailLine("The build file has this ability, but the current data hasn't (it may have been renamed or removed). It costs nothing, and anything that needed it shows an error.", null, false),
+        DetailLine("", null, false),
+        DetailLine("Double-click it (or right-click › Clear this ability) to remove it, then add what it became, if anything. Until then it's saved as it was read.", null, false),
+    )
 }

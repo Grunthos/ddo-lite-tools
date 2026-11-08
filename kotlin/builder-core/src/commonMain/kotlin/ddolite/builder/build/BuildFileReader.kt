@@ -612,10 +612,15 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         val ability = parseAbility(buildTree.treeName + " " + raw, isDestiny)
         val resolved = if (ability.parsed) resolveAbility(ability, keepLowerRank = true) else null
         if (resolved == null) {
-            // Kotlin only: an enhancement tree in the data keeps the line as a placeholder slot.
-            if (!isDestiny && ability.parsed && data.findTree(buildTree.treeName) != null) {
+            // Kotlin only: a tree or destiny in the data keeps the line as a placeholder slot.
+            val known = if (isDestiny) data.findDestiny(buildTree.treeName) else data.findTree(buildTree.treeName)
+            if (ability.parsed && known != null) {
                 buildTree.addMissing(MissingAbility(ability.tier, raw))
-                deprecations.enhancements.add(ability.copy(kept = true))
+                if (isDestiny) {
+                    deprecations.destinies.add(ability.copy(kept = true))
+                } else {
+                    deprecations.enhancements.add(ability.copy(kept = true))
+                }
                 return
             }
             deprecateAbility(ability)
@@ -637,15 +642,15 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
      * Records an ability that didn't resolve. Ported from `basDeprecate.DeprecateAbility`
      * (basDeprecate.bas:444).
      *
-     * VB bug, reported as a problem: for a destiny ability VB writes to an array it never sized,
-     * so it stops with "Subscript out of range" (the ability is still counted as deprecated).
+     * Kotlin fix (VB-BUGS #1): for a destiny ability VB writes to an array it never sized and stops
+     * with "Subscript out of range"; here it's dropped and listed in Messages, as an enhancement is.
      */
     private fun deprecateAbility(ability: DeprecatedAbility) {
         if (ability.isDestiny) {
             deprecations.destinies.add(ability)
-            throw VbRuntimeError(SUBSCRIPT_OUT_OF_RANGE)
+        } else {
+            deprecations.enhancements.add(ability)
         }
-        deprecations.enhancements.add(ability)
     }
 
     /**

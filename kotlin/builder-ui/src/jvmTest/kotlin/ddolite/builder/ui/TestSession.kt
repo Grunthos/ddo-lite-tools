@@ -7,6 +7,7 @@ import ddolite.builder.data.loadBuilderData
 import ddolite.common.theme.ThemeFileKind
 import ddolite.common.theme.loadTheme
 import ddolite.dataformat.DirectoryDataSource
+import ddolite.dataformat.Windows1252
 import ddolite.dataformat.decodeText
 import java.nio.file.Files
 import java.nio.file.Path
@@ -24,14 +25,15 @@ object TestSession {
         override fun chooseLevel(min: Int, max: Int): Int? = null
     }
 
-    /** A new session with [buildName] (a file in Save/) open. */
-    fun open(buildName: String): BuilderSession {
+    /** A new session with [buildName] (a file in Save/) open, its text changed by [edit] first. */
+    fun open(buildName: String, edit: (String) -> String = { it }): BuilderSession {
         val file = dataDir.resolveSibling("Settings").resolve("Black.screen")
         val theme = loadTheme(decodeText(Files.readAllBytes(file)).text, "Black", ThemeFileKind.SCREEN).theme
         val skills = SkillsScreenState(data, listOf(theme), prototypePresets())
         val session = BuilderSession(data, skills, TreeSlotsState(data, readTreeHeaders(source), skills), YesPrompts)
         val build = Path.of(System.getProperty("ddolite.saveDir")).resolve(buildName)
-        session.openBuild(readBuildFile(Files.readAllBytes(build), data, BuildPoints.ADVENTURER))
+        val text = edit(Windows1252.decode(Files.readAllBytes(build)))
+        session.openBuild(readBuildFile(Windows1252.encode(text), data, BuildPoints.ADVENTURER))
         return session
     }
 }

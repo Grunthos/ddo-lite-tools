@@ -36,9 +36,8 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
      * Issues (feats to replace) and notices (everything else). Ported from `CountMessages`
      * (frmDeprecate.frm:270), without the binary-only counts.
      *
-     * VB quirk, kept: destiny abilities are counted, but ShowNotices doesn't list them (that code is
-     * commented out), so they'd keep the count above 0. (VB stops loading at a missing destiny
-     * ability anyway: VB-BUGS #1.)
+     * Destiny abilities are counted, and (Kotlin only) listed: VB's ShowNotices has that code
+     * commented out, but VB stops loading at a missing destiny ability anyway (VB-BUGS #1).
      */
     fun countMessages(): Pair<Int, Int> {
         val issues = deprecations.feats.size
@@ -86,6 +85,11 @@ class DeprecationMessages(private val rules: BuildRules, val deprecations: Depre
             val e = deprecations.enhancements[i]
             val kept = if (e.kept) " (kept as a red slot)" else ""
             result.add(DeprecationMessage("Enhancements: " + abilityNotice(e) + kept, MessageGroup.ENHANCEMENT, i + 1))
+        }
+        for (i in deprecations.destinies.indices) {
+            val d = deprecations.destinies[i]
+            val kept = if (d.kept) " (kept as a red slot)" else ""
+            result.add(DeprecationMessage("Destinies: " + abilityNotice(d) + kept, MessageGroup.DESTINY, i + 1))
         }
         for (i in deprecations.reducedRanks.indices) {
             val r = deprecations.reducedRanks[i]

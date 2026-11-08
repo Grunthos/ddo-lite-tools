@@ -130,7 +130,12 @@ class BuildRoundTripTest {
                 }
             }
             // Abilities kept as placeholder slots are saved back; only the others leave the file.
-            var droppedAbilities = deprecations.destinies.size
+            var droppedAbilities = 0
+            for (d in deprecations.destinies) {
+                if (!d.kept) {
+                    droppedAbilities++
+                }
+            }
             for (e in deprecations.enhancements) {
                 if (!e.kept) {
                     droppedAbilities++

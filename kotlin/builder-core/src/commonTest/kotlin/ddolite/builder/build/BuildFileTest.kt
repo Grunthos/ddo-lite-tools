@@ -35,6 +35,9 @@ class BuildFileTest {
                 "TreeName: Human\nType: Race\nAbbreviation: Hum\n\n" +
                 "AbilityName: Versatility\nTier: 0\nSelector: Attack, Defense\n\n" +
                 "AbilityName: Inflame: Energy Absorption\nTier: 1\nRanks: 3\n",
+            "Builder/Destinies.txt" to
+                "DestinyName: Exalted Angel\nAbbreviation: Angel\nType: Destiny\n\n" +
+                "AbilityName: Astral Touch\nTier: 0\n\nAbilityName: Deepening Faith\nTier: 0\n",
         ),
         LoadLog(),
     )
@@ -207,6 +210,30 @@ class BuildFileTest {
         assertTrue(slots[0].placeholder)
         assertFalse(slots[1].placeholder)
         assertTrue(writeBuildText(before.rules).contains("Ability: Tier 0: No Such Ability\r\nAbility: Tier 0: Versatility: Attack\r\n"))
+    }
+
+    @Test
+    fun destinyKeepsMissingAbilitiesAsPlaceholders() {
+        // As an enhancement tree (Kotlin only: VB stops loading, VB-BUGS #1). A destiny the data
+        // hasn't has its abilities dropped and listed, rather than stopping the load.
+        val result = read(
+            fighter + "[Destiny]\n\nDestiny: Exalted Angel\nType: Destiny\n" +
+                "Ability: Tier 0: Astral Touch\nAbility: Tier 0: No Such Ability\nAbility: Tier 0: Deepening Faith\n\n" +
+                "Destiny: No Such Destiny\nType: Destiny\nAbility: Tier 0: Anything\n\n",
+        )
+        assertEquals(emptyList(), result.problems)
+        val angel = result.build.destinies[0]
+        assertEquals(2, angel.abilities.size)
+        assertEquals(listOf("No Such Ability"), angel.missing.map { it.caption })
+        assertEquals(listOf(true, false), result.deprecations.destinies.map { it.kept })
+        val messages = DeprecationMessages(result.rules, result.deprecations).messages().map { it.text }
+        assertTrue(messages.contains("Destinies: Exalted Angel Tier 0: No Such Ability not found (kept as a red slot)"), messages.toString())
+        assertTrue(messages.contains("Destinies: No Such Destiny Tier 0: Anything not found"), messages.toString())
+        val saved = writeBuildText(result.rules)
+        assertTrue(saved.contains("Ability: Tier 0: Astral Touch\r\nAbility: Tier 0: No Such Ability\r\nAbility: Tier 0: Deepening Faith\r\n"), saved)
+        // Clearing it in the Destinies window removes it.
+        TreeEdits(result.rules, destinies = true).clearPlaceholder(angel, 0)
+        assertFalse(writeBuildText(result.rules).contains("No Such Ability"))
     }
 
     @Test

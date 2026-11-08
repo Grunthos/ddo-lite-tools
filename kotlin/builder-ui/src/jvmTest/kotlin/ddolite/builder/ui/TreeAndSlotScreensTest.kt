@@ -347,6 +347,60 @@ class TreeAndSlotScreensTest {
         assertEquals(abilities, kensei().abilities.size)
     }
 
+    @Test
+    fun destinyPlaceholderSlotsExplainClearAndTakeADrop() {
+        // A destiny ability the data hasn't (VB stops loading: VB-BUGS #1) is a red placeholder slot,
+        // as in an enhancement tree.
+        val session = TestSession.open("Kensei Warpriest.build") {
+            it.replace("Ability: Tier 0: Thick Skinned\r\n", "Ability: Tier 0: Thin Skinned\r\n")
+        }
+        val screen = session.destiny
+        screen.opened()
+        screen.chooseTab(1)
+        screen.chooseComboTree("Legendary Dreadnought")
+        fun dreadnought(): BuildTree = session.rules!!.build.destinies[0]
+        val abilities = dreadnought().abilities.size
+        assertEquals(1, dreadnought().missing.size)
+        val rows = screen.slotRows()
+        assertEquals(abilities + 1, rows.size)
+        val row = rows.indexOfFirst { it.cost == "?" } + 1
+        assertEquals(3, row, "where the file had it")
+        assertEquals("Thin Skinned", rows[row - 1].caption)
+        assertTrue(rows[row - 1].error)
+
+        // Clicking explains; a right-click opens the menu; double-clicking removes it (undoably).
+        screen.clickSlot(row, PointerButton.PRIMARY)
+        assertEquals("Not in the current data", screen.details?.caption)
+        screen.clickSlot(row, PointerButton.SECONDARY)
+        assertEquals(row, screen.slotMenuRow)
+        screen.closeSlotMenu()
+        screen.doubleClickSlot(row)
+        assertTrue(dreadnought().missing.isEmpty())
+        assertEquals(abilities, dreadnought().abilities.size)
+        session.undo()
+        assertEquals(1, dreadnought().missing.size)
+
+        // An ability dragged from the list lights the placeholder up; dropped there, it replaces it.
+        var chosen = -1
+        for (i in screen.abilities.indices) {
+            if (screen.clickAbility(i)) {
+                chosen = i
+                break
+            }
+        }
+        assertTrue(chosen >= 0, "an ability without selectors is offered")
+        val item = EnhancementDrag.ListAbility(screen.abilities[chosen].tier, screen.abilities[chosen].ability)
+        assertTrue(screen.startAbilityDrag(item))
+        val target = screen.slotRows().indexOfFirst { it.cost == "?" } + 1
+        assertTrue(screen.slotStates[target - 1] != DropState.DEFAULT)
+        screen.abilityDropped(item, AbilityRowKey(target))
+        assertTrue(dreadnought().missing.isEmpty())
+        assertEquals(abilities + 1, dreadnought().abilities.size)
+        for (a in dreadnought().abilities) {
+            assertTrue(a.ability != BLANK_ABILITY)
+        }
+    }
+
     // ---------------------------------------------------------------- Feats slots
 
     /** The first row with a feat whose slot is the given kind, or 0. */

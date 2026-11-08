@@ -15,6 +15,8 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
    `DeprecateAbility`: for a destiny ability it writes to an array it never sized ("Subscript out
    of range"). Hit when a `.build` names a destiny ability the current data has renamed or removed.
    *Fix:* `ReDim Preserve` the destiny array as the enhancement branch does.
+   **The Kotlin version fixes this**, and keeps the ability as a red placeholder slot
+   (KOTLIN-CHANGES.md).
 
 2. **Stats › Schedule tab with a level-up chosen (confirmed in VB 4.15).** `Forms/Build/frmStats.frm:1614`
    `DrawLevelupRow` loops `For i = 0 To MAX_LEVEL` (36) but the grid has columns 0-30 only
