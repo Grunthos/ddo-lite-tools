@@ -1,0 +1,237 @@
+[Overview]
+
+Name: Golden C Iconic Divine Artificer
+Race: Purple Dragon Knight
+Alignment: Lawful Neutral
+MaxLevels: 20
+MaxLevels: 20
+
+Notes: A level 20 Purple Dragon Knight (iconic) Cleric 13 / Artificer 7.
+Notes: Second line of notes.
+
+Class: Cleric
+Class: Artificer
+
+Level: 1	Cleric
+Level: 2	Cleric
+Level: 3	Cleric
+Level: 4	Cleric
+Level: 5	Cleric
+Level: 6	Cleric
+Level: 7	Artificer
+Level: 8	Cleric
+Level: 9	Artificer
+Level: 10	Cleric
+Level: 11	Artificer
+Level: 12	Cleric
+Level: 13	Artificer
+Level: 14	Cleric
+Level: 15	Artificer
+Level: 16	Cleric
+Level: 17	Artificer
+Level: 18	Cleric
+Level: 19	Artificer
+Level: 20	Cleric
+
+
+[Stats]
+
+Preferred: Hero
+
+;    Advn  Chmp  Hero  Lgnd  Tome
+;    ----  ----  ----  ----  ----
+STR:               2            
+DEX:                            
+CON:               8            
+INT:               8            
+WIS:              16           3
+CHA:                            
+;    ----  ----  ----  ----
+;                 34         
+
+Levelup: 0	Wisdom
+Levelup: 4	Wisdom
+Levelup: 8	Wisdom
+Levelup: 12	Wisdom
+Levelup: 16	Wisdom
+Levelup: 20	Wisdom
+Levelup: 24	
+Levelup: 28	
+Levelup: 32	
+Levelup: 36	
+
+
+[Skills]
+
+;         1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  Tome
+;        ------------------------------------------------------------------------------------
+Balance:                                                                                    
+Bluff  :                                                                                    
+Concent:  4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1     
+Diplo  :                                                                                    
+Disable:                                                  2       2       3       2         
+Haggle :                                                                                    
+Heal   :                                                                                    
+Hide   :                                                                                    
+Intim  :                                                                                    
+Jump   :                                                                                    
+Listen :                                                                                    
+Move Si:                                                                                    
+Open Lo:                                                                                    
+Perform:                                                                                    
+Repair :  4   1   1   1   1   1           4   1   4   1   2   1   2   1   1   1   2   1     
+Search :  4   1   1   1   1   1                                                             
+Spellcr:  4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1     
+Spot   :                                                                                    
+Swim   :                                                                                    
+Tumble :                                                                                    
+UMD    :  4   1   1   1   1   1   5   3   1   2   1   2   1   2   1   2   1   2   1   2     
+
+
+[Feats]
+
+Standard: Heroic 1	Empower Healing Spell
+Standard: Heroic 3	Maximize Spell
+Standard: Heroic 6	Quicken Spell
+Standard: Heroic 9	Improved Turning
+Standard: Heroic 12	Construct Essence
+Standard: Heroic 15	Spell Penetration
+Standard: Heroic 18	Empower Spell
+
+Race: Purple Dragon Knight 1	Extra Turning
+
+Class: Cleric 2	Domain: Healing Domain
+
+Class: Artificer 4	Heighten Spell
+
+Deity: Deity 1	Follower of: Helm
+Deity: Deity 6	Deity Ability: Ever Watchful
+
+
+[Spells]
+
+Spell: Cleric 1	Cure Light Wounds
+Spell: Cleric 1	Bane
+Spell: Cleric 1	Bless
+Spell: Cleric 1	Cause Fear
+Spell: Cleric 1	Command
+Spell: Cleric 1	Divine Favor
+
+Spell: Cleric 2	Cure Moderate Wounds
+Spell: Cleric 2	Aid
+Spell: Cleric 2	Bear's Endurance
+Spell: Cleric 2	Bull's Strength
+Spell: Cleric 2	Close Wounds
+Spell: Cleric 2	Deific Vengeance
+
+Spell: Cleric 3	Cure Serious Wounds
+Spell: Cleric 3	Bestow Curse
+Spell: Cleric 3	Blindness
+Spell: Cleric 3	Contagion
+Spell: Cleric 3	Dispel Magic
+Spell: Cleric 3	Glyph of Warding
+
+Spell: Cleric 4	Cure Critical Wounds
+Spell: Cleric 4	Chaos Hammer
+Spell: Cleric 4	Death Ward
+Spell: Cleric 4	Dismissal
+Spell: Cleric 4	Divine Power
+Spell: Cleric 4	Freedom of Movement
+
+Spell: Cleric 5	Mass Cure Light Wounds
+Spell: Cleric 5	Break Enchantment
+Spell: Cleric 5	Divine Punishment
+Spell: Cleric 5	Flame Strike
+Spell: Cleric 5	Greater Command
+
+Spell: Cleric 6	Mass Cure Moderate Wounds
+Spell: Cleric 6	Banishment
+Spell: Cleric 6	Blade Barrier
+Spell: Cleric 6	Cometfall
+
+Spell: Cleric 7	Mass Cure Serious Wounds
+Spell: Cleric 7	Destruction
+Spell: Cleric 7	Greater Restoration
+
+Spell: Artificer 1	Ablative Armor
+Spell: Artificer 1	Admixture: Cure Light Wounds
+Spell: Artificer 1	Conjure Bolts
+
+Spell: Artificer 2	Admixture: Cure Moderate Wounds
+Spell: Artificer 2	Bear's Endurance
+
+Spell: Artificer 3	Admixture: Cure Serious Wounds
+Spell: Artificer 3	Admixture: Remove Disease
+
+
+[Enhancements]
+
+Tier5: Radiant Servant
+
+Tree: Radiant Servant
+Type: Class
+Source: Cleric
+ClassLevels: 13
+Ability: Tier 0: Healing Power
+Ability: Tier 0: Cure Moderate Wounds
+Ability: Tier 0: Positive Energy Burst
+Ability: Tier 0: Improved Empower Healing
+Ability: Tier 1: Divine Aid I
+Ability: Tier 1: Bliss (Rank 3)
+Ability: Tier 1: Altruism (Rank 3)
+Ability: Tier 1: Wand and Scroll Mastery (Rank 3)
+Ability: Tier 2: Efficient Empower Healing (Rank 3)
+Ability: Tier 2: Divine Healing (Rank 3)
+Ability: Tier 2: Improved Turning (Rank 3)
+Ability: Tier 2: Mighty Turning
+Ability: Tier 3: Divine Aid II
+Ability: Tier 3: Intense Healing (Rank 3)
+Ability: Tier 3: Stat: Wisdom
+Ability: Tier 4: Divine Aid III
+Ability: Tier 4: Incredible Healing (Rank 3)
+Ability: Tier 4: Stat: Wisdom
+Ability: Tier 4: Divine Health
+Ability: Tier 5: Positive Energy Aura
+Ability: Tier 5: Cure Focus
+Ability: Tier 5: Radiance
+
+Tree: Arcanotechnician
+Type: Class
+Source: Artificer
+ClassLevels: 7
+Ability: Tier 0: Arcanotechnician
+Ability: Tier 0: Palliative Admixture
+Ability: Tier 0: Thaumaturgical Battery
+Ability: Tier 1: Energy of Creation (Rank 3)
+Ability: Tier 1: Spell Critical
+Ability: Tier 1: Arcane Skills (Rank 2)
+Ability: Tier 2: Spell Critical II
+Ability: Tier 2: Efficient Metamagic: Empower (Rank 1)
+
+Tree: Battle Engineer
+Type: Class
+Source: Artificer
+ClassLevels: 7
+Ability: Tier 0: Battle Engineer
+Ability: Tier 1: Field Engineer (Rank 1)
+
+Tree: Purple Dragon Knight
+Type: Race
+ClassLevels: 20
+Ability: Tier 0: Human Versatility: Human Spell Power Boost
+Ability: Tier 1: Action Surge: Wisdom (Rank 2)
+
+
+[LevelingGuide]
+
+Guide: RadServant Tier 0: Healing Power
+Guide: RadServant Tier 1: Bliss (Rank 1)
+Guide: RadServant Tier 1: Bliss (Rank 2)
+Guide: RadServant Tier 1: Bliss (Rank 3)
+Guide: PDK Tier 0: Human Versatility: Human Spell Power Boost
+Guide: RadServant Tier 1: Divine Aid I
+Guide: Arcanotech Tier 0: Arcanotechnician
+Guide: BtlEngineer Tier 0: Battle Engineer
+Guide: Reset Tree: BtlEngineer
+Guide: Arcanotech Tier 1: Spell Critical
+
