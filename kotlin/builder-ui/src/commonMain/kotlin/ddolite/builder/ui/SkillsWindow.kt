@@ -148,6 +148,15 @@ fun SkillsWindowContent(state: BuilderSession, classIcons: Map<String, ImageBitm
                     skills.menuRow = 0
                 })
             }
+            if (skillAt != null && skills.levelMenu != 0) {
+                PopupMenu(skills.levelMenuItems(), -1, skillAt, density, onChoose = { index ->
+                    skillMenuAt = null
+                    skills.chooseLevelMenu(index)
+                }, onDismiss = {
+                    skillMenuAt = null
+                    skills.levelMenu = 0
+                })
+            }
             val contrastAt = contrastMenuAt
             if (contrastAt != null) {
                 // ContrastMenu (:1237) ticks the current setting; mnuContrast_Click (:1246) redraws.

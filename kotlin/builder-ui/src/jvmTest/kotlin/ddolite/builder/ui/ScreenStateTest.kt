@@ -1,5 +1,6 @@
 package ddolite.builder.ui
 
+import ddolite.builder.model.Skill
 import ddolite.builder.model.TreeStyle
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -192,5 +193,29 @@ class ScreenStateTest {
         screen.chooseSpell()
         assertNotNull(screen.rows().getOrNull(row - 1))
         assertTrue(screen.rows()[row - 1].spell.isNotEmpty(), "the first empty slot is filled")
+    }
+
+    @Test
+    fun skillsLevelHeaderRightClickOpensAMenu() {
+        val session = TestSession.open("Kensei Warpriest.build")
+        val skills = session.skills
+        fun level1(): Int {
+            var total = 0
+            for (skill in Skill.entries) {
+                total += skills.spend.get(skill, 1)
+            }
+            return total
+        }
+        assertTrue(level1() > 0)
+        // The right-click only opens the menu (VB cleared the level at once).
+        skills.press(0, 1, PointerButton.SECONDARY)
+        assertEquals(1, skills.levelMenu)
+        assertEquals(listOf("Clear Level 1"), skills.levelMenuItems())
+        assertTrue(level1() > 0)
+        assertFalse(session.dirty)
+        skills.chooseLevelMenu(0)
+        assertEquals(0, skills.levelMenu)
+        assertEquals(0, level1())
+        assertTrue(session.dirty)
     }
 }

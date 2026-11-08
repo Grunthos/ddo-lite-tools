@@ -25,6 +25,7 @@ where things are; **Look** = how they're drawn.
 | Feats: a feat (or a feat's selector) the data no longer has is kept in its slot as a red placeholder showing the file's text: the slot counts as empty, selecting it explains; dropping a feat on it replaces it, double-click or Clear This Feat removes it, a slot swap moves it; saved back as read until then (VB drops it, leaving the slot empty). Messages marks it "kept as a red slot". | Rule | `Modules/Build/basFormatLite.bas` `LoadFeatsText` (:920) | ce28a72 |
 | A red slot's error ("Error: Requires …") is the first line of the details box (VB puts it last, often out of sight). | Look | frmEnhancements, frmDestiny2 `ShowDetails` | 78f06ba |
 | A file that can't be read or imported shows the error instead of closing the program. | Rule | `LoadBuild` and the import routines' error handlers | 8fc0792 |
+| Skills: a right-click on a level number opens a menu, "Clear Level N" (VB clears the level's points on the right-click, without asking). A right-click on a cell still removes a point at once. | Rule | `Forms/Build/frmSkills.frm` `picGrid_MouseDown` (:1660) | |
 | Deity feats are read back by the character level VB writes ("Deity 12"), then by class level; VB matches only the class level, so it loses any deity feat whose two levels differ (most multiclass builds). VB-BUGS 7. | Rule | `Modules/Build/basFormatLite.bas` `IdentifySlot` (:1014) | e546bbc |
 
 ## 2. Features VB doesn't have

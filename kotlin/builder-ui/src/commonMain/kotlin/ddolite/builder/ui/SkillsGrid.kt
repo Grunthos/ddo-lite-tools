@@ -174,7 +174,7 @@ fun compactGridLayout(textMeasurer: TextMeasurer, classRow: Boolean): GridLayout
  * picture box on frmSkills; drawing follows `DrawGrid` (:1400) and the Draw* routines after it,
  * interaction goes to [SkillsScreenState]. [classIcons] (by [classResourceId]) are drawn above the
  * levels when [layout] has room for them. [onMenu] gets the pointer position when a right-click on a
- * skill name asks for its menu (picGrid_MouseDown's PopupMenu).
+ * skill name or a level number asks for its menu (picGrid_MouseDown's PopupMenu).
  */
 @Composable
 fun SkillsGrid(
@@ -217,7 +217,7 @@ fun SkillsGrid(
                             if (state.press(row, col, pressedButton(event))) {
                                 repeating = startRepeating(scope) { state.repeat() }
                             }
-                            if (state.menuRow != 0) {
+                            if (state.menuRow != 0 || state.levelMenu != 0) {
                                 currentOnMenu(position)
                             }
                             event.changes[0].consume()

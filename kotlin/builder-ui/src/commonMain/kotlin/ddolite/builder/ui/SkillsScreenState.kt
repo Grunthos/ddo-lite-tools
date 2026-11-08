@@ -233,10 +233,9 @@ class SkillsScreenState(
             return false
         }
         if (row == 0) {
-            // Header: right-click on a level clears that level.
+            // Header: right-click on a level opens its menu (Kotlin; VB clears the level at once).
             if (col != 0 && button == PointerButton.SECONDARY) {
-                grid.clearLevel(spend, col)
-                changed()
+                levelMenu = col
             }
             return false
         }
@@ -335,6 +334,26 @@ class SkillsScreenState(
         } else {
             applyMaxRanks(skill, index + 1)
         }
+        changed()
+    }
+
+    /** The level whose header menu is showing; 0 = none. */
+    var levelMenu by mutableIntStateOf(0)
+
+    /** The level header menu's items (Kotlin only). */
+    fun levelMenuItems(): List<String> = listOf("Clear Level $levelMenu")
+
+    /**
+     * An item chosen from the level header menu: "Clear Level N" clears the level's skill points.
+     * VB clears it on the right-click itself (ClearColumn from picGrid_MouseDown, frmSkills.frm:1660).
+     */
+    fun chooseLevelMenu(index: Int) {
+        val level = levelMenu
+        levelMenu = 0
+        if (index != 0 || level < 1 || level > grid.levels) {
+            return
+        }
+        grid.clearLevel(spend, level)
         changed()
     }
 

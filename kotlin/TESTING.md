@@ -111,7 +111,8 @@ menus, keyboard, Undo, scaling, themes) and the "VB bug to confirm" items, which
 - [ ] Left / right / middle click, holding to repeat, double-click.
 - [ ] Clicking a skill name repeatedly: half ranks → full ranks → even levels → clear.
 - [ ] Right-click on a skill name: the menu, and each item.
-- [ ] Right-click on a level number clears that level.
+- [ ] Right-click on a level number opens a menu, "Clear Level N", which clears that level (new: VB clears
+      it on the right-click, without asking).
 - [ ] Disable Device / Open Lock need a trapper level first.
 - [ ] Points per level use the Intelligence at that level (change Int or an Int tome in Stats and watch).
 - [ ] Skill Tomes tab: the spinners' maximum, and the values saved in the file.
