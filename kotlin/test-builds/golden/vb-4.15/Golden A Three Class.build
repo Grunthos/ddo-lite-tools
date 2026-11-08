@@ -1,0 +1,225 @@
+[Overview]
+
+Name: Golden A Three Class
+Race: Human
+Alignment: Lawful Good
+MaxLevels: 20
+MaxLevels: 20
+
+Class: Wizard
+Class: Rogue
+Class: Fighter
+
+Level: 1	Rogue
+Level: 2	Wizard
+Level: 3	Fighter
+Level: 4	Fighter
+Level: 5	Wizard
+Level: 6	Rogue
+Level: 7	Wizard
+Level: 8	Fighter
+Level: 9	Wizard
+Level: 10	Rogue
+Level: 11	Wizard
+Level: 12	Fighter
+Level: 13	Rogue
+Level: 14	Wizard
+Level: 15	Rogue
+Level: 16	Wizard
+Level: 17	Rogue
+Level: 18	Wizard
+Level: 19	Wizard
+Level: 20	Wizard
+
+
+[Stats]
+
+Preferred: Champion
+
+;    Advn  Chmp  Hero  Lgnd  Tome
+;    ----  ----  ----  ----  ----
+STR:         2     2     2     3
+DEX:   6     6     8     8     5
+CON:   6     8     8    10     7
+INT:  16    16    16    16     8
+WIS:                           1
+CHA:                           2
+;    ----  ----  ----  ----
+;     28    32    34    36   
+
+Levelup: 0	Intelligence
+Levelup: 4	Intelligence
+Levelup: 8	Intelligence
+Levelup: 12	Intelligence
+Levelup: 16	Intelligence
+Levelup: 20	Intelligence
+Levelup: 24	
+Levelup: 28	
+Levelup: 32	
+Levelup: 36	
+
+
+[Skills]
+
+;         1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  Tome
+;        ------------------------------------------------------------------------------------
+Balance:  4                                                                                 
+Bluff  :                                                                                    
+Concent:  4                                                               5                 
+Diplo  :                                                                                    
+Disable:  4           1   1   4   1   2   2   1   2   3   1   2   1   2   1   2   2   2     
+Haggle :                                                                                    
+Heal   :                                                                                    
+Hide   :  4                                                                                 
+Intim  :  4                                                                                 
+Jump   :  4                                                                                 
+Listen :                                                                                    
+Move Si:  4                                                                                 
+Open Lo:  4                   5               4           3   1   1   2   1   2   2   3     
+Perform:                                                                                    
+Repair :                                                                                    
+Search :  4   2   2   2   2   1   2   2   2   1   2   2   1   2   1   2   1   2   2   2     
+Spellcr:  4                   2               7           9      11       7                 
+Spot   :  4   2   2   2   2   1   2   2   2   1   2   2   1   2   1   2   1   2   2   2     
+Swim   :                                                                                    
+Tumble :  4   2   2   2   2   1   2   2   2   1   2   2   1   2   1   2   1   2   2   2     
+UMD    :  4   2   2   2   2   1   2   2   2   1   2   2   1   2   1   2   1   2   2   2     
+
+
+[Feats]
+
+Standard: Heroic 1	Toughness
+Standard: Heroic 3	Two Weapon Fighting
+Standard: Heroic 6	Empower Spell
+Standard: Heroic 9	Maximize Spell
+Standard: Heroic 12	Improved Critical: Piercing
+Standard: Heroic 15	Toughness
+Standard: Heroic 18	Heighten Spell
+
+Race: Human 1	Least Dragonmark: Passage
+
+Class: Wizard 1	Spell Focus: Evocation
+Class: Wizard 5	Quicken Spell
+Class: Wizard 10	Enlarge Spell
+
+Class: Fighter 1	Weapon Focus: Piercing
+Class: Fighter 2	Power Attack
+Class: Fighter 4	Precision
+
+Alternate: Heroic 1	Dodge
+Alternate: Heroic 18	Spell Penetration
+
+Exchange: Heroic 6	15	Extend Spell
+
+
+[Spells]
+
+Spell: Wizard 1	Acid Spray
+Spell: Wizard 1	Burning Hands
+Spell: Wizard 1	Charm Person
+Spell: Wizard 1	Cause Fear
+Spell: Wizard 1	Chill Touch
+
+Spell: Wizard 2	Bear's Endurance
+Spell: Wizard 2	Blindness
+Spell: Wizard 2	Blur
+Spell: Wizard 2	Bull's Strength
+Spell: Wizard 2	Cat's Grace
+
+Spell: Wizard 3	Acid Blast
+Spell: Wizard 3	Chain Missiles
+Spell: Wizard 3	Deep Slumber
+Spell: Wizard 3	Dispel Magic
+
+Spell: Wizard 4	Acid Rain
+Spell: Wizard 4	Bestow Curse
+Spell: Wizard 4	Burning Blood
+Spell: Wizard 4	Charm Monster
+
+Spell: Wizard 5	Ball Lightning
+Spell: Wizard 5	Break Enchantment
+Spell: Wizard 5	Cloudkill
+
+
+[Enhancements]
+
+Tier5: Archmage
+RacialAP: 3
+UniversalAP: 4
+
+Tree: Archmage
+Type: Class
+Source: Wizard
+ClassLevels: 10
+Ability: Tier 0: Archmage Specialization: Evocation
+Ability: Tier 0: Archmage Specialization II: Evocation
+Ability: Tier 1: Energy of the Scholar (Rank 3)
+Ability: Tier 1: Spell Critical
+Ability: Tier 1: Wand and Scroll Mastery (Rank 3)
+Ability: Tier 1: Subtle Spellcasting (Rank 3)
+Ability: Tier 2: Efficient Metamagic: Efficient Maximize (Rank 3)
+Ability: Tier 2: Spell Critical II
+Ability: Tier 2: Spellcraft (Rank 3)
+Ability: Tier 3: Spell Critical III
+Ability: Tier 3: Spell Penetration (Rank 3)
+Ability: Tier 3: Intelligence
+Ability: Tier 4: Spell Critical IV
+Ability: Tier 4: Intelligence
+Ability: Tier 4: School Mastery: Evocation
+Ability: Tier 4: Efficient Heighten (Rank 2)
+Ability: Tier 5: Arcane Supremacy
+Ability: Tier 5: Spell Mastery
+
+Tree: Thief-Acrobat
+Type: Class
+Source: Rogue
+ClassLevels: 6
+Ability: Tier 0: Staff Control
+Ability: Tier 0: Stick Fighting
+Ability: Tier 1: Thief Acrobatics (Rank 3)
+Ability: Tier 1: Fast Movement
+Ability: Tier 1: Charming (Rank 3)
+Ability: Tier 2: Haste Boost
+Ability: Tier 2: Subtlety (Rank 2)
+
+Tree: Kensei
+Type: Class
+Source: Fighter
+ClassLevels: 4
+Ability: Tier 0: Kensei Focus: Light Blades
+Ability: Tier 1: Weapon Group Specialization I: Light Blades
+Ability: Tier 1: Action Boost: Haste Boost
+Ability: Tier 1: Extra Action Boost (Rank 2)
+
+Tree: Human
+Type: Race
+ClassLevels: 20
+Ability: Tier 0: Human Versatility: Human Spell Power Boost
+Ability: Tier 1: Dragonmark Focus: Orien Dragonmark Focus (Rank 3)
+
+Tree: Falconry
+Type: Global
+ClassLevels: 20
+Ability: Tier 0: Summon Avian Companion: Raven
+Ability: Tier 1: Hunter's Knowledge
+Ability: Tier 1: Rugged (Rank 1)
+
+
+[LevelingGuide]
+
+Guide: Human Tier 0: Human Versatility: Human Spell Power Boost
+Guide: ThiefAcro Tier 0: Staff Control
+Guide: Human Tier 1: Dragonmark Focus: Orien Dragonmark Focus (Rank 1)
+Guide: Archmage Tier 0: Archmage Specialization: Evocation
+Guide: Archmage Tier 1: Energy of the Scholar (Rank 1)
+Guide: Archmage Tier 1: Energy of the Scholar (Rank 2)
+Guide: Kensei Tier 0: Kensei Focus: Light Blades
+Guide: Kensei Tier 1: Action Boost: Haste Boost
+Guide: Bank AP
+Guide: Reset Tree: Kensei
+Guide: Archmage Tier 1: Spell Critical
+Guide: Falconry Tier 0: Summon Avian Companion: Raven
+Guide: Reset All Trees
+Guide: Archmage Tier 0: Archmage Specialization: Evocation
+Guide: Archmage Tier 1: Spell Critical
+

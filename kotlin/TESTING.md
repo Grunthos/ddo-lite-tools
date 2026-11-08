@@ -19,7 +19,7 @@ With the 4.15 exe, VB's saves and exports can be captured once and compared by t
 which is far more thorough than comparing by eye. The builds to capture, and the steps, are in
 [test-builds/golden/CAPTURE.md](test-builds/golden/CAPTURE.md).
 
-- [ ] Capture done (`kotlin/golden/snapshot-4.15/`).
+- [ ] Capture done (`kotlin/test-builds/golden/vb-4.15/`). So far: the four Golden .build files.
 
 Once the tests compare against the capture, they cover the content of these items, so they only need
 a look at colours (red slots, highlights) against the capture's screenshots: §2's round trip and

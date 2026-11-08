@@ -1,0 +1,3 @@
+VB: Character Builder Lite 4.15.0 (official exe)
+Data: 0c57d69 (last commit to Data/; no local changes)
+Captured: 2026-11-08

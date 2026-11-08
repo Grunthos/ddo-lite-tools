@@ -3,7 +3,7 @@
 # .build files must be CRLF: VB and the Kotlin reader split them on CRLF
 *.build text eol=crlf
 # Kotlin conversion: keep golden outputs byte-for-byte, scripts with their native line endings
-kotlin/golden/** -text
+kotlin/test-builds/golden/vb-*/** -text
 kotlin/gradlew text eol=lf
 kotlin/gradlew.bat text eol=crlf
 *.jar binary

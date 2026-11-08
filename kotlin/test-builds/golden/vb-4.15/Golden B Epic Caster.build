@@ -1,0 +1,294 @@
+[Overview]
+
+Name: Golden B Epic Caster
+Race: Aasimar
+Alignment: Lawful Good
+MaxLevels: 34
+MaxLevels: 34
+
+Class: Favored Soul
+Class: Warlock
+
+Level: 1	Favored Soul
+Level: 2	Favored Soul
+Level: 3	Favored Soul
+Level: 4	Favored Soul
+Level: 5	Favored Soul
+Level: 6	Favored Soul
+Level: 7	Warlock
+Level: 8	Warlock
+Level: 9	Favored Soul
+Level: 10	Favored Soul
+Level: 11	Favored Soul
+Level: 12	Favored Soul
+Level: 13	Favored Soul
+Level: 14	Favored Soul
+Level: 15	Favored Soul
+Level: 16	Favored Soul
+Level: 17	Favored Soul
+Level: 18	Favored Soul
+Level: 19	Favored Soul
+Level: 20	Favored Soul
+
+
+[Stats]
+
+Preferred: Legend
+
+Adventurer: No
+Champion: No
+Hero: No
+;    Advn  Chmp  Hero  Lgnd  Tome
+;    ----  ----  ----  ----  ----
+STR:                     2      
+DEX:                     2      
+CON:                    10     6
+INT:                            
+WIS:                    16     8
+CHA:                     6     4
+;    ----  ----  ----  ----
+;                       36   
+
+Levelup: 0	Wisdom
+Levelup: 4	Wisdom
+Levelup: 8	Wisdom
+Levelup: 12	Wisdom
+Levelup: 16	Wisdom
+Levelup: 20	Wisdom
+Levelup: 24	Wisdom
+Levelup: 28	Wisdom
+Levelup: 32	Wisdom
+Levelup: 36	
+
+
+[Skills]
+
+;         1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  Tome
+;        ------------------------------------------------------------------------------------
+Balance:                                                                                    
+Bluff  :                                                                                    
+Concent:  4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1     
+Diplo  :                                                                                    
+Disable:                                                                                    
+Haggle :                                                                                    
+Heal   :                                                                                    
+Hide   :                                                                                    
+Intim  :                                                                                    
+Jump   :                                                                                    
+Listen :                                                                                    
+Move Si:                                                                                    
+Open Lo:                                                                                    
+Perform:                                                                                    
+Repair :                                                                                    
+Search :                                                                                    
+Spellcr:                                                                                    
+Spot   :                                                                                    
+Swim   :                                                                                    
+Tumble :                                                                                    
+UMD    :                                                                                    
+
+
+[Feats]
+
+Standard: Heroic 1	Maximize Spell
+Standard: Heroic 3	Past Life: Cleric
+Standard: Heroic 6	Empower Healing Spell
+Standard: Heroic 9	Quicken Spell
+Standard: Heroic 12	Empower Spell
+Standard: Heroic 15	Spell Focus: Evocation
+Standard: Heroic 18	Heighten Spell
+Standard: Epic 21	Great Ability: Wisdom
+Standard: Destiny 22	Epic Spell Power: Light and Alignment
+Standard: Epic 24	Intensify Spell
+Standard: Destiny 25	Epic Spell Power: Positive
+Standard: Epic 27	Great Ability: Wisdom
+Standard: Destiny 28	Fount of Life
+Standard: Epic 30	Master of Fire and Light
+Standard: Destiny 31	Guardian Angel
+Standard: Epic 33	Embolden Spell
+Standard: Destiny 34	Deific Warding
+
+Legend: Legend 30	Scion of: Celestia
+
+Race: Aasimar 1	Bond: Bond of the Protector
+
+Class: Favored Soul 2	Grace of Battle
+Class: Favored Soul 5	Energy Absorption: Fire
+Class: Favored Soul 7	Purity of Heart
+Class: Favored Soul 10	Energy Absorption: Cold
+Class: Favored Soul 15	Energy Absorption: Electricity
+
+Class: Warlock 1	Pact: Celestial
+
+Deity: Deity 1	Follower of: Silver Flame
+Deity: Deity 6	Deity Ability: Silver Flame Exorcism
+
+Alternate: Epic 21	Great Ability: Charisma
+
+Exchange: Heroic 9	18	Augment Summoning
+
+
+[Spells]
+
+Spell: Favored Soul 1	Bane
+Spell: Favored Soul 1	Bless
+Spell: Favored Soul 1	Cause Fear
+Spell: Favored Soul 1	Command
+
+Spell: Favored Soul 2	Aid
+Spell: Favored Soul 2	Bear's Endurance
+Spell: Favored Soul 2	Bull's Strength
+Spell: Favored Soul 2	Close Wounds
+
+Spell: Favored Soul 3	Bestow Curse
+Spell: Favored Soul 3	Blindness
+Spell: Favored Soul 3	Contagion
+Spell: Favored Soul 3	Cure Serious Wounds
+
+Spell: Favored Soul 4	Chaos Hammer
+Spell: Favored Soul 4	Cure Critical Wounds
+Spell: Favored Soul 4	Death Ward
+Spell: Favored Soul 4	Dismissal
+
+Spell: Favored Soul 5	Break Enchantment
+Spell: Favored Soul 5	Divine Punishment
+Spell: Favored Soul 5	Flame Strike
+Spell: Favored Soul 5	Greater Command
+
+Spell: Favored Soul 6	Banishment
+Spell: Favored Soul 6	Blade Barrier
+Spell: Favored Soul 6	Cometfall
+
+Spell: Favored Soul 7	Destruction
+Spell: Favored Soul 7	Greater Restoration
+Spell: Favored Soul 7	Mass Cure Serious Wounds
+
+Spell: Favored Soul 8	Death Pact
+Spell: Favored Soul 8	Fire Storm
+
+Spell: Favored Soul 9	Celestial Bombardment
+
+Spell: Warlock 1	Bane
+Spell: Warlock 1	Cause Fear
+Spell: Warlock 1	Bless
+
+
+[Enhancements]
+
+Tier5: Beacon of Hope
+RacialAP: 2
+
+Tree: Beacon of Hope
+Type: Class
+Source: Favored Soul
+ClassLevels: 18
+Ability: Tier 0: Pleasant Disposition
+Ability: Tier 0: Beacon of Grace
+Ability: Tier 0: Shining Light
+Ability: Tier 0: Beacon of Hope
+Ability: Tier 0: Flight of Glory
+Ability: Tier 1: Spell Critical
+Ability: Tier 1: Spell Points (Rank 3)
+Ability: Tier 1: Divine Durability (Rank 3)
+Ability: Tier 1: Good Hope
+Ability: Tier 2: Spell Critical II
+Ability: Tier 2: Close Wounds
+Ability: Tier 2: Might's Reward: Wisdom
+Ability: Tier 2: Divine Durability (Rank 3)
+Ability: Tier 3: Spell Critical III
+Ability: Tier 3: Efficient Empower Healing
+Ability: Tier 3: Stat: Wisdom
+Ability: Tier 4: Spell Critical IV
+Ability: Tier 4: Stat: Wisdom
+Ability: Tier 4: Optimism
+Ability: Tier 4: Death Ward
+Ability: Tier 5: Hope for Success
+Ability: Tier 5: Heal
+Ability: Tier 5: Undying Beacon
+Ability: Tier 5: Raise Dead
+
+Tree: Angel of Vengeance
+Type: Class
+Source: Favored Soul
+ClassLevels: 18
+Ability: Tier 0: Font of Power
+Ability: Tier 0: Shield of Condemnation
+Ability: Tier 1: Nimbus of Light
+Ability: Tier 1: Scourge (Rank 3)
+Ability: Tier 1: Angelic Resistance (Rank 2)
+Ability: Tier 1: Inquisition (Rank 2)
+Ability: Tier 2: Spell Power Boost
+Ability: Tier 2: Efficient Metamagic: Efficient Maximize (Rank 1)
+Ability: Tier 2: Just Reward (Rank 3)
+Ability: Tier 2: Wand and Scroll Mastery (Rank 3)
+
+Tree: Tainted Scholar
+Type: Class
+Source: Warlock
+ClassLevels: 2
+Ability: Tier 0: Tainted Spellcasting
+Ability: Tier 1: Planar Power (Rank 3)
+Ability: Tier 1: Eldritch Focus (Rank 2)
+
+Tree: Aasimar
+Type: Race
+ClassLevels: 34
+Ability: Tier 0: Stronger Bonds
+Ability: Tier 0: Stronger Bonds II: Protector
+Ability: Tier 1: Fight the Wicked
+Ability: Tier 1: Counsel (Rank 3)
+Ability: Tier 1: True Resilience: Protector (Rank 2)
+
+
+[LevelingGuide]
+
+Guide: Aasimar Tier 0: Stronger Bonds
+Guide: TaintedSchol Tier 0: Tainted Spellcasting
+Guide: Aasimar Tier 1: Counsel (Rank 1)
+Guide: BeaconHope Tier 0: Pleasant Disposition
+Guide: BeaconHope Tier 1: Spell Critical
+Guide: AngelVeng Tier 0: Font of Power
+Guide: Bank AP
+Guide: BeaconHope Tier 1: Divine Durability (Rank 1)
+
+
+[Destiny]
+
+PermDestinyPoints: 15
+Destiny: Exalted Angel
+Type: Destiny
+Ability: Tier 0: Astral Touch
+Ability: Tier 0: Deepening Faith
+Ability: Tier 0: Angelic Charge
+Ability: Tier 0: Heavenly Ability: Heavenly Blessing
+Ability: Tier 1: Subtle Flame (Rank 3)
+Ability: Tier 1: Born By Flame (Rank 3)
+Ability: Tier 1: Destiny Mantle: Angelic Form
+Ability: Tier 1: Holy Strike: Healing Pillar
+Ability: Tier 2: Divine Protection (Rank 3)
+Ability: Tier 2: Saving Grace (Rank 3)
+Ability: Tier 2: Angelic Body
+Ability: Tier 3: Exalted Angel Spell Focus: Evocation (Rank 3)
+Ability: Tier 3: Noble Affinity: Sun Bolt
+Ability: Tier 3: Angelic Soul
+Ability: Tier 3: Purity of Mind and Soul (Rank 3)
+Ability: Tier 4: Blood and Radiance
+Ability: Tier 4: Holy Presence
+Ability: Tier 4: Enhanced Metamagics: Empower (Rank 3)
+Ability: Tier 5: Enhanced Angelic Spell Focus (Rank 3)
+Ability: Tier 5: Heavenly Magic: Holy Fireball
+Ability: Tier 5: Ascendance
+Ability: Tier 5: Enhanced Metamagics II: Intensify
+
+Destiny: Divine Crusader
+Type: Destiny
+Ability: Tier 0: Just Cause
+Ability: Tier 0: Confront any Foe
+Ability: Tier 1: Spear of Light (Rank 3)
+Ability: Tier 1: Consecration
+Ability: Tier 1: Shield of Justice (Rank 2)
+
+Destiny: Unyielding Sentinel
+Type: Destiny
+Ability: Tier 0: Unyielding
+

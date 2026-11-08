@@ -202,11 +202,11 @@ ddo-lite-tools/
     tools/validate/             data validator CLI (CI)
     tools/bld-convert/          binary .bld → .build converter
     tools/refresh-data/         replacement for frmRefreshData (wiki spell scrape)
-    golden/                     golden files + manifests (§6)
+    test-builds/golden/         golden input builds, and what VB wrote for them in vb-<version>/ (§6)
 ```
 
 - Tests read `../Data` directly. Golden tests use a **pinned copy** of the data (§6.3).
-- `.gitattributes`: add `kotlin/golden/** -text` so git doesn't change golden line endings.
+- `.gitattributes`: `kotlin/test-builds/golden/vb-*/** -text` so git doesn't change golden line endings.
 - `.gitignore`: add `kotlin/**/build/`, `kotlin/.gradle/`, `kotlin/.idea/`, `kotlin/local.properties`.
 - `Make-Release.ps1` names folders explicitly, so `kotlin/` never ships in the VB6 zip.
 - JDK 21 (LTS), current stable Kotlin 2.x and Compose Multiplatform at project start; pin versions in `libs.versions.toml`.
@@ -266,18 +266,19 @@ Cover, at least:
 
 ### 6.4 Storage and the manifest
 ```
-kotlin/golden/
-  snapshot-<date>/
-    manifest.json        { dataCommit, exeName, exeVersion, capturedBy, capturedOn, notes }
-    Data/                pinned copy of Data/ used for capture
+kotlin/test-builds/golden/
+  A Three Class.build …        the input builds (written to cover 6.2)
+  CAPTURE.md                   the capture checklist
+  vb-<version>/                what VB wrote, flat
+    manifest.txt               VB version and the Data/ commit used
     error.log
-    builds/<name>/
-      input.build
-      forum-<format>.txt
-      ron.txt, ddobuilder.txt, guide.csv, guide.txt
-      screens/<form>.png
+    Golden <build>.build       VB's Save As
+    Golden <build> forum-<format>.txt, … ddobuilder.ddocp, … guide.csv, … guide.txt
+    <build> <window>.png
 ```
-- Capture procedure: start the exe with the build path as its argument (`CharacterBuilderLite.exe "<file>"`; the Builder accepts a file on the command line, `basMain.bas:30`). Then File ▸ Export ▸ to Forums, pick the format, Copy, and paste into the file. Optionally automate with pywinauto/AutoHotkey.
+- Capture procedure: [test-builds/golden/CAPTURE.md](test-builds/golden/CAPTURE.md). (2026-11-08: the
+  snapshot lives beside its input builds rather than in `kotlin/golden/`, and records the Data/ commit
+  instead of keeping a copy of Data/.)
 - **Rule:** recapture after any Data or VB6 code change that affects captured builds. Never edit golden files by hand.
 
 **Exit criteria 1A:** one complete snapshot committed, with a manifest, covering every checklist item in 6.2.
@@ -311,7 +312,7 @@ Each step lists its deliverables and the test that marks it done.
 ### B3 – Validator CLI (`tools/validate`)
 - [ ] Reports the same problems as the VB6 load log. Exit code ≠ 0 on errors.
 - [ ] CI job runs on every push or PR that touches `Data/`.
-- **Done when:** output matches `golden/snapshot-*/error.log` (same set of errors, wording may differ, differences explained). **First comparison against VB6, and the point to propose merging to `master` (D-3).**
+- **Done when:** output matches `test-builds/golden/vb-*/error.log` (same set of errors, wording may differ, differences explained). **First comparison against VB6, and the point to propose merging to `master` (D-3).**
 
 ### B4 – Build model and `.build` reading and writing
 - [x] `Build` model (`builder-core` package `ddolite.builder.build`, replaces `BuildType6`). It is mutable, like VB's
