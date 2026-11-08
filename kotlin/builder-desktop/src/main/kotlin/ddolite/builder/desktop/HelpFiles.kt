@@ -2,6 +2,7 @@ package ddolite.builder.desktop
 
 import ddolite.builder.data.LoadLog
 import ddolite.common.help.HelpText
+import ddolite.dataformat.Vb
 import ddolite.dataformat.Windows1252
 import ddolite.dataformat.decodeText
 import ddolite.builder.ui.BuilderSession
@@ -41,7 +42,7 @@ class HelpFiles(private val root: Path) {
             return false
         }
         try {
-            errorLog.writeBytes(Windows1252.encode(text))
+            errorLog.writeBytes(Windows1252.encode(Vb.saveStringAs(text)))
         } catch (e: Exception) {
             return false
         }

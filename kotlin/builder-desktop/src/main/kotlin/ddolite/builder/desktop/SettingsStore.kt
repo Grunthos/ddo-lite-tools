@@ -1,6 +1,7 @@
 package ddolite.builder.desktop
 
 import ddolite.builder.settings.BuilderSettings
+import ddolite.dataformat.Vb
 import ddolite.dataformat.Windows1252
 import ddolite.dataformat.decodeText
 import java.nio.file.Files
@@ -40,7 +41,7 @@ class SettingsStore(private val root: Path) {
     /** SaveSettings: the whole file, as Windows-1252 text (as VB's xp.File.SaveStringAs). */
     fun save(settings: BuilderSettings) {
         try {
-            Files.write(kotlinFile, Windows1252.encode(settings.write()))
+            Files.write(kotlinFile, Windows1252.encode(Vb.saveStringAs(settings.write())))
         } catch (e: Exception) {
             JOptionPane.showMessageDialog(null, "Can't save the settings to " + kotlinFile + ":\n" + e.message, "Settings", JOptionPane.ERROR_MESSAGE)
         }

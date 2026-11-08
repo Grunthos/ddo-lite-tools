@@ -139,4 +139,16 @@ object Vb {
         }
         return r.toInt()
     }
+
+    /**
+     * The text VB's `xp.File.SaveStringAs` (clsFile.cls:549) puts in a file. It writes with
+     * `Print #`, which adds a CRLF; text already ending in two CRLFs loses one first, so it ends
+     * the same. Every VB save of builds, exports, settings, formats and the error log goes through it.
+     */
+    fun saveStringAs(text: String): String {
+        if (text.endsWith("\r\n\r\n")) {
+            return text
+        }
+        return text + "\r\n"
+    }
 }

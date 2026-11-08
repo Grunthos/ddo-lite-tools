@@ -1,5 +1,6 @@
 package ddolite.builder.desktop
 
+import ddolite.dataformat.Vb
 import ddolite.dataformat.Windows1252
 import java.awt.FileDialog
 import java.awt.Frame
@@ -32,7 +33,7 @@ internal fun writeFormatFile(file: File, text: String) {
         if (file.exists()) {
             file.delete()
         }
-        file.writeBytes(Windows1252.encode(text))
+        file.writeBytes(Windows1252.encode(Vb.saveStringAs(text)))
     } catch (e: Exception) {
         JOptionPane.showMessageDialog(null, "Can't save " + file.name + ":\n" + e.message, "Save As", JOptionPane.ERROR_MESSAGE)
     }

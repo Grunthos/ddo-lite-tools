@@ -2,6 +2,7 @@ package ddolite.builder.desktop
 
 import ddolite.builder.output.GuideExport
 import ddolite.builder.output.PlannerExport
+import ddolite.dataformat.Vb
 import ddolite.dataformat.Windows1252
 import ddolite.builder.ui.BuilderSession
 import java.awt.Desktop
@@ -106,7 +107,7 @@ class Exports(private val files: BuildFiles) {
 
     private fun write(parent: Frame, target: File, text: String): Boolean {
         try {
-            target.writeBytes(Windows1252.encode(text))
+            target.writeBytes(Windows1252.encode(Vb.saveStringAs(text)))
         } catch (e: Exception) {
             JOptionPane.showMessageDialog(parent, "Can't save " + target.name + ":\n" + e.message, "Save", JOptionPane.ERROR_MESSAGE)
             return false

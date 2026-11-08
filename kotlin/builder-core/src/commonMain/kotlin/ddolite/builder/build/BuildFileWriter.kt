@@ -27,11 +27,7 @@ fun writeBuildFile(rules: BuildRules): ByteArray = Windows1252.encode(writeBuild
 fun writeBuildText(rules: BuildRules): String {
     val writer = BuildFileWriter(rules)
     writer.write()
-    var text = writer.text()
-    if (text.endsWith("\r\n\r\n")) {
-        text = text.substring(0, text.length - 2)
-    }
-    return text + "\r\n"
+    return Vb.saveStringAs(writer.text())
 }
 
 /** VB's line array (`mstrLine`, `mlngLines`) and the Save routines of basFormatLite. */
