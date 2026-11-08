@@ -20,9 +20,9 @@ fun writeBuildFile(rules: BuildRules): ByteArray = Windows1252.encode(writeBuild
  *
  * VB quirks, kept:
  * - "MaxLevels:" is written twice.
- * - A deity feat's slot is written with its character level ("Deity 7"), but reading matches deity
- *   slots by class level, so a deity feat whose class level differs from its character level is
- *   lost when the file is opened again.
+ *
+ * A deity feat's slot is written with its character level ("Deity 7"), as VB does; VB reads it back
+ * by class level and loses it (VB-BUGS #7), Kotlin by character level.
  */
 fun writeBuildText(rules: BuildRules): String {
     val writer = BuildFileWriter(rules)

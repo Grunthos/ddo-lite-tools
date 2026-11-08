@@ -111,21 +111,23 @@ class BuildFileTest {
     }
 
     @Test
-    fun deityFeatsAreSavedByLevelButReadByClassLevel() {
+    fun deityFeatsAreSavedAndReadByCharacterLevel() {
         // Cleric from level 4: deity slots at class levels 1 and 6 are character levels 4 and 9.
         val levels = StringBuilder("Class: Fighter\nClass: Cleric\n\n")
         for (level in 1..20) {
             levels.append("Level: ").append(level).append('\t').append(if (level <= 3) "Fighter" else "Cleric").append('\n')
         }
+        // Written by class level: no deity slot at character level 1 or 6, so class level is matched.
         val result = read(overview(levels.toString()) + "[Feats]\n\nDeity: Deity 1\tToughness\nDeity: Deity 6\tPurity of Heart\n")
         val deity = result.build.feats(BuildFeatType.DEITY)
         assertEquals(listOf(4, 9), deity.map { it.level })
         assertEquals(listOf("Toughness", "Purity of Heart"), deity.map { it.featName })
         val saved = writeBuildText(result.rules)
         assertTrue(saved.contains("Deity: Deity 4\tToughness\r\n"), saved)
-        // Reading that back finds no deity slot at class level 4 or 9: both feats are lost, as in VB.
+        assertTrue(saved.contains("Deity: Deity 9\tPurity of Heart\r\n"), saved)
+        // VB finds no deity slot at class level 4 or 9 and loses both (VB-BUGS #7); Kotlin keeps them.
         val reread = read(saved.replace("\r\n", "\n"))
-        assertEquals(listOf("", ""), reread.build.feats(BuildFeatType.DEITY).map { it.featName })
+        assertEquals(listOf("Toughness", "Purity of Heart"), reread.build.feats(BuildFeatType.DEITY).map { it.featName })
     }
 
     @Test

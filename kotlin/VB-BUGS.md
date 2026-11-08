@@ -55,8 +55,11 @@ is lost; **Wrong** = a wrong result or rule; **Display** = cosmetic.
    writes `"Deity " & .Level`; load: `:1016` `IdentifySlot` matches deity slots on `.ClassLevel`
    (the comment says "Deity feats are based on class level"). A deity feat whose character level
    differs from its class level (any multiclass, e.g. Fighter 1 / Cleric 2 → Deity at level 3,
-   class level 1) is **lost when the file is reopened**. *Fix:* write `.ClassLevel`; to read old
-   files, fall back to matching `.Level` when no class level matches.
+   class level 1) is **lost when the file is reopened** (VB 4.15 saves golden build D's as Deity 2 and 12).
+   *Fix:* in `IdentifySlot`, match deity slots on `.Level`, falling back to `.ClassLevel` when no
+   level matches. (Writing `.ClassLevel` instead wouldn't do: Cleric, Paladin and Dark Apostate get
+   deity slots at class levels 1 and 6, Favored Soul at 1, 6 and 20, so a build with two of those
+   classes has two slots at the same class level.) **The Kotlin version fixes this** that way.
 
 8. **Warlock pact spells are empty after opening a build.** `Modules/Build/basMain.bas:254-268`
    `CascadeChanges` runs `InitBuildSpells` before `InitBuildFeats`; on load (`basDocuments.bas:294`)

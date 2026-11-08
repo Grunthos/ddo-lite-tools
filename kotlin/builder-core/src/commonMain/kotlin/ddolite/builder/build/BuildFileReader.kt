@@ -440,8 +440,8 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
     }
 
     /**
-     * The feat slot "Kind n" names: its kind and 0-based index, or null. Standard slots are found by
-     * character level, class and deity slots by class level. Ported from `IdentifySlot`
+     * The feat slot "Kind n" names: its kind and 0-based index, or null. Standard and deity slots are
+     * found by character level, class slots by class level. Ported from `IdentifySlot`
      * (basFormatLite.bas:999) and `IdentifySlotType` (:1034).
      */
     private fun identifySlot(raw: String): SlotRef? {
@@ -453,9 +453,23 @@ private class BuildFileReader(private val data: BuilderData, preferred: BuildPoi
         var index = 0
         when (type) {
             BuildFeatType.ALTERNATE, BuildFeatType.EXCHANGE -> index = 0
-            BuildFeatType.CLASS1, BuildFeatType.CLASS2, BuildFeatType.CLASS3, BuildFeatType.DEITY -> {
+            BuildFeatType.CLASS1, BuildFeatType.CLASS2, BuildFeatType.CLASS3 -> {
                 while (index < slots.size && slots[index].classLevel != number) {
                     index++
+                }
+            }
+            BuildFeatType.DEITY -> {
+                // Kotlin fix (VB-BUGS #7): VB writes deity slots by character level but matches them by
+                // class level, losing them. Character level first (what VB writes; two deity classes can
+                // share a class level), then class level for a file written that way.
+                while (index < slots.size && slots[index].level != number) {
+                    index++
+                }
+                if (index >= slots.size) {
+                    index = 0
+                    while (index < slots.size && slots[index].classLevel != number) {
+                        index++
+                    }
                 }
             }
             else -> {
